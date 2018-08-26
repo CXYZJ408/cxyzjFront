@@ -1,5 +1,5 @@
 <template>
-    <v-app class="back" :style="{'background-image':'url('+ bg_url +') '}">
+    <v-app class="background" :style="{'background-image':'url('+ bg_url +') '}">
         <nuxt/>
         <Foot></Foot>
     </v-app>
@@ -34,11 +34,10 @@
   }
 </script>
 <style scoped>
-    .back {
-        background-repeat: no-repeat;
-        background-size: cover;
+    .background {
+        background-size: 100% 100%;
         width: 100%;
-        height: 150vh;
         overflow: hidden;
+        background: no-repeat fixed;
     }
 </style>

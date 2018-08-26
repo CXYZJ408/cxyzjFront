@@ -1,12 +1,12 @@
 <template>
-    <v-flex md12>
+    <v-flex md12 style="z-index:999">
         <v-toolbar flat fixed class="elevation-5">
             <v-layout align-center justify-center row>
                 <v-flex wrap md1 offset-md1 sm2 xs3 text-md-center text-xs-center>
                     <div><img style="width: 50%" src="/img/login/logo-small.png" alt=""></div>
                 </v-flex>
                 <v-flex wrap md3 sm2 xs3>
-                    <mymenu :icon_list="icons"></mymenu>
+                    <mymenu :icons="icons"></mymenu>
                 </v-flex>
                 <v-spacer></v-spacer>
                 <v-flex wrap md2 sm3 xs4 @mouseleave="show_name=false">

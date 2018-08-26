@@ -12,7 +12,7 @@ module.exports = {
     link: [
       {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'},
       {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'},
-      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_69qmcawp7aq.css'}
+      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_6aqho7g7esl.css'}
     ]
   },
   plugins: [

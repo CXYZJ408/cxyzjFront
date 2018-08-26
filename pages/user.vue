@@ -3,9 +3,7 @@
         <v-layout wrap>
             <toolbar :head="user.head_url" :name="user.nickname" :color="user.theme_color"></toolbar>
         </v-layout>
-        <v-layout wrap pt-3 mt-5 justify-center row fill-height>
-
-        </v-layout>
+        <nuxt-child/>
     </v-container>
 
 </template>
@@ -14,7 +12,7 @@
   import toolbar from '~/components/user/userToolBar.vue'
 
   export default {
-    name: 'setting',
+    name: 'index',
     components: {
       toolbar
     },
@@ -44,6 +42,10 @@
 </script>
 
 <style scoped>
+
+    .back {
+        background-color: rgba(255, 255, 255, .9);
+    }
 
 
 </style>

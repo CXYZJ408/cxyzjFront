@@ -1,9 +1,10 @@
 <template>
     <v-app class="back">
-
         <v-container grid-list-md text-xs-center fluid>
             <v-layout align-center justify-center pt-3>
-                <Logo></Logo>
+                <v-flex id="logo" md2 sm3 xs6>
+                    <div><img src="/img/login/logo-small.png"></div>
+                </v-flex>
             </v-layout>
             <v-layout align-center justify-center pt-3>
                 <nuxt/>
@@ -32,12 +33,11 @@
 </template>
 
 <script>
-  import Logo from '~/components/user/Logo'
   import Foot from '~/components/Footer'
 
   export default {
     components: {
-      Logo, Foot
+      Foot
     }
   }
 </script>
@@ -59,5 +59,13 @@
         width: 100%;
     }
 
+    #logo {
+        z-index: 50;
+    }
+
+    #logo img {
+        width: 80%;
+        height: 80%;
+    }
 
 </style>

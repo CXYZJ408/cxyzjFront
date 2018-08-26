@@ -3,15 +3,15 @@
         <v-layout wrap>
             <toolbar :head="user.head_url" :name="user.nickname" :color="user.theme_color"></toolbar>
         </v-layout>
-        <v-layout wrap pt-3 mt-5 justify-center row fill-height>
+        <v-layout wrap pt-3 mt-5 row fill-height>
             <v-flex md12 xl10 offset-xl1 sm12 class="elevation-12 back">
-                <myhead></myhead>
+                <myhead :user="user"></myhead>
                 <v-layout>
                     <v-flex md2 class="left">
                         <leftMenu></leftMenu>
                     </v-flex>
                     <v-flex md10 class="pr-3 " style="padding: 0!important;">
-                       <nuxt-child/>
+                        <nuxt-child/>
                     </v-flex>
                 </v-layout>
             </v-flex>
@@ -42,8 +42,8 @@
           phone: '17602545735',
           theme_color: 'orange',
           role: 'user',
-          introduce: 'xxx',
-          gender: 2,
+          introduce: 'Listen to your favorite artists and albums whenever and wherever, online and offline.Listen to your favorite artists andalbums whenever and wherever, online and offline.',
+          gender: 1,
           attentions: 0,
           fans: 0,
           articles: 0,
@@ -61,17 +61,12 @@
 
     .back {
         background-color: rgba(255, 255, 255, .9);
+        min-height: 600px;
     }
 
     .left {
         margin: 0;
         padding: 0 !important;
-
     }
 
-    .main {
-        box-shadow: none;
-        background-color: rgba(255, 255, 255, .7);
-        height: 100%;
-    }
 </style>
