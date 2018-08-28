@@ -38,3 +38,7 @@ body::-webkit-scrollbar {
 .icon {
     height: auto;
 }
+body{
+    padding: 0!important;
+    margin: 0!important;
+}

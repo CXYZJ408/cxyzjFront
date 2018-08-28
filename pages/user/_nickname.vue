@@ -1,23 +1,17 @@
 <template>
-    <v-container grid-list-md>
-        <v-layout wrap>
-            <toolbar :head="user.head_url" :name="user.nickname" :color="user.theme_color"></toolbar>
-        </v-layout>
-        <v-layout wrap pt-3 mt-5 row fill-height>
-            <v-flex md12 xl10 offset-xl1 sm12 class="elevation-12 back">
-                <myhead :user="user"></myhead>
-                <v-layout>
-                    <v-flex md2 class="left">
-                        <leftMenu></leftMenu>
-                    </v-flex>
-                    <v-flex md10 class="pr-3 " style="padding: 0!important;">
-                        <nuxt-child/>
-                    </v-flex>
-                </v-layout>
-            </v-flex>
-        </v-layout>
-    </v-container>
-
+    <v-layout wrap  mt-5 row fill-height>
+        <v-flex md12 xl10 offset-xl1 sm12 class="elevation-12 back">
+            <myhead :user="user"></myhead>
+            <v-layout>
+                <v-flex md2 class="left">
+                    <leftMenu></leftMenu>
+                </v-flex>
+                <v-flex md10 class="pr-3 " style="padding: 0!important;">
+                    <nuxt-child/>
+                </v-flex>
+            </v-layout>
+        </v-flex>
+    </v-layout>
 </template>
 
 <script>

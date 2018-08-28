@@ -1,7 +1,8 @@
 <template>
-    <v-container grid-list-md>
+    <v-container wrap>
         <v-layout wrap>
-            <toolbar :head="user.head_url" :name="user.nickname" :color="user.theme_color"></toolbar>
+            <toolbar :avatar="user.head_url" :icons="icons" :nickname="user.nickname"
+                     :theme_color="user.theme_color"></toolbar>
         </v-layout>
         <nuxt-child/>
     </v-container>
@@ -13,11 +14,18 @@
 
   export default {
     name: 'index',
+    layout: 'user',
     components: {
       toolbar
     },
     data () {
       return {
+        icons: [
+          {class: 'iconfont icon-yonghu', name: '个人中心', iconColor: '#18ADED', fontColor: '#18ADED'},
+          {class: 'iconfont icon-article', name: '文章', iconColor: '#8E44AD'},
+          {class: 'iconfont icon-discussion', name: '讨论', iconColor: '#18ADED'},
+          {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24'},
+          {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800'}],
         user: {
           nickname: 'yaser',
           head_url: '/img/test/head.jpg',

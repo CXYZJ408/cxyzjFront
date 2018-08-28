@@ -40,8 +40,8 @@
                                 <span class="title " @mouseover="showReplier=true">{{comment.replier.nickname}}</span>
                             </nuxt-link>
                         </div>
-                        <v-icon class="ml-3" color="grey">iconfont icon-huifu1</v-icon>
-                        <div @mouseleave="showDiscusser=false" class="d-inline-block ml3">
+                        <v-icon class="ml-2" color="grey">iconfont icon-huifu1</v-icon>
+                        <div @mouseleave="showDiscusser=false" class="d-inline-block ml-2">
                             <transition name="fade">
                                 <div v-show="showDiscusser" class="userCard2" @mouseleave="showDiscusser=false">
                                     <card :user="comment.discusser" class=" elevation-3"></card>

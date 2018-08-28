@@ -25,7 +25,7 @@
                 <span>{{status}}</span>
             </v-flex>
         </v-layout>
-        <v-layout>
+        <v-layout v-if="article.articleInfo.thumbnail.length!==0">
             <v-flex md9>
                 <v-layout row wrap>
                     <v-flex md12 class="title" pl-4 mt-1><strong>
@@ -44,6 +44,17 @@
                 <div class="thumbnail">
                     <img :src="article.articleInfo.thumbnail" alt="">
                 </div>
+            </v-flex>
+        </v-layout>
+        <v-layout row wrap v-if="article.articleInfo.thumbnail.length===0">
+            <v-flex md12 class="title" pl-4 mt-1><strong>
+                <nuxt-link
+                        :to="'/article/'+article.articleInfo.article_id">{{article.articleInfo.title}}
+                </nuxt-link>
+            </strong>
+            </v-flex>
+            <v-flex md12 px-3 pt-2><p class=" grey--text body-2">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{article.articleInfo.article_sum}}</p>
             </v-flex>
         </v-layout>
         <v-layout wrap align-center row>

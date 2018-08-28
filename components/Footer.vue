@@ -18,14 +18,18 @@
 
 <style scoped>
     .foot {
-        background-color: rgba(0, 0, 0,0);
+        background-color: rgba(0, 0, 0, 0);
         z-index: 50;
     }
 
     a {
         text-decoration: none !important;
-        color: white;
+        color: #8590A6;
     }
 
+    .font {
+        font-size: 18px;
+     color: #8590A6;
+    }
 
 </style>

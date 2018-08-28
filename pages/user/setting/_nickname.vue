@@ -1,12 +1,9 @@
 <template>
-    <v-container grid-list-md>
         <v-layout wrap justify-center row>
             <v-flex md9 xl6>
                 <set :user="user"></set>
             </v-flex>
         </v-layout>
-    </v-container>
-
 </template>
 
 <script>

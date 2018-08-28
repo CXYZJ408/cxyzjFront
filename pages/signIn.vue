@@ -90,6 +90,8 @@
     a {
         text-decoration: none;
     }
-
+    .icon{
+        height: 30px;
+    }
 
 </style>

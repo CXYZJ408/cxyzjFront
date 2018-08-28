@@ -1,16 +1,16 @@
 <template>
     <v-layout align-center justify-start row fill-height @mouseleave="show=false">
-        <v-flex md4>
+        <v-flex md4 xl3>
             <v-btn flat @mouseenter="show=true" color="white">
                 <v-icon v-bind:style="{ 'font-size':`${icon_size}px`,'color':icons[0].iconColor }">
                     {{icons[0].class}}
                 </v-icon>
                 <strong v-bind:style="{ 'font-size':font_size +'px',color:icons[0].fontColor}"
-                        class="test">{{icons[0].name}}</strong>
+                        class="pl-2">{{icons[0].name}}</strong>
             </v-btn>
         </v-flex>
         <transition name="slide-fade">
-            <v-flex md8 v-show="show" pl-1>
+            <v-flex md8 v-show="show" pl-3>
                 <el-tooltip v-for="(item,index) in icons" v-if="index>0"
                             :key="index" class="item" effect="dark" :content="item.name" placement="bottom">
 
@@ -67,8 +67,6 @@
 </script>
 
 <style scoped>
-
-
     .v-btn {
         margin: 0;
     }
