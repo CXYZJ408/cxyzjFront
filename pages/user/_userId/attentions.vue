@@ -23,7 +23,7 @@
           {
             user_id: 'xxxxx',
             nickname: '野望',
-            head_url: 'static/img/test/head.jpg',
+            head_url: '/img/test/head.jpg',
             bg_url: 'xxx',
             theme_color: 'xxxx',
             role: 'user',
@@ -39,7 +39,7 @@
           {
             user_id: 'xxxxx',
             nickname: 'yaser',
-            head_url: 'static/img/test/head.jpg',
+            head_url: '/img/test/head.jpg',
             bg_url: 'xxx',
             theme_color: 'xxxx',
             role: 'user',
@@ -55,7 +55,7 @@
           {
             user_id: 'xxxxx',
             nickname: 'yaser',
-            head_url: 'static/img/test/head.jpg',
+            head_url: '/img/test/head.jpg',
             bg_url: 'xxx',
             theme_color: 'xxxx',
             role: 'user',
@@ -71,7 +71,7 @@
           {
             user_id: 'xxxxx',
             nickname: 'yaser',
-            head_url: 'static/img/test/head.jpg',
+            head_url: '/img/test/head.jpg',
             bg_url: 'xxx',
             theme_color: 'xxxx',
             role: 'user',
@@ -87,7 +87,7 @@
           {
             user_id: 'xxxxx',
             nickname: 'yaser',
-            head_url: 'static/img/test/head.jpg',
+            head_url: '/img/test/head.jpg',
             bg_url: 'xxx',
             theme_color: 'xxxx',
             role: 'user',
@@ -103,7 +103,7 @@
           {
             user_id: 'xxxxx',
             nickname: 'yaser',
-            head_url: 'static/img/test/head.jpg',
+            head_url: '/img/test/head.jpg',
             bg_url: 'xxx',
             theme_color: 'xxxx',
             role: 'user',

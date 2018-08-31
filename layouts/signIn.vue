@@ -10,7 +10,7 @@
                 <nuxt/>
             </v-layout>
         </v-container>
-        <Foot></Foot>
+        <Footer></Footer>
         <no-ssr>
             <vue-particles class="particles" color="#5cbdaa"
                            :particleOpacity="0.7"
@@ -33,12 +33,7 @@
 </template>
 
 <script>
-  import Foot from '~/components/Footer'
-
   export default {
-    components: {
-      Foot
-    }
   }
 </script>
 

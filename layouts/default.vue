@@ -1,18 +1,14 @@
 <template>
     <v-app class="background">
         <nuxt/>
-        <Foot></Foot>
+        <no-ssr>
+            <Footer color='#8590A6'></Footer>
+        </no-ssr>
     </v-app>
 </template>
 
 <script>
-  import Foot from '~/components/Footer'
-
-  export default {
-    components: {
-      Foot
-    }
-  }
+  export default {}
 </script>
 <style scoped>
     .background {

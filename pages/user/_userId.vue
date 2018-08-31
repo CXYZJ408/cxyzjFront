@@ -1,6 +1,6 @@
 <template>
-    <v-layout wrap  mt-5 row fill-height>
-        <v-flex md12 xl10 offset-xl1 sm12 class="elevation-12 back">
+    <v-layout wrap mt-5 row fill-height justify-center>
+        <v-flex md10 xl9 sm12 class="elevation-12 back mb-5">
             <myhead :user="user"></myhead>
             <v-layout>
                 <v-flex md2 class="left">
@@ -13,7 +13,6 @@
         </v-flex>
     </v-layout>
 </template>
-
 <script>
   import myhead from '~/components/user/myhead.vue'
   import toolbar from '~/components/user/userToolBar.vue'
@@ -28,6 +27,7 @@
         drawer: true,
         right: null,
         user: {
+          user_id: 'xxxxx',
           nickname: 'yaser',
           head_url: '/img/test/head.jpg',
           email: '335767798@qq.com',
@@ -45,14 +45,17 @@
           comments: 0
         }
       }
+    },
+    mounted () {
+      let id = this.$store.state.user.user_id
+      this.$router.push({path: `/user/${id}/articles`})//重定向
+      // console.log(router.path)
     }
 
   }
 </script>
 
 <style scoped>
-
-
     .back {
         background-color: rgba(255, 255, 255, .9);
         min-height: 600px;

@@ -1,5 +1,5 @@
 <template>
-    <v-container wrap>
+    <v-container wrap grid-list-md fluid>
         <v-layout wrap>
             <toolbar :avatar="user.head_url" :icons="icons" :nickname="user.nickname"
                      :theme_color="user.theme_color"></toolbar>
@@ -27,6 +27,7 @@
           {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24'},
           {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800'}],
         user: {
+          user_id: 'xxxxx',
           nickname: 'yaser',
           head_url: '/img/test/head.jpg',
           email: '335767798@qq.com',

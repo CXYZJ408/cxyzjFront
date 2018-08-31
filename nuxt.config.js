@@ -3,7 +3,7 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: 'Cxyzj',
+    title: '程序员之家',
     meta: [
       {charset: 'utf-8'},
       {name: 'viewport', content: 'width=device-width, initial-scale=1'},
@@ -12,7 +12,7 @@ module.exports = {
     link: [
       {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'},
       {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'},
-      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_196834yf698.css'}
+      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_el51iwa9izu.css'}
     ]
   },
   plugins: [
@@ -21,15 +21,12 @@ module.exports = {
     {src: '~/assets/js/iconfont.js', ssr: false},
     {src: '~/plugins/element.js'},
     {src: '~/plugins/menu.js'},
-    {src: '~/plugins/swiper.js', ssr: false}
-  ],
+    {src: '~/plugins/component.js'}],
   css: [
     '~/assets/style/app.styl',
     '~/assets/style/common.css',
     '~/assets/style/iconfont.css',
-    'element-ui/lib/theme-chalk/index.css',
-    'swiper/dist/css/swiper.css'
-  ],
+    'element-ui/lib/theme-chalk/index.css'],
   /*
   ** Customize the progress bar color
   */
@@ -41,19 +38,9 @@ module.exports = {
     vendor: [
       '~/plugins/vuetify.js'
     ],
-    extractCSS: true,
+    extractCSS: true
     /*
     ** Run ESLint on save
     */
-    extend (config, ctx) {
-      if (ctx.isDev && ctx.isClient) {
-        config.module.rules.push({
-          enforce: 'pre',
-          test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
-          exclude: /(node_modules)/
-        })
-      }
-    }
   }
 }

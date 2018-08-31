@@ -1,6 +1,7 @@
 export const state = () => ({
   isLogin: false,
   user: {
+    user_id: '7777777',
     nickname: 'yaser',
     head_url: '/img/test/head.jpg',
     email: '335767798@qq.com',

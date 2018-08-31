@@ -2,14 +2,14 @@
     <v-card class="article mx-3 mb-3" :class="{'elevation-3': hover}" @mouseover="hover=true"
             @mouseleave="hover=false">
         <v-layout wrap align-center row>
-            <v-flex md4 ml-4 mt-1>
+            <v-flex md10 ml-4 mt-1>
                 <div @mouseleave="show=false" class="d-inline-block">
                     <transition name="fade">
                         <div v-show="show" class="userCard" @mouseleave="show=false">
                             <card :user="article.user" class=" elevation-3"></card>
                         </div>
                     </transition>
-                    <nuxt-link class="user" :to="'/user/'+article.user.nickname+'/articles'">
+                    <nuxt-link class="user" :to="'/user/'+article.user.user_id+'/articles'">
                         <v-avatar size="50">
                             <img :src="article.user.head_url" alt="">
                         </v-avatar>

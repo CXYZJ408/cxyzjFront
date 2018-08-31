@@ -1,55 +1,59 @@
 <template>
-        <v-card class="userCard mt-3 pa-3 ml-2 py-4">
-            <v-layout row wrap justify-center>
-                <v-flex md3>
-                    <v-avatar size="60">
-                        <img src="/img/test/head.jpg" alt="">
-                    </v-avatar>
-                </v-flex>
-                <v-flex md9>
-                    <v-layout row wrap class="grey--text">
-                        <v-flex md6>
-                            <nuxt-link :to="'/user/'+user.nickname+'/attentions'" class="attentions"><span>关注：{{user.attentions}}</span>
-                            </nuxt-link>
-                        </v-flex>
-                        <v-flex md6>
-                            <nuxt-link :to="'/user/'+user.nickname+'/articles'" class="articles"><span>文章：{{user.articles}}</span>
-                            </nuxt-link>
-                        </v-flex>
-                        <v-flex md6>
-                            <nuxt-link :to="'/user/'+user.nickname+'/fans'" class="fans"><span>粉丝：{{user.fans}}</span>
-                            </nuxt-link>
-                        </v-flex>
-                        <v-flex md6>
-                            <nuxt-link :to="'/user/'+user.nickname+'/discussions'" class="discussions"><span>讨论：{{user.discussions}}</span>
-                            </nuxt-link>
-                        </v-flex>
-                        <v-flex md6>
-                            <nuxt-link :to="'/user/'+user.nickname+'/comments'" class="comments"><span>评论：{{user.comments}}</span>
-                            </nuxt-link>
-                        </v-flex>
-                    </v-layout>
-                </v-flex>
-            </v-layout>
-            <v-layout row wrap align-center justify-center class="text-md-center">
-                <v-flex md12>
+    <v-card class="userCard mt-3 pa-3 ml-2 py-4 sm12">
+        <v-layout row wrap justify-center>
+            <v-flex md3 sm3>
+                <v-avatar size="60">
+                    <img :src="user.head_url" alt="">
+                </v-avatar>
+            </v-flex>
+            <v-flex md9 sm9>
+                <v-layout row wrap class="grey--text">
+                    <v-flex md6 sm6>
+                        <nuxt-link :to="'/user/'+user.user_id+'/attentions'" class="attentions"><span>关注：{{user.attentions}}</span>
+                        </nuxt-link>
+                    </v-flex>
+                    <v-flex md6 sm6>
+                        <nuxt-link :to="'/user/'+user.user_id+'/articles'" class="articles">
+                            <span>文章：{{user.articles}}</span>
+                        </nuxt-link>
+                    </v-flex>
+                    <v-flex md6 sm6>
+                        <nuxt-link :to="'/user/'+user.user_id+'/fans'" class="fans"><span>粉丝：{{user.fans}}</span>
+                        </nuxt-link>
+                    </v-flex>
+                    <v-flex md6 sm6>
+                        <nuxt-link :to="'/user/'+user.user_id+'/discussions'" class="discussions"><span>讨论：{{user.discussions}}</span>
+                        </nuxt-link>
+                    </v-flex>
+                    <v-flex md6 sm6>
+                        <nuxt-link :to="'/user/'+user.user_id+'/comments'" class="comments">
+                            <span>评论：{{user.comments}}</span>
+                        </nuxt-link>
+                    </v-flex>
+                </v-layout>
+            </v-flex>
+        </v-layout>
+        <v-layout row wrap align-center justify-center class="text-md-center text-sm-center">
+            <v-flex md12 sm12>
+                <nuxt-link :to="'/user/'+user.user_id+'/articles'" class="user">
                     <span class="title" style="text-transform: capitalize">{{user.nickname}}</span>
-                    <v-icon class="ml-1" size="20" color="red" v-if="user.gender===0">iconfont icon-nv</v-icon>
-                    <v-icon class="ml-1" size="20" color="blue" v-if="user.gender===1">iconfont icon-nan</v-icon>
-                    <v-icon class="ml-1" size="20" color="grey" v-if="user.gender===2">iconfont icon-suo</v-icon>
-                </v-flex>
-                <v-flex md12>
-                    <p class="grey--text">{{user.introduce}}</p>
-                </v-flex>
-                <v-flex md6>
-                    <v-btn outline block flat :color="color" round @mouseover="isAttention(true)"
-                           @mouseleave="isAttention(false)" @click="clickAttention">
-                        <v-icon>{{icon}}</v-icon>
-                        {{attention}}
-                    </v-btn>
-                </v-flex>
-            </v-layout>
-        </v-card>
+                </nuxt-link>
+                <v-icon class="ml-1" size="20" color="red" v-if="user.gender===0">iconfont icon-nv</v-icon>
+                <v-icon class="ml-1" size="20" color="blue" v-if="user.gender===1">iconfont icon-nan</v-icon>
+                <v-icon class="ml-1" size="20" color="grey" v-if="user.gender===2">iconfont icon-suo</v-icon>
+            </v-flex>
+            <v-flex md12 sm12>
+                <p class="grey--text">{{user.introduce}}</p>
+            </v-flex>
+            <v-flex md6 sm6>
+                <v-btn outline block flat :color="color" round @mouseover="isAttention(true)"
+                       @mouseleave="isAttention(false)" @click="clickAttention">
+                    <v-icon>{{icon}}</v-icon>
+                    {{attention}}
+                </v-btn>
+            </v-flex>
+        </v-layout>
+    </v-card>
 </template>
 
 <script>
@@ -116,6 +120,8 @@
     .userCard {
         box-shadow: none;
         background-color: rgb(255, 255, 255);
+        max-width: 320px;
+        height: 260px;
     }
 
     a {
@@ -141,5 +147,8 @@
 
     .comments:hover {
         color: #259B24;
+    }
+    .user:hover{
+        color: #18ADED;
     }
 </style>

@@ -18,7 +18,7 @@
                                     <card :user="discussion.user" class=" elevation-3"></card>
                                 </div>
                             </transition>
-                            <nuxt-link class="user" :to="'/user/'+discussion.user.nickname+'/articles'">
+                            <nuxt-link class="user" :to="'/user/'+discussion.user.user_id+'/articles'">
                                 <span  class="subheading grey--text" @mouseover="show=true"
                                       style="text-transform: capitalize">{{discussion.user.nickname}}</span>
                             </nuxt-link>

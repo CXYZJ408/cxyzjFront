@@ -22,7 +22,7 @@
                                     <card :user="comment.discusser" class=" elevation-3"></card>
                                 </div>
                             </transition>
-                            <nuxt-link class="user" :to="'/user/'+comment.discusser.nickname+'/articles'">
+                            <nuxt-link class="user" :to="'/user/'+comment.discusser.user_id+'/articles'">
                                 <span class="title"
                                       @mouseover="showDiscusser=true">{{comment.discusser.nickname}}</span>
                             </nuxt-link>
@@ -36,7 +36,7 @@
                                     <card :user="comment.replier" class=" elevation-3"></card>
                                 </div>
                             </transition>
-                            <nuxt-link class="user" :to="'/user/'+comment.replier.nickname+'/articles'">
+                            <nuxt-link class="user" :to="'/user/'+comment.replier.user_id+'/articles'">
                                 <span class="title " @mouseover="showReplier=true">{{comment.replier.nickname}}</span>
                             </nuxt-link>
                         </div>
@@ -47,7 +47,7 @@
                                     <card :user="comment.discusser" class=" elevation-3"></card>
                                 </div>
                             </transition>
-                            <nuxt-link class="user" :to="'/user/'+comment.discusser.nickname+'/articles'">
+                            <nuxt-link class="user" :to="'/user/'+comment.discusser.user_id+'/articles'">
                             <span class="title "
                                   @mouseover="showDiscusser=true">{{comment.discusser.nickname}}</span>
                             </nuxt-link>

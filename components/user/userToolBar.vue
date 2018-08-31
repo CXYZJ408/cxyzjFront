@@ -9,7 +9,7 @@
                     <mymenu :icon_size="icon_size" :font_size="font_size" :icons="icons"></mymenu>
                 </v-flex>
 
-                <v-flex v-if="!$store.state.isLogin" offset-md3 offset-xl4 wrap md3>
+                <v-flex v-if="!$store.state.isLogin" offset-md4 offset-xl3 wrap md3>
                     <v-btn flat outline color="blue" class="title ml-5" to="/signIn">登录</v-btn>
                     <v-btn color="blue" class="title" dark to="/signUp">注册</v-btn>
                 </v-flex>
