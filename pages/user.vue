@@ -1,8 +1,7 @@
 <template>
-    <v-container wrap grid-list-md fluid>
-        <v-layout wrap>
-            <toolbar :avatar="user.head_url" :icons="icons" :nickname="user.nickname"
-                     :theme_color="user.theme_color"></toolbar>
+    <v-container wrap grid-list-md mb-5  class="clearPadding">
+        <v-layout wrap row>
+            <toolbar :userCenter=true :font_size=25></toolbar>
         </v-layout>
         <nuxt-child/>
     </v-container>
@@ -20,12 +19,6 @@
     },
     data () {
       return {
-        icons: [
-          {class: 'iconfont icon-yonghu', name: '个人中心', iconColor: '#18ADED', fontColor: '#18ADED'},
-          {class: 'iconfont icon-article', name: '文章', iconColor: '#8E44AD'},
-          {class: 'iconfont icon-discussion', name: '讨论', iconColor: '#18ADED'},
-          {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24'},
-          {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800'}],
         user: {
           user_id: 'xxxxx',
           nickname: 'yaser',

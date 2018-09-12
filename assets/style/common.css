@@ -11,8 +11,26 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+.content-input-wrapper {
+    height: 100%;
+}
+
 .slide-fade-enter-active {
     transition: all .4s ease-in-out;
+}
+
+.wrap_image {
+    position: absolute;
+    top: 50%;
+    margin-top: -60px;
+    right: 20px;
+    width: 150px;
+    height: 100px;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -26,6 +44,23 @@ body::-webkit-scrollbar {
 
 .slide-fade-leave-active {
     transition: all .8s cubic-bezier(0, 0, .58, 1)
+}
+
+.clearAll {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.clearPadding {
+    padding: 0 !important;
+}
+
+.clearMargin {
+    margin: 0 !important;
+}
+
+a {
+    text-decoration: none;
 }
 
 .slide-fade-enter {

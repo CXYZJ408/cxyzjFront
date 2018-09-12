@@ -1,6 +1,5 @@
 <template>
-    <v-card class="article mx-3 mb-3" :class="{'elevation-3': hover}" @mouseover="hover=true"
-            @mouseleave="hover=false">
+    <v-card class="article mx-3 pb-3" flat>
         <v-layout wrap align-center row>
             <v-flex md10 ml-4 mt-1>
                 <div @mouseleave="show=false" class="d-inline-block">
@@ -73,7 +72,7 @@
                 <span class="body-2 pl-1" :class="{'redfont':article.articleInfo.is_collected}">{{article.articleInfo.collections}}</span>
             </v-flex>
             <v-spacer></v-spacer>
-            <v-flex md2 v-show="article.articleInfo.is_author">
+            <v-flex md2 v-show="article.articleInfo.is_author&&userCenter">
                 <el-tooltip class="item" effect="dark" content="编辑" placement="bottom"
                             v-show="article.articleInfo.allow_edit">
                     <v-btn class="btn-operation " flat round color="blue" icon>
@@ -81,7 +80,7 @@
                     </v-btn>
                 </el-tooltip>
                 <v-dialog v-model="dialog" persistent max-width="290" v-show="article.articleInfo.allow_delete">
-                    <el-tooltip slot="activator" class="item" effect="dark" content="删除" placement="bottom">
+                    <el-tooltip slot="activator" effect="dark" content="删除" placement="bottom">
                         <v-btn class="btn-operation " flat round color="red" icon>
                             <v-icon color="red" size="22">iconfont icon-delete</v-icon>
                         </v-btn>
@@ -116,6 +115,10 @@
       },
       index: {
         type: Number
+      },
+      userCenter: {
+        type: Boolean,
+        default: false
       }
     },
     data: function () {
@@ -163,9 +166,8 @@
 
 <style scoped>
     .article {
-        box-shadow: none;
-        background-color: rgb(255, 255, 255);
-        height: 235px;
+        /*box-shadow: none;*/
+        /*background-color: rgb(255, 255, 255);*/
     }
 
     .thumbnail {

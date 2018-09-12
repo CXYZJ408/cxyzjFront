@@ -1,5 +1,5 @@
 <template>
-    <v-app class="background" :style="{'background-image':'url('+ bg_url +') '}">
+    <v-app class="background" :style="{'background-image':'url('+ back +')'}">
         <nuxt/>
         <Footer></Footer>
     </v-app>
@@ -13,14 +13,23 @@
         default: '/img/user/background.jpeg'
       }
     },
-    data () {
-      return {
-        bg_url: ''
-      }
-    },
     methods: {
       init () {
-        this.bg_url = this.back
+        let Cookie = require('js-cookie')
+        console.log(new Date().getTime(), this.$store.state)
+        if (this.$store.state.tokenHasUpdate) {
+          console.log(new Date(), '更新cookie')
+          console.log('更新前的cookie：', Cookie.get('token'))
+          Cookie.set('token', this.$store.state.token)
+          console.log('更新后的cookie：', Cookie.get('token'))
+          this.$store.commit('shouldUpdateToken', false)
+        }
+        if (this.$store.state.tokenExpired) {
+          this.$message('用户认证已过期，需要重新登录')
+          Cookie.remove('token')//移除token
+          Cookie.remove('refreshToken')
+          this.$store.commit('tokenExpired',false)
+        }
       }
     },
     mounted () {

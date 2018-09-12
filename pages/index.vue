@@ -1,66 +1,110 @@
 <template>
-    <v-container grid-list-md>
-        <v-layout row wrap>
-            <toolbar :avatar="$store.state.user.head_url" :icons="icons" :font_size=25
-                     :nickname="$store.state.user.nickname"
-                     :theme_color="$store.state.user.theme_color"></toolbar>
-        </v-layout>
-        <v-layout align-center justify-center wrap>
-            <v-flex md12 xl9 wrap>
-                <v-carousel id="slide">
-                    <v-carousel-item
-                            v-for="(item,i) in items"
-                            :key="i"
-                            :src="item"
-                    ></v-carousel-item>
-                </v-carousel>
-            </v-flex>
-        </v-layout>
-        <v-layout row wrap justify-center mt-3>
-            <v-flex md9 xl7>
-                <v-card id="main">
-                    <v-layout row wrap justify-center>
-                        <v-flex md12>
-                            <v-card-title class="display-1 green--text pb-2">
-                                <span class=" mt-3">最新动态</span>
-                            </v-card-title>
-                            <hr>
-                        </v-flex>
-                        <dynamic v-for="(item,index) in dynamics" :dynamic="item" :key="index"></dynamic>
-                        <!--TODO api完成后完善瀑布加载-->
-                        <v-flex md9 v-show="showLoadMore">
-                            <v-btn flat round block color="grey" dark class="title" @click="loadMore">加载更多</v-btn>
-                        </v-flex>
-                        <v-flex md9 v-show="showLoad" class="text-md-center ma-3">
-                            <v-progress-circular
-                                    :size="40"
-                                    color="grey"
-                                    indeterminate
-                            ></v-progress-circular>
-                        </v-flex>
-
-                    </v-layout>
-                </v-card>
-            </v-flex>
-            <v-flex md3 xl2 wrap class="father " v-scroll="onScroll" ref="father">
-                <div :class="{fixed:isFixed}" :style="style">
-                    <board :board="board" v-for="(board ,index) in boards" :class="{'top35':index>0}"
-                           :key="index"></board>
-                </div>
-            </v-flex>
-        </v-layout>
-    </v-container>
+    <div id="myindnex">
+        <v-container v-scroll="onScroll" grid-list-md class="clearPadding">
+            <v-layout row wrap>
+                <toolbar :font_size=25 :index=true></toolbar>
+            </v-layout>
+            <v-layout align-center justify-center wrap style="margin-top: 90px!important;height: 500px">
+                <v-flex md12 xl9 wrap>
+                    <no-ssr>
+                        <v-carousel id="slide">
+                            <v-carousel-item
+                                    v-for="(item,i) in items"
+                                    :key="i"
+                                    :src="item"
+                            ></v-carousel-item>
+                        </v-carousel>
+                    </no-ssr>
+                </v-flex>
+            </v-layout>
+            <v-layout row wrap justify-center mt-3>
+                <v-flex md9 xl7>
+                    <v-card id="main">
+                        <v-layout row wrap justify-center>
+                            <v-flex md3>
+                                <v-card-title class="display-1 green--text pb-2">
+                                    <strong class="mt-1">热门文章</strong>
+                                </v-card-title>
+                            </v-flex>
+                            <v-flex md9 class="mt-3">
+                                <v-tabs
+                                        slot="extension"
+                                        v-model="tabs"
+                                        right
+                                        class="mr-2">
+                                    <v-tab
+                                            v-for="(n,i) in types"
+                                            :key="i"
+                                            ripple>
+                                        <span class="title">{{n}}</span>
+                                    </v-tab>
+                                    <v-tabs-slider color="blue"></v-tabs-slider>
+                                </v-tabs>
+                            </v-flex>
+                            <v-flex md12>
+                                <hr style="border: 1.5px solid #BBBBBB;">
+                            </v-flex>
+                            <v-flex md12>
+                                <v-tabs-items v-model="tabs">
+                                    <v-tab-item
+                                            v-for="n in 7"
+                                            :key="n"
+                                            lazy
+                                    >
+                                        <dynamic v-for="(item,index) in dynamics" :dynamic="item"
+                                                 :key="index"></dynamic>
+                                        <!--TODO api完成后完善瀑布加载-->
+                                        <v-layout row wrap justify-center>
+                                            <v-flex md8 v-show="showLoadMore">
+                                                <v-btn flat round block dark class="title black--text"
+                                                       @click="loadMore">
+                                                    加载更多
+                                                </v-btn>
+                                            </v-flex>
+                                            <v-flex md12 v-show="showLoad" class="text-md-center ma-3">
+                                                <v-progress-circular
+                                                        :size="40"
+                                                        color="grey"
+                                                        indeterminate
+                                                ></v-progress-circular>
+                                            </v-flex>
+                                        </v-layout>
+                                    </v-tab-item>
+                                </v-tabs-items>
+                            </v-flex>
+                        </v-layout>
+                    </v-card>
+                </v-flex>
+                <v-flex md3 xl2 wrap class="father " ref="father">
+                    <div :class="{fixed:isFixed}" :style="topicstyle" ref="hotTopic">
+                        <hotTopic :topics="topics"></hotTopic>
+                    </div>
+                    <div :class="{fixed2:isFixed}" class="mt-3" :style="boardstyle" v-if="$store.state.isLogin">
+                        <board :board="board" v-for="(board ,index) in boards"
+                               :class="{'top35':index>0}"
+                               :key="index"></board>
+                    </div>
+                </v-flex>
+            </v-layout>
+        </v-container>
+        <el-tooltip content="建议反馈" placement="top" effect="dark">
+            <v-icon @click="" color="blue" size="35" class="feedback">
+                iconfont icon-feedback
+            </v-icon>
+        </el-tooltip>
+    </div>
 </template>
 
 <script>
   import toolbar from '~/components/user/userToolBar.vue'
   import dynamic from '~/components/index/dynamic.vue'
   import board from '~/components/index/board.vue'
+  import hotTopic from '~/components/index/hotTopic.vue'
 
   export default {
     name: 'index',
     components: {
-      toolbar, dynamic, board
+      toolbar, dynamic, board, hotTopic
     },
     methods: {
       PerLoad () {
@@ -95,11 +139,13 @@
           // 如果当前浏览部分的上端距离页面顶端的距离加上屏幕的高度大于页面高度-200 提前加载
           this.PerLoad()
         }
-        if (offsetTop >= 500) {
-          // 如果当前浏览部分的上端距离大于500，则固定board
+        if (offsetTop >= 530) {
+          // 如果当前浏览部分的上端距离大于510，则固定board和hotTopic
           this.isFixed = true
           let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
-          this.style = 'width:' + width + 'px'
+          let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
+          this.boardstyle = 'width:' + width + 'px;top:' + height + 'px'
+          this.topicstyle = 'width:' + width + 'px'
         } else {
           this.isFixed = false
           this.style = ''
@@ -109,21 +155,50 @@
     data: function () {
       return {
         isFixed: false,
-        style: '',
+        boardstyle: '',
+        topicstyle: '',
         scrollDisabled: false,
         showLoadMore: false,
         loadTimes: 1,
         showLoad: false,
-        list: [],
-        icons: [
-          {class: 'iconfont icon-compass', name: '首页', iconColor: '#18ADED', fontColor: '#18ADED'},
-          {class: 'iconfont icon-article', name: '文章', iconColor: '#8E44AD'},
-          {class: 'iconfont icon-discussion', name: '讨论', iconColor: '#18ADED'},
-          {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24'},
-          {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800'}],
+        tabs: 0,
+        types: ['推荐', '前端', '后端', 'Android', '运维', '算法', '人工智能'],
         items: [
           '/img/test/2.jpg', '/img/test/1.jpg', '/img/test/3.jpg'
         ],
+        topics: [
+          {
+            name: '前端开发',
+            href: '/',
+          },
+          {
+            name: '后端开发',
+            href: '/'
+          },
+          {
+            name: '数据库',
+            href: '/'
+          },
+          {
+            name: '安卓开发',
+            href: '/'
+          },
+          {
+            name: '架构',
+            href: '/'
+          },
+          {
+            name: 'JavaScript',
+            href: '/'
+          },
+          {
+            name: '设计模式',
+            href: '/'
+          },
+          {
+            name: '算法',
+            href: '/'
+          }],
         boards: [
           {
             icon: 'icon-discussion',
@@ -133,17 +208,19 @@
             back: {
               background: 'rgba(24, 173, 237, .4)'
             },
-            text: '讨论'
+            text: '发讨论',
+            href: '/discussions'
           },
           {
-            icon: 'icon-article',
+            icon: 'icon-write',
             iconStyle: {
               color: '#8E44AD'
             },
             back: {
               background: 'rgba(166, 57, 168, .4)'
             },
-            text: '文章'
+            text: '写文章',
+            href: '/write'
           },
           {
             icon: 'icon-educate',
@@ -153,7 +230,8 @@
             back: {
               background: 'rgba(37, 155, 36, .4)'
             },
-            text: '学堂'
+            text: '学知识',
+            href: '/educate'
           },
           {
             icon: 'icon-about',
@@ -163,7 +241,8 @@
             back: {
               background: 'rgba(255, 128, 0, .4)'
             },
-            text: '关于'
+            text: '关于',
+            href: '/about'
           }
         ],
         dynamics: [
@@ -172,8 +251,8 @@
             text: '涉及到的知识点\n' +
               'input 标签的 onchange 事件是在上传完文件之后触发\n' +
               '当 input 标签 type="file" 时，使用 files 属性获取到上传的文件对象\n' +
-              'readAsDataURL 用于将读取内容转换成 base64 编码\n' +
-              '区分 canvas 的 画布 和 绘画环境：\n' +
+              'readAsDataURL 用于将读取内容转换成 base64 编码\n' + ~
+                '区分 canvas 的 画布 和 绘画环境：\n' +
               '画布：对应代码中的 cvs，可以设置画布 width，height；\n' +
               '绘画环境：对应代码中的 ctx，由 cvs 得来。ctx = cvs.getContext(\'2d\')，可以设置 fillStyle，fillRect 等；\n' +
               '\n' +
@@ -204,6 +283,9 @@
               comments: 3,
               is_followed: false
             },
+            topic: {
+              name: '前端'
+            },
             update_time: '两天前'
           },
           {
@@ -231,6 +313,9 @@
               discussions: 4,
               comments: 3,
               is_followed: false
+            },
+            topic: {
+              name: '编程语言'
             },
             update_time: '两天前'
           },
@@ -260,6 +345,9 @@
               comments: 3,
               is_followed: false
             },
+            topic: {
+              name: '架构'
+            },
             update_time: '两天前'
           },
           {
@@ -287,6 +375,9 @@
               discussions: 4,
               comments: 3,
               is_followed: false
+            },
+            topic: {
+              name: 'Android'
             },
             update_time: '两天前'
           },
@@ -319,6 +410,9 @@
               comments: 3,
               is_followed: false
             },
+            topic: {
+              name: '人工智能'
+            },
             update_time: '两天前'
           }
         ]
@@ -328,32 +422,40 @@
 </script>
 
 <style>
-    #slide .v-carousel__controls {
+    #myindnex #slide .v-carousel__controls {
         background: none !important;
     }
 
-    #slide {
+    #myindnex #slide {
         border-radius: 15px
     }
 
-    #main {
+    #myindnex #main {
         border-radius: 15px;
     }
 
-    hr {
-        border: 1.5px solid #BBBBBB;
-    }
-
-    .fixed {
+    #myindnex .fixed {
         position: fixed;
-        top: 90px;
+        top: 70px;
     }
 
-    .top35 {
+    #myindnex .fixed2 {
+        position: fixed;
+    }
+
+    #myindnex .feedback {
+        position: fixed;
+        top: 93%;
+        left: 95%;
+        background-color: white;
+        border-radius: 50px;
+    }
+
+    #myindnex .top35 {
         margin-top: 35px;
     }
 
-    .father {
+    #myindnex .father {
         position: relative;
     }
 </style>

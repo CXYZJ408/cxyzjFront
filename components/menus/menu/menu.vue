@@ -1,30 +1,26 @@
 <template>
-    <v-layout align-center justify-start row fill-height @mouseleave="show=false">
-        <v-flex md4 xl3>
-            <v-btn flat @mouseenter="show=true" color="white">
-                <v-icon v-bind:style="{ 'font-size':`${icon_size}px`,'color':icons[0].iconColor }">
-                    {{icons[0].class}}
-                </v-icon>
-                <strong v-bind:style="{ 'font-size':font_size +'px',color:icons[0].fontColor}"
-                        class="pl-2">{{icons[0].name}}</strong>
-            </v-btn>
-        </v-flex>
-        <transition name="slide-fade">
-            <v-flex md8 v-show="show" pl-3>
-                <el-tooltip v-for="(item,index) in icons" v-if="index>0"
-                            :key="index" class="item" effect="dark" :content="item.name" placement="bottom">
+    <div class="d-inline-block pt-1" style="float:left;">
+        <div class="text-md-center d-inline-block ml-2">
+            <v-icon v-bind:style="{ 'font-size':`${icon_size}px`,'color':icons[0].iconColor }">
+                {{icons[0].class}}
+            </v-icon>
+            <strong v-bind:style="{ 'font-size':font_size +'px',color:icons[0].iconColor}"
+                    class="pl-2">{{icons[0].name}}</strong>
+        </div>
+        <div class="text-md-center d-inline-block">
+            <el-tooltip class="ml-3" v-for="(item,index) in icons" v-if="index>0"
+                        :key="index" effect="dark" :content="item.name" placement="bottom" >
+                <nuxt-link :to="item.href">
+                    <v-icon @mouseover="change_color(index,item.iconColor)"
+                            @mouseout="change_color(index, '#BBBBBB')"
+                            :style="{ 'font-size':icon_size +'px','color': default_color[index] }">
+                        {{item.class}}
+                    </v-icon>
+                </nuxt-link>
+            </el-tooltip>
+        </div>
+    </div>
 
-                    <v-btn  flat fab small @mouseover="change_color(index,item.iconColor)"
-                           @mouseout="change_color(index,temp_color)">
-                        <v-icon
-                                :style="{ 'font-size':icon_size +'px','color': default_color[index] }">
-                            {{item.class}}
-                        </v-icon>
-                    </v-btn>
-                </el-tooltip>
-            </v-flex>
-        </transition>
-    </v-layout>
 </template>
 <script>
   export default {
@@ -34,33 +30,80 @@
         type: Number,
         default: 20
       },
+      distance: {
+        type: String,
+        default: 'ml-3'
+      },
       icon_size: {
         type: Number,
         default: 30
       },
-      icons: {
-        type: Array
+      index: {
+        type: Boolean,
+        default: false
+      },
+      discussion: {
+        type: Boolean,
+        default: false
+      },
+      userCenter: {
+        type: Boolean,
+        default: false
+      },
+      write: {
+        type: Boolean,
+        default: false
+      },
+      education: {
+        type: Boolean,
+        default: false
+      },
+      about: {
+        type: Boolean,
+        default: false
       }
     },
     data: function () {
       return {
         show: false,
-        default_color: [],
-        temp_color: '#BBBBBB'
+        default_color: ['#BBBBBB', '#BBBBBB', '#BBBBBB', '#BBBBBB', '#BBBBBB', '#BBBBBB'],
+        iconList: [
+          {class: 'iconfont icon-compass', name: '首页', iconColor: '#2C3E50', href: '/'},
+          {class: 'iconfont icon-discussion', name: '讨论', iconColor: '#18ADED', href: '/discussions'},
+          {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24', href: '/educations'},
+          {class: 'iconfont icon-write', name: '写作', iconColor: '#8E44AD', href: '/write'},
+          {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800', href: '/about'},
+          {class: 'iconfont icon-yonghu', name: '个人中心', iconColor: '#18ADED', href: '/user'}],
+        icons: []
       }
     },
     methods: {
       init () {
-        this.default_color = []
-        for (let x = 0; x < this.icons.length; x++) {
-          this.default_color.push(this.temp_color)
+        this.icons = []
+        let first = 0
+        if (this.discussion) {
+          first = 1
+        } else if (this.education) {
+          first = 2
+        } else if (this.write) {
+          first = 3
+        } else if (this.about) {
+          first = 4
+        } else if (this.userCenter) {
+          first = 5
+        }
+        this.icons.push(this.iconList[first])
+        for (let i = 0; i < 5; i++) {//个人中心只在是第一个的时候才放入
+          if (i !== first) {
+            this.icons.push(this.iconList[i])
+          }
         }
       },
       change_color (index, color) {
-        this.$set(this.default_color, index, color)
+        this.$set(this.default_color, index, color)//修改颜色
       }
     },
-    mounted () {
+    created () {
       this.init()
     }
   }

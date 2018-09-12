@@ -1,9 +1,13 @@
 <template>
 
     <v-card class="main pt-3">
-        <myArticle v-for="(item,index) in articleList" v-if="item!==undefined" :key="index" :index="index"
-                   @del="del"
-                   :article="item"></myArticle>
+        <v-layout row wrap>
+            <v-flex my-1 md12 v-for="(item,index) in articleList" v-if="item!==undefined" :key="index">
+                <myArticle :index="index"
+                           @del="del" :userCenter=true
+                           :article="item"></myArticle>
+            </v-flex>
+        </v-layout>
         <div class="py-3 text-md-center">
             <el-pagination
                     layout="prev, pager, next"

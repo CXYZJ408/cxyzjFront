@@ -1,5 +1,5 @@
 <template>
-    <v-app class="back">
+    <v-app class="back" :style="{'background-image':'url('+ background +')'}">
         <v-container grid-list-md text-xs-center fluid>
             <v-layout align-center justify-center pt-3>
                 <v-flex id="logo" md2 sm3 xs6>
@@ -11,47 +11,52 @@
             </v-layout>
         </v-container>
         <Footer></Footer>
-        <no-ssr>
-            <vue-particles class="particles" color="#5cbdaa"
-                           :particleOpacity="0.7"
-                           :particlesNumber="100"
-                           shapeType="circle"
-                           :particleSize="4"
-                           linesColor="#5cbdaa"
-                           :linesWidth="1"
-                           :lineLinked="true"
-                           :lineOpacity="0.4"
-                           :linesDistance="180"
-                           :moveSpeed="5"
-                           :hoverEffect="true"
-                           hoverMode="grab"
-                           :clickEffect="true"
-                           clickMode="remove">
-            </vue-particles>
-        </no-ssr>
     </v-app>
 </template>
 
 <script>
   export default {
+    methods: {
+      changeBackground () {
+        let index = Math.floor(Math.random() * 24 + 1)
+        this.background = `/img/login/${index}.jpg`
+      },
+      init () {
+        let Cookie = require('js-cookie')
+        console.log(new Date().getTime(), this.$store.state)
+        if (this.$store.state.tokenHasUpdate) {
+          console.log(new Date(), '更新cookie')
+          console.log('更新前的cookie：', Cookie.get('token'))
+          Cookie.set('token', this.$store.state.token)
+          console.log('更新后的cookie：', Cookie.get('token'))
+          this.$store.commit('shouldUpdateToken', false)
+        }
+        if (this.$store.state.tokenExpired) {
+          this.$message('用户认证已过期，需要重新登录')
+          Cookie.remove('token')//移除token
+          Cookie.remove('refreshToken')
+          this.$store.commit('tokenExpired',false)
+        }
+      }
+    },
+    data: function () {
+      return {
+        background: ''
+      }
+    },
+    mounted () {
+      this.changeBackground()
+      this.init()
+    }
   }
 </script>
 
 <style scoped>
     .back {
         background-size: cover;
-        background-color: #16A085;
         width: 100%;
         overflow: hidden;
-        padding-right: 15px;
-    }
-
-    .particles {
-        background-size: cover;
-        position: absolute;
-        z-index: 20;
-        height: 100%;
-        width: 100%;
+        background-attachment: fixed
     }
 
     #logo {
@@ -59,8 +64,8 @@
     }
 
     #logo img {
-        width: 80%;
-        height: 80%;
+        width: 55%;
+        height: 55%;
     }
 
 </style>

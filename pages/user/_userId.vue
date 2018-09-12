@@ -1,6 +1,6 @@
 <template>
-    <v-layout wrap mt-5 row fill-height justify-center>
-        <v-flex md10 xl9 sm12 class="elevation-12 back mb-5">
+    <v-layout wrap mt-5 row fill-height justify-center style="margin-top: 90px!important;">
+        <v-flex md12 xl9 class="elevation-12 back mb-5">
             <myhead :user="user"></myhead>
             <v-layout>
                 <v-flex md2 class="left">

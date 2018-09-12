@@ -19,7 +19,7 @@
                                            action="https://jsonplaceholder.typicode.com/posts/"
                                            :show-file-list="false" :on-success="handleAvatarSuccess"
                                            :before-upload="beforeAvatarUpload">
-                                    <v-avatar :tile="tile" size="100" color="grey lighten-4">
+                                    <v-avatar size="100" color="grey lighten-4">
                                         <img :src="imageUrl" alt="avatar">
                                     </v-avatar>
                                 </el-upload>
@@ -251,7 +251,6 @@
           v => !!v || '邮箱不可为空'
         ],
         imageUrl: '/test.png',
-        tile: false,
         sex: ''
       }
     }

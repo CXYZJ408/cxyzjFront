@@ -1,30 +1,144 @@
+import UserApi from '../api/UserApi'
+import * as $utils from '../utils/index'
+import Status from '../utils/status'
+
+let defaultToken = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0ODcwMDUzODM3OTgyOTI0ODIiLCJyb2xlIjoiUk9MRV9BTk9OWU1JVFkiLCJleHAiOjE1NDUxNjAzMjMsImlhdCI6MTUzNjQwMDMyMywiaXNzIjoiY3h5emoiLCJzdWIiOiJUb2tlbiIsImF1ZCI6IlVzZXIiLCJqdGkiOiJhMmFhODc4Yi03MjgzLTQ5NjgtOWJjOS00ZjFhZDEzNmViOWQifQ.y5H4oXx05V33Bo9ZQRvVf8IqyNMxYDzHZW27_D9QD_MzTbhNHsQ9FsHmcXF9OkdZ_gCRIOdPhT7tElMaCk7iig'
+//默认的匿名用户的token是不会过期的(或者说是在2118年过期,如果这个项目还在的话。。。)
 export const state = () => ({
   isLogin: false,
-  user: {
-    user_id: '7777777',
-    nickname: 'yaser',
-    head_url: '/img/test/head.jpg',
-    email: '335767798@qq.com',
-    bg_url: '/img/user/background.jpeg',
-    regist_date: 'xxx',
-    phone: '17602545735',
-    theme_color: 'orange',
-    role: 'user',
-    introduce: 'xxx',
-    gender: 2,
-    attentions: 0,
-    fans: 0,
-    articles: 0,
-    discussions: 0,
-    comments: 0
-  }
+  token: '',
+  refreshToken: '',
+  background: '',//the background of the full layout
+  user: {},//user information
+  tokenHasUpdate: false,//should client need to flush the cookie
+  tokenExpired: false//whether token is expired
 })
 
 export const mutations = {
-  login () {
+  //the login or logout operation
+  loginAgain (state, data) {
+    console.log('LoginAgain')
     state.isLogin = true
+    state.user = data.user
   },
-  logout () {
+  login (state, data) {
+    console.log('start set user')
+    state.isLogin = true
+    state.user = data.user
+    state.token = data.token
+    state.refreshToken = data.refreshToken
+  },
+  logout (state) {
     state.isLogin = false
+    state.refreshToken = ''
+    state.token = defaultToken
+    state.tokenHasUpdate = false
+    state.user = {}
+  },
+  //the setting operation
+  setBackground (state, background) {
+    state.background = background
+  },
+  setToken (state, token) {
+    state.token = token
+    console.log('setTokenOK')
+  },
+  setRefreshToken (state, token) {
+    state.refreshToken = token
+    console.log('setRefreshTokenOK')
+  },
+  shouldUpdateToken (state, need) {
+    state.tokenHasUpdate = need
+  },
+  setTokenRefreshToken (state, tokens) {
+    if (!!tokens.refreshToken) {
+      this.commit('setRefreshToken', tokens.refreshToken)
+    } else {
+      console.log('tokens.refreshToken is not exist')
+    }
+    if (!!tokens.token) {
+      this.commit('setToken', tokens.token)
+    } else {
+      console.log('tokens.token is not exist')
+    }
+    console.log('token reset ok')
+  },
+  tokenIsExpired (state, data) {
+    state.tokenExpired = data
+  },
+  //clear the cache of token
+  clearToken (state) {
+    state.token = ''
+  },
+  clearRefreshToken (state) {
+    state.refreshToken = ''
+  },
+  clearAll (state) {
+    state.token = ''
+    state.refreshToken = ''
   }
 }
+export const actions = {
+  async nuxtServerInit (store, {req}) {//在跳转其它的页面或是刷新页面的时候，nuxt会自动调用
+    //读取req中的cookie
+    if (Object.keys(store.state.user).length === 0) {//用户还没有登陆
+      let refreshToken = await $utils.parseCookieByName(req.headers.cookie, 'refreshToken')//获取refresh
+      let token = await $utils.parseCookieByName(req.headers.cookie, 'token')//获取token
+      let tokens = {
+        token: token,
+        refreshToken: refreshToken
+      }
+      store.commit('clearAll')//清空token，防止缓存
+      store.commit('setTokenRefreshToken', tokens)//将token全部重置
+      if (store.state.refreshToken.length === 0) {//如果重置token之后，refreshToken仍然为空，则表示还没有登陆
+        store.commit('setToken', defaultToken)
+        console.log('the status without login')
+      } else {
+        //存在refreshToken
+        let $userApi = new UserApi(store)
+        let calls = [$userApi.getUserSimple]
+        if (!!token) {
+          //存在有token，使用token进行刷新
+          await $utils.proxy(null, calls, store).then((res) => {
+            if (res[0].status === Status.SUCCESS) {
+              //成功刷新用户信息
+              store.commit('loginAgain', res[0].data)
+            } else {
+              //刷新失败
+              console.log('refresh failed')
+              console.log('refreshToken and token is expired , flush failed! ')
+              store.commit('tokenIsExpired', true)
+              store.commit('logout')
+            }
+          })
+        } else {
+          //没有token，使用refreshToken重新获取token，同时获取用户信息
+          await $userApi.refreshToken().then(async (res) => {
+            //成功重新获取了token
+            if (res) {
+              //重新获取用户信息
+              await $utils.proxy(null, calls, store).then((res) => {
+                if (res[0].status === Status.SUCCESS) {
+                  //成功刷新用户信息
+                  store.commit('loginAgain', res[0].data)
+                } else {
+                  //刷新失败
+                  console.log('refresh failed')
+                  console.log('refreshToken and token is expired , flush failed! ')
+                  store.commit('tokenIsExpired', true)
+                  store.commit('logout')                }
+              })
+            } else {
+              console.log('refreshToken and token is expired , flush failed! ')
+              store.commit('tokenIsExpired', true)
+              store.commit('logout')
+              // 退出处理
+            }
+          })
+        }
+      }
+    }
+  }
+}
+
+

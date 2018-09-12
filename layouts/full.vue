@@ -1,14 +1,15 @@
 <template>
-    <v-app class="background">
+    <v-app class="background" :style="{'background-image': 'url('+$store.state.background+')' }">
         <nuxt/>
-        <no-ssr>
-            <Footer color='#8590A6'></Footer>
+        <no-ssr class="mt-5">
+            <Footer color='white'></Footer>
         </no-ssr>
     </v-app>
 </template>
 
 <script>
   export default {
+    name: 'full',
     methods: {
       init () {
         let Cookie = require('js-cookie')
@@ -33,13 +34,12 @@
     }
   }
 </script>
+
 <style scoped>
     .background {
-        background-size: 100% 100%;
+        background-size: cover;
         width: 100%;
         overflow: hidden;
-        background: #F3F3F3 no-repeat fixed;
+        background-attachment: fixed;
     }
-
-
 </style>
