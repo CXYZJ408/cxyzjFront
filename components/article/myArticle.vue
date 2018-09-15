@@ -2,19 +2,23 @@
     <v-card class="article mx-3 pb-3" flat>
         <v-layout wrap align-center row>
             <v-flex md10 ml-4 mt-1>
-                <div @mouseleave="show=false" class="d-inline-block">
-                    <transition name="fade">
-                        <div v-show="show" class="userCard" @mouseleave="show=false">
-                            <card :user="article.user" class=" elevation-3"></card>
-                        </div>
-                    </transition>
-                    <nuxt-link class="user" :to="'/user/'+article.user.user_id+'/articles'">
-                        <v-avatar size="50">
-                            <img :src="article.user.head_url" alt="">
-                        </v-avatar>
-                        <span class="subheading ml-3" @mouseover="show=true"
-                              style="text-transform: capitalize">{{article.user.nickname}}</span>
-                    </nuxt-link>
+                <div class="d-inline-block">
+                    <v-menu open-on-hover
+                            bottom
+                            close-delay="250"
+                            lazy
+                            transition="scale-transition"
+                            class="menu"
+                            :close-on-content-click=false>
+                        <nuxt-link slot="activator" class="user" :to="'/user/'+article.user.user_id+'/articles'">
+                            <v-avatar size="50">
+                                <img :src="article.user.head_url" alt="">
+                            </v-avatar>
+                            <span class="subheading ml-3"
+                                  style="text-transform: capitalize">{{article.user.nickname}}</span>
+                        </nuxt-link>
+                        <card :user="article.user" class=" elevation-3"></card>
+                    </v-menu>
                 </div>
                 <span class="subheading ml-3 grey--text">{{article.articleInfo.update_time}}</span>
                 <span class="subheading ml-3 blue-grey--text">{{article.type.type_name}}</span>
@@ -123,6 +127,12 @@
     },
     data: function () {
       return {
+        items: [
+          {title: 'Click Me'},
+          {title: 'Click Me'},
+          {title: 'Click Me'},
+          {title: 'Click Me 2'}
+        ],
         hover: false,
         dialog: false,
         show: false
@@ -165,9 +175,10 @@
 </script>
 
 <style scoped>
-    .article {
-        /*box-shadow: none;*/
-        /*background-color: rgb(255, 255, 255);*/
+
+    .v-menu__content {
+        box-shadow: none !important;
+        -webkit-box-shadow: none !important;
     }
 
     .thumbnail {
@@ -199,14 +210,6 @@
 
     .user:hover {
         color: #18ADED
-    }
-
-    .userCard {
-        position: absolute;
-        z-index: 999;
-        width: 300px;
-        left: 40px;
-        top: 13px;
     }
 
     .redfont {

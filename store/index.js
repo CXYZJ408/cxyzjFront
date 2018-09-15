@@ -1,4 +1,4 @@
-import UserApi from '../api/UserApi'
+import Api from '../api/Api'
 import * as $utils from '../utils/index'
 import Status from '../utils/status'
 
@@ -11,7 +11,8 @@ export const state = () => ({
   background: '',//the background of the full layout
   user: {},//user information
   tokenHasUpdate: false,//should client need to flush the cookie
-  tokenExpired: false//whether token is expired
+  tokenExpired: false,//whether token is expired
+  Welcome: false
 })
 
 export const mutations = {
@@ -27,6 +28,10 @@ export const mutations = {
     state.user = data.user
     state.token = data.token
     state.refreshToken = data.refreshToken
+    state.Welcome = true
+  },
+  cancelWelcome (state) {
+    state.Welcome = false
   },
   logout (state) {
     state.isLogin = false
@@ -95,14 +100,14 @@ export const actions = {
         console.log('the status without login')
       } else {
         //存在refreshToken
-        let $userApi = new UserApi(store)
-        let calls = [$userApi.getUserSimple]
+        let $Api = new Api(store)
+        let call = $Api.UserApi().getUserSimple
         if (!!token) {
           //存在有token，使用token进行刷新
-          await $utils.proxy(null, calls, store).then((res) => {
-            if (res[0].status === Status.SUCCESS) {
+          await $utils.proxyOne(null, call, store).then((res) => {
+            if (res.status === Status.SUCCESS) {
               //成功刷新用户信息
-              store.commit('loginAgain', res[0].data)
+              store.commit('loginAgain', res.data)
             } else {
               //刷新失败
               console.log('refresh failed')
@@ -113,20 +118,21 @@ export const actions = {
           })
         } else {
           //没有token，使用refreshToken重新获取token，同时获取用户信息
-          await $userApi.refreshToken().then(async (res) => {
+          await $Api.UserApi().refreshToken().then(async (res) => {
             //成功重新获取了token
             if (res) {
               //重新获取用户信息
-              await $utils.proxy(null, calls, store).then((res) => {
-                if (res[0].status === Status.SUCCESS) {
+              await $utils.proxyOne(null, call, store).then((res) => {
+                if (res.status === Status.SUCCESS) {
                   //成功刷新用户信息
-                  store.commit('loginAgain', res[0].data)
+                  store.commit('loginAgain', res.data)
                 } else {
                   //刷新失败
                   console.log('refresh failed')
                   console.log('refreshToken and token is expired , flush failed! ')
                   store.commit('tokenIsExpired', true)
-                  store.commit('logout')                }
+                  store.commit('logout')
+                }
               })
             } else {
               console.log('refreshToken and token is expired , flush failed! ')

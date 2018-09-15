@@ -152,6 +152,16 @@
         }
       }
     },
+    mounted () {
+      if (this.$store.state.Welcome) {
+        this.$notify({
+          title: '登录成功！',
+          message: `你好${this.$store.state.user.nickname}，欢迎登录程序员之家！`,
+          type: 'success'
+        })
+        this.$store.commit('cancelWelcome')
+      }
+    },
     data: function () {
       return {
         isFixed: false,

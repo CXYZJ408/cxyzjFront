@@ -20,10 +20,8 @@ axios.interceptors.request.use(config => {
       console.log('axiosToken-------------', $store.state.token.split('.')[2])
       token = 'Bearer ' + $store.state.token//在请求头部加上token，用于用户认证
     }
-    config.headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: token
-    }
+    config.headers.Authorization = token
+    console.log('header', config.headers)
   }
 
   return config
@@ -43,19 +41,16 @@ axios.interceptors.response.use(response => {
 export default {//导出方法
   get (url, params, header = {}) {
     console.log('get', url)
-    return axios.get(url, {
-      params, header
-    })
+    return axios.get(url, {params}, header)
   },
-  post (url, params, header = {}) {
-    return axios.post(url, qs.stringify(params), {
-      header
-    })
+  post (url, params, header = {'Content-Type': 'application/x-www-form-urlencoded'}, needQS = true) {
+    if (needQS) {
+      params = qs.stringify(params)
+    }
+    return axios.post(url, params, header)
   },
   put (url, params, header = {}) {
-    return axios.put(url, qs.stringify(params), {
-      header
-    })
+    return axios.put(url, qs.stringify(params), header)
   },
   patch (url, params, header = {}) {
     return axios.patch(url, qs.stringify(params), {

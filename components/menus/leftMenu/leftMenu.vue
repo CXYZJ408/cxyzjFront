@@ -1,12 +1,5 @@
 <template>
-    <v-navigation-drawer
-            floating
-            permanent
-            stateless
-            value="true"
-            class="d-inline-block menu"
-    >
-        <v-list dense>
+        <v-list class="menu">
             <v-list-tile
                     v-for="(item,index) in items" v-if="index<=3"
                     :key="index"
@@ -36,7 +29,6 @@
             </v-flex>
             </v-layout>
         </v-list>
-    </v-navigation-drawer>
 </template>
 
 <script>

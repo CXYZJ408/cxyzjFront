@@ -5,7 +5,6 @@
                 <nuxt-link class="grey--text" to="/signUp">注册</nuxt-link>
             </v-card-text>
             <v-form v-if="loginWithPassword" v-model="valid" ref="form" lazy-validation>
-
                 <v-text-field
                         class="pt-2 px-3"
                         prepend-icon="account_circle"
@@ -99,11 +98,10 @@
     </v-flex>
 </template>
 <script>
-
-  import UserApi from '~/api/UserApi'
+  import Api from '~/api/Api'
 
   let Cookie
-  let $userApi
+  let $Api
   export default {
     head: {
       title: '程序员之家 - 登录'
@@ -120,6 +118,7 @@
     },
     data: () => ({
       code: '',
+      reset: false,
       codeRules: [
         v => !!v || '验证码不可为空'
       ],
@@ -127,7 +126,7 @@
       hasSend: false,
       valid: false,
       valid2: false,
-      text: '验证码登录(手机或邮箱)',
+      text: '手机验证码登录',
       loginWithPassword: true,
       phoneEmail: '',
       show: false,
@@ -154,7 +153,7 @@
       change: function () {
         this.loginWithPassword = !this.loginWithPassword
         if (this.loginWithPassword) {
-          this.text = '验证码登录(手机号或邮箱)'
+          this.text = '手机验证码登录'
           this.$refs.form2.reset()
         } else {
           this.text = '密码登录(手机号或邮箱)'
@@ -166,22 +165,18 @@
         return phone.test(phoneEmail)
       },
       sendCode () {
-        let calls = [$userApi.sendCode]
-        let sendData = [{'phone': this.phoneEmail}]
+        let call = $Api.UserApi().sendCode
+        let sendData = {'phone': this.phoneEmail}
         //获取验证码
-
-        this.$utils.proxy(sendData, calls).then((res) => {
-          if (res[0].status === this.$status.SUCCESS) {
+        this.$utils.proxyOne(sendData, call).then((res) => {
+          if (res.status === this.$status.SUCCESS) {
             //成功发送验证码
-            this.$message({
-              message: '验证码发送成功',
-              type: 'success'
-            })
+            this.$message.success('验证码发送成功')
             let times = 60
             this.codeMsg = '重新获取(60秒)'
             this.hasSend = true
             let timer = setInterval(() => {
-              if (times === 0) {
+              if (times === 0 || this.text === '手机验证码登录') {
                 clearInterval(timer)
                 this.hasSend = false
                 this.codeMsg = '发送验证码'
@@ -190,52 +185,54 @@
                 this.codeMsg = `重新获取(${times}秒)`
               }
             }, 1000)
-          } else if (res[0].status === this.$status.CODE_SEND_FAILURE) {
+          } else if (res.status === this.$status.CODE_SEND_FAILURE) {
             this.$message.error('验证码发送失败，请尝试重新发送')
           }
         })
       },
       login () {
-        let sendData = []
-        let calls = []
+        let sendData
+        let call
         let that = this
         if (this.loginWithPassword && this.$refs.form.validate()) {
+          let $md5 = require('js-md5')
           //使用密码登录，同时通过表单验证
+          let password = $md5(this.password.split('').reverse().join(''))
           if (this.isPhone(this.phoneEmail)) {
             //手机
-            sendData = [{'phone': this.phoneEmail, 'password': this.password}]
+            sendData = {'phone': this.phoneEmail, 'password': password}
           } else {
             //邮箱
-            sendData = [{'email': this.phoneEmail, 'password': this.password}]
+            sendData = {'email': this.phoneEmail, 'password': password}
           }
-          calls = [$userApi.loginPassword]
-          this.$utils.proxy(sendData, calls).then((res) => {
-            let status = res[0].status
+          call = $Api.UserApi().loginPassword
+          this.$utils.proxyOne(sendData, call).then((res) => {
+            let status = res.status
             if (status === this.$status.WRONG_PASSWORD) {
               this.$message.error('密码错误！！')
             } else if (status === this.$status.NONE_USER) {
               this.$message.error('当前用户不存在，请先注册！！')
             } else if (status === this.$status.SUCCESS) {
-              that.$store.commit('login', res[0].data)
-              Cookie.set('token', res[0].data.token)
-              Cookie.set('refreshToken', res[0].data.refreshToken, {expires: 7})
+              that.$store.commit('login', res.data)
+              Cookie.set('token', res.data.token)
+              Cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
               this.$router.push({path: `/`})
             }
           })
         } else if (!this.loginWithPassword && this.$refs.form2.validate()) {
           //使用验证码登录，同时通过表单验证
-          sendData = [{'phone': this.phoneEmail, 'code': this.code}]
-          calls = [$userApi.loginCode]
-          this.$utils.proxy(sendData, calls).then((res) => {
-            let status = res[0].status
+          sendData = {'phone': this.phoneEmail, 'code': this.code}
+          call = $Api.UserApi().loginCode
+          this.$utils.proxyOne(sendData, call).then((res) => {
+            let status = res.status
             if (status === this.$status.CODE_ERROR) {
               this.$message.error('验证码错误！！')
             } else if (status === this.$status.NONE_USER) {
               this.$message.error('当前用户不存在，请先注册！！')
             } else if (status === this.$status.SUCCESS) {
-              that.$store.commit('login', res[0].data)
-              Cookie.set('token', res[0].data.token)
-              Cookie.set('refreshToken', res[0].data.refreshToken, {expires: 7})
+              that.$store.commit('login', res.data)
+              Cookie.set('token', res.data.token)
+              Cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
               this.$router.push({path: `/`})
             }
           })
@@ -245,17 +242,11 @@
     mounted () {
       //初始化
       Cookie = require('js-cookie')
-      $userApi = new UserApi(this.$store)
+      $Api = new Api(this.$store)
     }
   }
 </script>
 <style scoped>
-
-    .form {
-        z-index: 50;
-        background-color: rgba(255, 255, 255, 1);
-    }
-
     a {
         text-decoration: none;
     }

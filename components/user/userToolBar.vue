@@ -16,14 +16,14 @@
                         <v-spacer></v-spacer>
                         <v-flex v-if="$store.state.isLogin" wrap md7 xl6 @mouseleave="show_name=false"
                                 class="text-md-right">
-                            <el-input v-model="search" placeholder="搜索"></el-input>
+                            <el-input v-model="search" placeholder="搜索" ></el-input>
 
                             <el-tooltip effect="dark" content="通知" placement="bottom">
-                                <v-avatar :size="33" class="ml-3">
+                                <v-avatar :size="33" class="ml-4 mr-3">
                                     <v-icon @click="click" class="alarm">iconfont icon-remind</v-icon>
                                 </v-avatar>
                             </el-tooltip>
-                            <el-dropdown @command="handleCommand">
+                            <el-dropdown @command="handleCommand" trigger="click">
                                 <v-avatar :size="45" class="ml-4">
                                     <img :src="$store.state.user.head_url" alt="">
                                 </v-avatar>
