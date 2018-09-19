@@ -64,7 +64,7 @@
                 <p class="body-2">{{text}}</p>
             </v-flex>
             <v-flex md1>
-                <el-tooltip class="item" effect="dark" content="展开" placement="bottom">
+                <el-tooltip class="item" effect="dark" :content="expandWord" placement="bottom">
                     <v-btn flat icon color="grey">
                         <v-icon @click="expand">{{arrow}}</v-icon>
                     </v-btn>
@@ -140,7 +140,8 @@
         arrow: 'keyboard_arrow_down',
         text: '',
         showDiscusser: false,
-        showReplier: false
+        showReplier: false,
+        expandWord: '展开'
       }
     },
     methods: {
@@ -161,8 +162,10 @@
         this.text = this.setString(this.comment.commentInfo.text, this.all)
         if (this.all) {
           this.arrow = 'keyboard_arrow_up'
+          this.expandWord = '收起'
         } else {
           this.arrow = 'keyboard_arrow_down'
+          this.expandWord = '展开'
         }
       },
       setString (str, all) {
@@ -224,13 +227,15 @@
         left: 40px;
         top: 32px;
     }
-.userCard2{
-    position: absolute;
-    z-index: 999;
-    width: 300px;
-    left: 130px;
-    top: 32px;
-}
+
+    .userCard2 {
+        position: absolute;
+        z-index: 999;
+        width: 300px;
+        left: 130px;
+        top: 32px;
+    }
+
     .redfont {
         color: #E74C3C !important;
     }

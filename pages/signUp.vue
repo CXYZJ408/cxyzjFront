@@ -41,7 +41,7 @@
                             </v-flex>
                             <v-flex md7 xs12 sm10>
                                 <v-text-field label="昵称" class="text" v-model="user.nickname" :rules="nickRules"
-                                              prepend-icon="account_circle"
+                                              prepend-icon="account_circle" @keyup.enter="next('2')"
                                               required></v-text-field>
                                 <v-radio-group v-model="user.gender" row required :rules="genderRules">
                                     <v-radio label="男" value=0 color="blue" on-icon="iconfont icon-nan">
@@ -75,11 +75,12 @@
                             <v-flex md11 xs12>
                                 <v-text-field prepend-icon="phone" v-model="user.phone" :rules="phoneRules"
                                               :error="phone_error" label="手机号" :error-messages="phone_msg"
-                                              required></v-text-field>
+                                              required @keyup.enter="next('3')"></v-text-field>
                                 <v-layout algin-center justify-start row xs12 sm8 wrap>
                                     <v-flex md8 xs12>
                                         <v-text-field prepend-icon="verified_user" v-model="phoneCode"
-                                                      :rules="codeRules" label="短信验证码" required></v-text-field>
+                                                      :rules="codeRules" label="短信验证码" required
+                                                      @keyup.enter="next('3')"></v-text-field>
                                     </v-flex>
                                     <v-flex md4 xs12>
                                         <v-btn block large round class="white--text" color="grey" @click="send('phone')"
@@ -113,11 +114,12 @@
                                 <v-text-field prepend-icon="email" v-model="user.email"
                                               :rules="emailRules"
                                               :error="email_error" :error-messages="email_msg"
-                                              label="邮箱" required></v-text-field>
+                                              label="邮箱" required @keyup.enter="next('4')"></v-text-field>
                                 <v-layout algin-center justify-start row xs12 sm8 wrap>
                                     <v-flex md8 xs12>
                                         <v-text-field prepend-icon="verified_user" v-model="emailCode"
-                                                      :rules="codeRules" label="邮箱验证码" required></v-text-field>
+                                                      :rules="codeRules" label="邮箱验证码" required
+                                                      @keyup.enter="next('4')"></v-text-field>
                                     </v-flex>
                                     <v-flex md4 xs12>
                                         <v-btn block large round class="white--text" color="grey" @click="send('email')"
@@ -149,27 +151,35 @@
                         <v-layout algin-center row xs12 sm8 wrap>
                             <v-flex md11 xs12>
                                 <v-text-field :type="show1?'text':'password'"
-                                              :append-icon="show1?'visibility_off':'visibility'" prepend-icon="lock"
-                                              v-model="password1" :rules="passwordRules" label="输入密码"
+                                              :append-icon="show1?'visibility_off':'visibility'"
+                                              prepend-icon="lock"
+                                              v-model="password1"
+                                              :rules="passwordRules"
+                                              label="输入密码"
                                               :error="password_error"
                                               :error-messages="error_msg"
                                               @click:append="show1=!show1"
                                               @input="passwordStrength"
-                                              required></v-text-field>
+                                              required
+                                              @keyup.enter="register"></v-text-field>
 
-                                <v-text-field :type="show2?'text':'password'" class="pt-4"
-                                              :append-icon="show2?'visibility_off':'visibility'" prepend-icon="lock"
-                                              v-model="password2" :rules="passwordRules" label="再次输入密码"
+                                <v-text-field :type="show2?'text':'password'"
+                                              class="pt-4"
+                                              :append-icon="show2?'visibility_off':'visibility'"
+                                              prepend-icon="lock"
+                                              v-model="password2"
+                                              :rules="passwordRules"
+                                              label="再次输入密码"
                                               :error="password_error"
                                               :error-messages="error_msg"
                                               @click:append="show2=!show2"
+                                              @keyup.enter="register"
                                               required></v-text-field>
                                 <v-layout class="pt-2">
                                     <v-flex md3 class="grey--text text-md-left title">密码强度：</v-flex>
                                     <v-flex md9>
                                         <el-progress class="pt-2" :percentage="strength" :stroke-width="6"
-                                                     :show-text="false"
-                                                     :color="strengthColor"></el-progress>
+                                                     :show-text="false" :color="strengthColor"></el-progress>
                                     </v-flex>
                                 </v-layout>
                             </v-flex>
@@ -209,7 +219,7 @@
       reset () {
         switch (this.step) {
           case '1':
-           this.$refs.form0.reset()
+            this.$refs.form0.reset()
             this.user.head_url = '/test.png'
             break
           case '2':
@@ -277,8 +287,10 @@
             this.$message.success('验证码发送成功')
             if (mode === 'phone') {
               this.phoneHasSend = true
+              this.phoneRest = false
             } else {
               this.emailHasSend = true
+              this.emailRest = false
             }
             let times = 60
             let timer = setInterval(() => {
@@ -296,7 +308,7 @@
                 if ((this.emailRest) || times === 0) {
                   clearInterval(timer)
                   this.emailHasSend = false
-                  this.emailCodeMsg = '发送手机验证码'
+                  this.emailCodeMsg = '发送邮箱验证码'
                   this.emailRest = false
                 } else {
                   this.emailCodeMsg = `重新获取(${times}秒)`
@@ -323,11 +335,11 @@
         this.user.head_url = res.data.url//设置图片
         this.progress = false//隐藏进度条
       },
-      handleAvatarProgress (event, rawFile) {
+      handleProgress (event, rawFile) {
         this.percentProgress = Math.floor(event.percent)//进度条
         this.progress = true//显示进度条，隐藏图片
       },
-      handleAvatarError () {
+      handleError () {
         this.progress = false
         this.$message.error('头像上传失败')
       },

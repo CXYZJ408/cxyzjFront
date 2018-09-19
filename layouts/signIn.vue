@@ -34,7 +34,10 @@
           this.$message('用户认证已过期，需要重新登录')
           Cookie.remove('token')//移除token
           Cookie.remove('refreshToken')
-          this.$store.commit('tokenExpired', false)
+          this.$router.push({path: `/signIn`})
+          this.$store.commit('tokenIsExpired', false)
+          this.$store.commit('clearAll')
+
         }
       }
     },

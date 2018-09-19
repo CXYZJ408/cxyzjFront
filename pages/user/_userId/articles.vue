@@ -1,5 +1,4 @@
 <template>
-
     <v-card class="main pt-3">
         <v-layout row wrap>
             <v-flex my-1 md12 v-for="(item,index) in articleList" v-if="item!==undefined" :key="index">
@@ -219,7 +218,7 @@
 <style scoped>
     .main {
         box-shadow: none;
-        background-color: rgba(255, 255, 255, .5);
+        background-color: rgba(178, 186, 187, .3);
         min-height: 800px;
         height: 100%;
     }

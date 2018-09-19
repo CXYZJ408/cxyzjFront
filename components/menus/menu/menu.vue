@@ -28,7 +28,7 @@
     props: {
       font_size: {
         type: Number,
-        default: 20
+        default: 18
       },
       distance: {
         type: String,
@@ -36,7 +36,7 @@
       },
       icon_size: {
         type: Number,
-        default: 30
+        default: 28
       },
       index: {
         type: Boolean,

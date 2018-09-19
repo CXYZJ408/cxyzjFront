@@ -65,9 +65,9 @@ export async function proxyOne (data, call, store) {
         if (refreshOk) {
           //刷新成功
           let invokesAgain = call(data)
-          console.log('invokesAgain', invokesAgain.length)
-          console.log('再次请求成功')
+          console.log('invokesAgain', invokesAgain)
           return await Promise.resolve(invokesAgain).then(function (result) {
+            console.log('再次请求成功')
             if (result) {
               console.log('开始返回数据')
               return result.data
@@ -91,6 +91,8 @@ export async function proxyOne (data, call, store) {
         return false
       }
     }
+  }).catch((e) => {
+    return {statusCode: 404, message: 'Post not found'}
   })
 }
 

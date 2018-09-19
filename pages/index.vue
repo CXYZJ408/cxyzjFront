@@ -2,7 +2,7 @@
     <div id="myindnex">
         <v-container v-scroll="onScroll" grid-list-md class="clearPadding">
             <v-layout row wrap>
-                <toolbar :font_size=25 :index=true></toolbar>
+                <toolbar :font_size=28 :icon_size=28 :index=true></toolbar>
             </v-layout>
             <v-layout align-center justify-center wrap style="margin-top: 90px!important;height: 500px">
                 <v-flex md12 xl9 wrap>
@@ -22,8 +22,8 @@
                     <v-card id="main">
                         <v-layout row wrap justify-center>
                             <v-flex md3>
-                                <v-card-title class="display-1 green--text pb-2">
-                                    <strong class="mt-1">热门文章</strong>
+                                <v-card-title class="headline green--text pb-2">
+                                    <strong class="mt-1 pl-2">热门文章</strong>
                                 </v-card-title>
                             </v-flex>
                             <v-flex md9 class="mt-3">
@@ -36,7 +36,7 @@
                                             v-for="(n,i) in types"
                                             :key="i"
                                             ripple>
-                                        <span class="title">{{n}}</span>
+                                        <span class="title2">{{n}}</span>
                                     </v-tab>
                                     <v-tabs-slider color="blue"></v-tabs-slider>
                                 </v-tabs>
@@ -174,7 +174,7 @@
         tabs: 0,
         types: ['推荐', '前端', '后端', 'Android', '运维', '算法', '人工智能'],
         items: [
-          '/img/test/2.jpg', '/img/test/1.jpg', '/img/test/3.jpg'
+          '/img/test/2.jpg', '/img/test/5.jpg', '/img/test/3.jpg'
         ],
         topics: [
           {
@@ -278,7 +278,7 @@
             dynamic_id: '8979651',
             is_collected: false,
             user: {
-              user_id: 'xxxxx',
+              user_id: '490538974364827648',
               nickname: '野望',
               head_url: '/img/test/head.jpg',
               bg_url: 'xxx',
@@ -463,6 +463,10 @@
 
     #myindnex .top35 {
         margin-top: 35px;
+    }
+
+    #main .title2 {
+        font-size: 18px;
     }
 
     #myindnex .father {

@@ -9,6 +9,7 @@
                             lazy
                             transition="scale-transition"
                             class="menu"
+                            open-delay="250"
                             :close-on-content-click=false>
                         <nuxt-link slot="activator" class="user" :to="'/user/'+article.user.user_id+'/articles'">
                             <v-avatar size="50">

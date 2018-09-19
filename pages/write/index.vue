@@ -56,9 +56,6 @@
     },
     components: {
       toolbar, upload
-    },
-    created () {
-      this.$store.commit('setBackground', '/img/Article/writeBack.jpg')
     }
   }
 </script>

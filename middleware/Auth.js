@@ -1,16 +1,12 @@
-export default function ({store, route, redirect}) {
+export default function ({store, route, redirect, error, params}) {
   console.log('middleware')
   if (store.state.isLogin) {
     //已经登陆了
     if ((route.fullPath === '/signIn') || route.fullPath === '/signUp') {
       return redirect('/')
     }
-  } else {
-    //还没有登陆，则需要确保不可以进入用户个人中心，写文章等
-    if (typeof (route.matched[0]) !== 'undefined') {
-      if (route.matched[0].path === '/user') {
-        return redirect('/signIn')
-      }
-    }
+  }
+  if (route.name==='user-setting-userId' && store.state.user.user_id !== params.userId) {
+    error({statusCode: 403, message: '未知错误！'})
   }
 }

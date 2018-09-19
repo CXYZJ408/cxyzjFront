@@ -1,14 +1,13 @@
 import Api from '../api/Api'
 import * as $utils from '../utils/index'
 import Status from '../utils/status'
-
+//主模块
 let defaultToken = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0ODcwMDUzODM3OTgyOTI0ODIiLCJyb2xlIjoiUk9MRV9BTk9OWU1JVFkiLCJleHAiOjE1NDUxNjAzMjMsImlhdCI6MTUzNjQwMDMyMywiaXNzIjoiY3h5emoiLCJzdWIiOiJUb2tlbiIsImF1ZCI6IlVzZXIiLCJqdGkiOiJhMmFhODc4Yi03MjgzLTQ5NjgtOWJjOS00ZjFhZDEzNmViOWQifQ.y5H4oXx05V33Bo9ZQRvVf8IqyNMxYDzHZW27_D9QD_MzTbhNHsQ9FsHmcXF9OkdZ_gCRIOdPhT7tElMaCk7iig'
 //默认的匿名用户的token是不会过期的(或者说是在2118年过期,如果这个项目还在的话。。。)
 export const state = () => ({
   isLogin: false,
   token: '',
   refreshToken: '',
-  background: '',//the background of the full layout
   user: {},//user information
   tokenHasUpdate: false,//should client need to flush the cookie
   tokenExpired: false,//whether token is expired
@@ -41,9 +40,6 @@ export const mutations = {
     state.user = {}
   },
   //the setting operation
-  setBackground (state, background) {
-    state.background = background
-  },
   setToken (state, token) {
     state.token = token
     console.log('setTokenOK')
@@ -68,6 +64,21 @@ export const mutations = {
     }
     console.log('token reset ok')
   },
+  setUserHead (state, head) {
+    state.user.head_url = head
+  },
+  setBgUrl (state, bgUrl) {
+    state.user.bg_url = bgUrl
+  },
+  setNickname (state, nickname) {
+    state.user.nickname = nickname
+  },
+  setGender (state, gender) {
+    state.user.gender = gender
+  },
+  setIntroduce (state, introduce) {
+    state.user.introduce = introduce
+  },
   tokenIsExpired (state, data) {
     state.tokenExpired = data
   },
@@ -79,7 +90,7 @@ export const mutations = {
     state.refreshToken = ''
   },
   clearAll (state) {
-    state.token = ''
+    state.token = defaultToken
     state.refreshToken = ''
   }
 }
@@ -95,8 +106,8 @@ export const actions = {
       }
       store.commit('clearAll')//清空token，防止缓存
       store.commit('setTokenRefreshToken', tokens)//将token全部重置
+      console.log(store.token)
       if (store.state.refreshToken.length === 0) {//如果重置token之后，refreshToken仍然为空，则表示还没有登陆
-        store.commit('setToken', defaultToken)
         console.log('the status without login')
       } else {
         //存在refreshToken

@@ -1,34 +1,34 @@
 <template>
-        <v-list class="menu">
-            <v-list-tile
-                    v-for="(item,index) in items" v-if="index<=3"
-                    :key="index"
-                    :to="item.link"
-                    class="py-2 pl-3 my-2"
-                    @click="change"
-                    @mouseover="change_color(index,item.icon_color)"
-                    @mouseout="change_color(index,'grey')"
-            >
-                <v-list-tile-action>
-                    <v-icon size="30" :style="{ 'color': default_color[index] }">{{ item.icon }}</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                    <v-list-tile-title class="menu_font" :style="{ 'color': default_color[index] }">{{ item.title }}
-                    </v-list-tile-title>
-                </v-list-tile-content>
-            </v-list-tile>
-            <v-layout row wrap align-center justify-center >
+    <v-list class="menu">
+        <v-list-tile
+                v-for="(item,index) in items" v-if="index<=3"
+                :key="index"
+                :to="item.link"
+                class="py-2 pl-3 my-2"
+                @click="change"
+                @mouseover="change_color(index,item.icon_color)"
+                @mouseout="change_color(index,'grey')"
+        >
+            <v-list-tile-action>
+                <v-icon size="30" :style="{ 'color': default_color[index] }">{{ item.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+                <v-list-tile-title class="menu_font" :style="{ 'color': default_color[index] }">{{ item.title }}
+                </v-list-tile-title>
+            </v-list-tile-content>
+        </v-list-tile>
+        <v-layout row wrap align-center justify-center>
             <v-flex md12 class="py-2  pl-4 " v-for="(item,index) in items" v-if="index>3"
-                 @mouseover="change_color(index,item.icon_color)"
-                 @mouseout="change_color(index,'grey')" :key="index">
+                    @mouseover="change_color(index,item.icon_color)"
+                    @mouseout="change_color(index,'grey')" :key="index">
                 <nuxt-link :to="item.link">
                     <v-icon size="20" class="ml-3" :style="{ 'color': default_color[index] }">{{ item.icon }}</v-icon>
                     <span class="menu_font2 ml-2"
                           :style="{ 'color': default_color[index] }">{{ item.title +item.num}}</span>
                 </nuxt-link>
             </v-flex>
-            </v-layout>
-        </v-list>
+        </v-layout>
+    </v-list>
 </template>
 
 <script>
@@ -42,18 +42,38 @@
     data: function () {
       return {
         items: [
-          {title: '文章', icon: 'iconfont icon-article', icon_color: '#8E44AD', link: '/user/yaser/articles'},
-          {title: '讨论', icon: 'iconfont icon-discussion', icon_color: '#18ADED', link: '/user/yaser/discussions'},
-          {title: '评论', icon: 'iconfont icon-comment', icon_color: '#259B24', link: '/user/yaser/comments'},
-          {title: '收藏', icon: 'iconfont icon-collection', icon_color: '#FF9800', link: '/user/yaser/collections'},
+          {
+            title: '文章',
+            icon: 'iconfont icon-article',
+            icon_color: '#8E44AD',
+            link: `/user/${this.$store.state.userCenter.user.user_id}/articles`
+          },
+          {
+            title: '讨论',
+            icon: 'iconfont icon-discussion',
+            icon_color: '#18ADED',
+            link: `/user/${this.$store.state.userCenter.user.user_id}/discussions`
+          },
+          {
+            title: '评论',
+            icon: 'iconfont icon-comment',
+            icon_color: '#259B24',
+            link: `/user/${this.$store.state.userCenter.user.user_id}/comments`
+          },
+          {
+            title: '收藏',
+            icon: 'iconfont icon-collection',
+            icon_color: '#FF9800',
+            link: `/user/${this.$store.state.userCenter.user.user_id}/collections`
+          },
           {
             title: '关注：',
             icon: 'iconfont icon-attention',
             icon_color: '#16A085',
             num: 5,
-            link: '/user/yaser/attentions'
+            link: `/user/${this.$store.state.userCenter.user.user_id}/attentions`
           },
-          {title: '粉丝：', icon: 'iconfont icon-fans', icon_color: '#E74C3C', num: 1, link: '/user/yaser/fans'}
+          {title: '粉丝：', icon: 'iconfont icon-fans', icon_color: '#E74C3C', num: 1, link: `/user/${this.$store.state.userCenter.user.user_id}/fans`}
         ],
         default_color: ['grey', 'grey', 'grey', 'grey', 'grey', 'grey'],
         temp: 0

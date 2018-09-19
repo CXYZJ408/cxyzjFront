@@ -23,7 +23,6 @@ body::-webkit-scrollbar {
     position: absolute;
     top: 50%;
     margin-top: -60px;
-    right: 20px;
     width: 150px;
     height: 100px;
 }

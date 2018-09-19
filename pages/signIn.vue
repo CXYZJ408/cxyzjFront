@@ -12,6 +12,7 @@
                         :rules="phoneEmailRules"
                         label="手机号或邮箱"
                         required
+                        @keyup.enter="login"
                 ></v-text-field>
                 <v-text-field
                         class="pt-3 px-3"
@@ -23,6 +24,7 @@
                         label="密码"
                         @click:append="show=!show"
                         required
+                        @keyup.enter="login"
                 ></v-text-field>
 
             </v-form>
@@ -34,6 +36,7 @@
                         :rules="phoneRules"
                         label="手机号"
                         required
+                        @keyup.enter="login"
                 ></v-text-field>
                 <v-layout class="pt-2 ">
                     <v-flex md7>
@@ -44,6 +47,7 @@
                                 :rules="codeRules"
                                 label="短信验证码"
                                 required
+                                @keyup.enter="login"
                         ></v-text-field>
                     </v-flex>
                     <v-flex md3>

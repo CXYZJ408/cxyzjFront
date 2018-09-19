@@ -10,9 +10,8 @@ axios.interceptors.request.use(config => {
   if (!!$store) {
     let token
     console.log('$needRefresh', $needRefresh)
-    // console.log('needRefresh:', $store.state.needRefresh)
     if ($needRefresh) {//如果原来的token过期了，使用refreshToken进行刷新
-      // console.log('axiosRefreshToken', $store.state.refreshToken.split('.')[2])
+      console.log('Refresh---axiosToken-------------', $store.state.refreshToken.split('.')[2])
       token = 'Bearer ' + $store.state.refreshToken//在请求头部加上token，用于用户认证
       console.log('Refresh')
       $needRefresh = false
@@ -21,7 +20,6 @@ axios.interceptors.request.use(config => {
       token = 'Bearer ' + $store.state.token//在请求头部加上token，用于用户认证
     }
     config.headers.Authorization = token
-    console.log('header', config.headers)
   }
 
   return config
@@ -39,7 +37,7 @@ axios.interceptors.response.use(response => {
 })
 
 export default {//导出方法
-  get (url, params, header = {}) {
+  get (url, params = {}, header = {}) {
     console.log('get', url)
     return axios.get(url, {params}, header)
   },

@@ -1,12 +1,12 @@
 <template>
     <v-layout wrap mt-5 row fill-height justify-center style="margin-top: 90px!important;">
-        <v-flex md12 xl9 class="elevation-12 back mb-5">
-            <myhead :user="user"></myhead>
-            <v-layout>
+        <v-flex md12 xl9 class=" back mb-5">
+            <myhead></myhead>
+            <v-layout class="elevation-12">
                 <v-flex md2 class="left">
                     <leftMenu></leftMenu>
                 </v-flex>
-                <v-flex md10 class="pr-3 " style="padding: 0!important;">
+                <v-flex md10 class="pr-3 content">
                     <nuxt-child/>
                 </v-flex>
             </v-layout>
@@ -16,54 +16,66 @@
 <script>
   import myhead from '~/components/user/myhead.vue'
   import toolbar from '~/components/user/userToolBar.vue'
+  import Api from '~/api/Api'
+  import * as $utils from '~/utils'
+  import $Status from '~/utils/status'
 
   export default {
     name: 'default',
     components: {
       myhead, toolbar
     },
-    data () {
-      return {
-        drawer: true,
-        right: null,
-        user: {
-          user_id: 'xxxxx',
-          nickname: 'yaser',
-          head_url: '/img/test/head.jpg',
-          email: '335767798@qq.com',
-          bg_url: '/img/user/background.jpeg',
-          regist_date: 'xxx',
-          phone: '17602545735',
-          theme_color: 'orange',
-          role: 'user',
-          introduce: 'Listen to your favorite artists and albums whenever and wherever, online and offline.Listen to your favorite artists andalbums whenever and wherever, online and offline.',
-          gender: 1,
-          attentions: 0,
-          fans: 0,
-          articles: 0,
-          discussions: 0,
-          comments: 0
-        }
+    asyncData ({params, redirect, store, error}) {
+      let $Api = new Api(store)
+      console.log(store.state.user.user_id)
+      if (store.state.user.user_id === params.userId) {
+        //访问的是自己的主页
+        return $utils.proxyOne(null, $Api.UserApi().getUserDetails, store).then((res) => {
+          if (res.status === $Status.SUCCESS) {
+            store.commit('userCenter/setUser', res.data.user)
+          } else {
+            if (store.state.tokenExpired) {
+              let Cookie = require('js-cookie')
+              Cookie.remove('token')//移除token
+              Cookie.remove('refreshToken')
+              store.commit('tokenIsExpired', false)// todo 修改为重定向
+            } else {
+              error({statusCode: 500, message: '未知错误！'})
+            }
+          }
+        }).catch((e) => {
+          error({statusCode: 500, message: '未知错误！'})
+        })
+      } else {
+        //访问别人的主页
+        return $utils.proxyOne(params.userId, $Api.UserApi().getOtherUserDetails, store).then((res) => {
+          console.log(res)
+          if (res.status === $Status.SUCCESS) {
+            store.commit('userCenter/setUser', res.data.user)
+          } else {
+            error({statusCode: 404, message: res.statusInfo})
+          }
+        }).catch((e) => {
+          error({statusCode: 500, message: '未知错误！'})
+        })
       }
-    },
-    mounted () {
-      let id = this.$store.state.user.user_id
-      this.$router.push({path: `/user/${id}/articles`})//重定向
-      // console.log(router.path)
     }
-
   }
 </script>
 
 <style scoped>
     .back {
-        background-color: rgba(255, 255, 255, .9);
         min-height: 600px;
     }
 
     .left {
         margin: 0;
+        background-color: rgba(255, 255, 255, .9);
         padding: 0 !important;
     }
 
+    .content {
+        padding: 0 !important;
+        background-color: rgba(255, 255, 255, .9);
+    }
 </style>

@@ -4,7 +4,7 @@
             <v-layout align-center justify-center>
                 <v-flex xl9 md12>
                     <v-layout justify-center align-center row>
-                        <v-flex md5 xl4 class="justify-center align-center">
+                        <v-flex md7 xl4 class="justify-center align-center">
                             <nuxt-link to="/"><img style="width: 60px;float: left" src="/img/login/logo-small.png"
                                                    alt="">
                             </nuxt-link>
@@ -14,17 +14,15 @@
                                     :distance="distance" :write="write"></mymenu>
                         </v-flex>
                         <v-spacer></v-spacer>
-                        <v-flex v-if="$store.state.isLogin" wrap md7 xl6 @mouseleave="show_name=false"
-                                class="text-md-right">
-                            <el-input v-model="search" placeholder="搜索" ></el-input>
-
+                        <v-flex v-if="$store.state.isLogin" wrap md7 xl6 class="text-md-right">
+                            <el-input v-model="search" placeholder="搜索" prefix-icon="el-icon-search"></el-input>
                             <el-tooltip effect="dark" content="通知" placement="bottom">
-                                <v-avatar :size="33" class="ml-4 mr-3">
+                                <v-avatar :size="28" class="ml-4 mr-3">
                                     <v-icon @click="click" class="alarm">iconfont icon-remind</v-icon>
                                 </v-avatar>
                             </el-tooltip>
                             <el-dropdown @command="handleCommand" trigger="click">
-                                <v-avatar :size="45" class="ml-4">
+                                <v-avatar :size="40" class="ml-2">
                                     <img :src="$store.state.user.head_url" alt="">
                                 </v-avatar>
                                 <el-dropdown-menu slot="dropdown">
@@ -33,7 +31,7 @@
                                 </el-dropdown-menu>
                             </el-dropdown>
                         </v-flex>
-                        <v-flex v-else wrap md7 xl5 class="text-md-right">
+                        <v-flex v-else wrap md5 xl5 class="text-md-right">
                             <el-input v-model="search" placeholder="搜索" prefix-icon="el-icon-search"></el-input>
                             <v-btn flat outline color="blue" class="btn" to="/signIn">登录</v-btn>
                             <v-btn color="blue" class="btn" dark to="/signUp">注册</v-btn>
@@ -112,7 +110,7 @@
 
 <style scoped>
     .iconfont {
-        font-size: 35px;
+        font-size: 28px;
         color: #8590A6;
     }
 
@@ -140,9 +138,12 @@
 
     .el-input >>> input {
         border-radius: 20px;
+        height: 30px;
         width: 100%;
     }
-
+    .el-input >>> .el-input__icon {
+       line-height: 0;
+    }
     .el-input {
         width: 30%;
         transition: all 1s ease-out;
