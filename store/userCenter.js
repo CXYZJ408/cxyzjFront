@@ -31,5 +31,11 @@ export const mutations = {
   updateEmail (state, email) {
     state.user.email = email
   },
+  updateFollow (state, follow) {
+    state.user.is_followed = follow
+  },
+  updateFans (state, fans) {
+    state.user.fans = fans
+  }
 
 }

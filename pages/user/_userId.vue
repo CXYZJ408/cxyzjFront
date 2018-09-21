@@ -1,5 +1,5 @@
 <template>
-    <v-layout wrap mt-5 row fill-height justify-center style="margin-top: 90px!important;">
+    <v-layout wrap mt-5 row fill-height justify-center style="margin-top: 90px!important;" >
         <v-flex md12 xl9 class=" back mb-5">
             <myhead></myhead>
             <v-layout class="elevation-12">

@@ -22,8 +22,8 @@
                                 </v-avatar>
                             </el-tooltip>
                             <el-dropdown @command="handleCommand" trigger="click">
-                                <v-avatar :size="40" class="ml-2">
-                                    <img :src="$store.state.user.head_url" alt="">
+                                <v-avatar :size="40" class="avatar ml-2">
+                                    <img :src="$store.state.user.head_url" v-bind:class="widthHeight" alt="">
                                 </v-avatar>
                                 <el-dropdown-menu slot="dropdown">
                                     <el-dropdown-item command="userCenter">个人中心</el-dropdown-item>
@@ -85,10 +85,21 @@
     data: function () {
       return {
         search: '',
-        show: false
+        show: false,
+        widthHeight: 'avatar-img-width'
       }
     },
     methods: {
+      widthOrHeight () {
+        let img = new Image()
+        console.log(this.$store.state.userCenter.user.head_url)
+        img.src = this.$store.state.userCenter.user.head_url
+        if (img.width < img.height) {
+          return 'width'
+        } else {
+          return 'height'
+        }
+      },
       click () {
         console.log('111')
       },
@@ -103,6 +114,14 @@
           this.$router.push({path: `/user/${this.$store.state.user.user_id}/articles`})
         }
 
+      }
+    },
+    mounted(){
+      let res = this.widthOrHeight()
+      if (res === 'width') {
+        this.widthHeight = 'avatar-img-width'
+      } else {
+        this.widthHeight = 'avatar-img-height'
       }
     }
   }
@@ -141,9 +160,11 @@
         height: 30px;
         width: 100%;
     }
+
     .el-input >>> .el-input__icon {
-       line-height: 0;
+        line-height: 0;
     }
+
     .el-input {
         width: 30%;
         transition: all 1s ease-out;
@@ -160,5 +181,9 @@
     a {
         text-decoration: none;
         color: inherit;
+    }
+
+    .avatar {
+        overflow: hidden;
     }
 </style>

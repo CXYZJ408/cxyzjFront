@@ -12,7 +12,7 @@ module.exports = {
     link: [
       {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'},
       {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'},
-      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_5kbld61gja8.css'}
+      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_9vmuodbve3l.css'}
     ]
   },
   plugins: [
@@ -22,7 +22,9 @@ module.exports = {
     {src: '~/plugins/menu.js'},
     {src: '~/plugins/component.js'},
     {src: '~/plugins/markdown.js', ssr: false},
-    {src: '~/plugins/Utils.js', ssr: false}
+    {src: '~/plugins/Utils.js', ssr: false},
+    {src: '~/plugins/vue-croppa.js', ssr: false}
+
   ],
   css: [
     '~/assets/style/app.styl',
@@ -30,7 +32,10 @@ module.exports = {
     '~/assets/style/iconfont.css',
     'element-ui/lib/theme-chalk/index.css'],
   router: {
-    middleware: ['Auth']
+    middleware: ['Auth'],
+    scrollBehavior: function (to, from, savedPosition) {
+      return {x: 0, y: 0}
+    }
   },
   /*
   ** Customize the progress bar color

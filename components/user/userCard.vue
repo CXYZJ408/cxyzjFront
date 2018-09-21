@@ -45,9 +45,9 @@
             <v-flex md12 sm12 class=" pb-2">
                 <p class="grey--text">{{user.introduce}}</p>
             </v-flex>
-            <v-flex md6 sm6  class=" pb-2">
+            <v-flex md6 sm6 class=" pb-2">
                 <v-btn outline block flat :color="color" round @mouseover="isAttention(true)"
-                       @mouseleave="isAttention(false)" @click="clickAttention">
+                       @mouseleave="isAttention(false)" @click="Attention">
                     <v-icon>{{icon}}</v-icon>
                     {{attention}}
                 </v-btn>
@@ -75,7 +75,7 @@
       }
     },
     methods: {
-      clickAttention () {
+      Attention () {
         this.user.is_followed = !this.user.is_followed
         if (!this.user.is_followed) {
           this.$emit('del', this.index)

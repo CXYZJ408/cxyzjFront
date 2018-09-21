@@ -1,5 +1,5 @@
 <template>
-    <v-card class="main elevation-5 pa-3">
+    <v-card class="main elevation-5 pa-3 ">
         <v-layout wrap row justify-center>
             <v-flex md8 offset-md3 class="text-md-right">
                 <nuxt-link class="blue--text " :to="'/user/'+user.user_id+'/articles'">返回我的主页></nuxt-link>
@@ -9,6 +9,7 @@
             <v-flex md12 mt-3 class="text-md-center">
                 <el-upload class="avatar-uploader"
                            action="#"
+                           accept="image/*"
                            :show-file-list="false"
                            :multiple="false"
                            :http-request="upload"
@@ -39,7 +40,7 @@
             <v-flex md6 v-if="editNickname">
                 <v-layout row wrap align-center>
                     <v-flex md4>
-                        <el-input v-model="user.nickname" placeholder="昵称" minlength="3" maxlength="10"></el-input>
+                        <el-input v-model="user.nickname" placeholder="昵称" maxlength="10"></el-input>
                     </v-flex>
                     <v-flex md6>
                         <v-icon color="blue" class="d-inline-block"
@@ -118,7 +119,8 @@
             <v-flex md6 v-if="editPassword">
                 <v-layout row wrap align-center>
                     <v-flex md6>
-                        <el-input placeholder="密码" v-model="newPassword" @input="passwordStrength"></el-input>
+                        <el-input placeholder="密码" v-model="newPassword" @input="passwordStrength"
+                                  type="password"></el-input>
                     </v-flex>
                     <v-flex md3>
                         <v-icon color="blue" class="d-inline-block" @click="finish('password')">
@@ -152,7 +154,10 @@
                                 type="textarea"
                                 :rows="4"
                                 placeholder="个人简介"
-                                v-model="user.introduce">
+                                v-model="user.introduce"
+                                resize="none"
+                                :maxlength="150"
+                        >
                         </el-input>
                     </v-flex>
                     <v-flex md12 text-md-right>
@@ -198,17 +203,17 @@
                            :on-progress="handleProgress"
                            :on-error="handleError"
                            :before-upload="beforeBackgroundUpload">
-                        <v-progress-circular
-                                :rotate="-90"
-                                :size="100"
-                                :width="15"
-                                v-if="progress"
-                                :value="percentProgress"
-                                color="green"
-                        >
-                            {{percentProgress}}%
-                        </v-progress-circular>
-                        <img v-else :src="user.bg_url"  class="backPicture">
+                    <v-progress-circular
+                            :rotate="-90"
+                            :size="100"
+                            :width="15"
+                            v-if="progress"
+                            :value="percentProgress"
+                            color="green"
+                    >
+                        {{percentProgress}}%
+                    </v-progress-circular>
+                    <img v-else :src="user.bg_url" class="backPicture">
                 </el-upload>
             </v-flex>
         </v-layout>
@@ -243,7 +248,7 @@
             </el-dialog>
             <el-dialog :visible.sync="editEmailPhone" width="480px">
                 <p class="display-2 text-md-center">{{`修改${which==='phone'?'手机':'邮箱'}`}}</p>
-                <p class="title blue--text text-md-center py-3" style="line-height:33px">
+                <p class="title blue--text text-md-center py-3" style="line-height:28px!important;">
                     请修改您的{{which==='phone'?'手机':'邮箱'}}<br>并进行相关的验证</p>
                 <v-form v-model="validateEmail" class="px-2" ref="email" v-if="which==='email'">
                     <v-layout algin-center justify-start row xs12 sm8 wrap>
@@ -396,16 +401,31 @@
         this.$message.error('图片上传失败')
       },
       beforeAvatarUpload (file) {
-        const isJPG = file.type === 'image/jpeg'
-        const isLt1M = file.size / 1024 / 1024 < 1
-        if (!isJPG) {
-          this.$message.warning('上传的头像图片只能是 JPG 格式!')
-        }
-        if (!isLt1M) {
-          this.$message.warning('上传的头像图片大小不能超过 1MB!')
-        }
-        console.log(isJPG && isLt1M)
-        return isJPG && isLt1M
+        console.log(file)
+        return new Promise((resolve, reject) => {
+          this.getPictureWidthHeight(file).then((result) => {
+            console.log(result)
+            if (result) {
+              const isAccess = this.accessType.includes(file.type)
+              const isLt1M = file.size / 1024 / 1024 < 1
+              if (!isAccess) {
+                this.$message.warning('上传的头像图片只能是 JPG 格式!')
+              }
+              if (!isLt1M) {
+                this.$message.warning('上传的头像图片大小不能超过 1MB!')
+              }
+              if (isAccess && isLt1M) {
+                resolve(true)
+              } else {
+                reject(false)
+              }
+            } else {
+              this.$message.warning('图片大小至少为190*190！')
+              reject(false)
+            }
+          })
+        })
+
       },
       beforeBackgroundUpload (file) {
         const isJPG = file.type === 'image/jpeg'
@@ -416,8 +436,23 @@
         if (!isLt2M) {
           this.$message.warning('上传的背景图片大小不能超过 2MB!')
         }
-        console.log(isJPG && isLt2M)
         return isJPG && isLt2M
+      },
+      getPictureWidthHeight (file) {
+        // 获取文件尺寸，判断尺寸在不在规定范围之内
+        return new Promise((resolve, reject) => {
+          let reader = new FileReader()
+          reader.readAsDataURL(file)
+          reader.onload = function (theFile) {
+            let image = new Image()
+            image.src = theFile.target.result
+            image.onload = function () {
+              console.log(this.width, this.height)
+              resolve(this.width >= 190 && this.height >= 190)
+            }
+          }
+        })
+
       },
       show (index, state) {
         this.$set(this.shows, index, state)
@@ -642,9 +677,12 @@
             break
           case 'password':
             this.show(4, false)
+            this.newPassword = ''
             this.editPassword = false
+            this.strength = 0
             break
           case 'introduce':
+            this.user.introduce = this.$store.state.userCenter.user.introduce//恢复
             this.show(5, false)
             this.editIntroduce = false
             break
@@ -654,33 +692,37 @@
         let sendData
         switch (which) {
           case 'nickname':
-            sendData = {nickname: this.user.nickname}
-            this.$utils.proxyOne(sendData, $Api.UserApi().updateNickname, this.$store).then((result) => {
-              if (result.status === $Status.SUCCESS) {
-                this.$store.commit('userCenter/updateNickname', this.user.nickname)
-                this.$store.commit('setNickname', this.user.nickname)
-                this.$notify({
-                  title: '修改成功！',
-                  message: '您的昵称修改成功！',
-                  type: 'success'
-                })
-              } else if (result.status === $Status.NICKNAME_EXIST) {
-                this.$notify({
-                  title: '修改失败！',
-                  message: '该昵称已经存在了，换个吧！',
-                  type: 'warning'
-                })
-              } else {
-                this.$notify({
-                  title: '修改失败！',
-                  message: '未知错误，昵称修改失败！',
-                  type: 'error'
-                })
-                this.user.nickname = this.$store.state.userCenter.user.nickname//恢复至未更改状态
-              }
-              this.show(0, false)
-              this.editNickname = false
-            })
+            if (this.user.nickname.length < 3) {
+              this.$message.warning('昵称太短啦！')
+            } else {
+              sendData = {nickname: this.user.nickname}
+              this.$utils.proxyOne(sendData, $Api.UserApi().updateNickname, this.$store).then((result) => {
+                if (result.status === $Status.SUCCESS) {
+                  this.$store.commit('userCenter/updateNickname', this.user.nickname)
+                  this.$store.commit('setNickname', this.user.nickname)
+                  this.$notify({
+                    title: '修改成功！',
+                    message: '您的昵称修改成功！',
+                    type: 'success'
+                  })
+                } else if (result.status === $Status.NICKNAME_EXIST) {
+                  this.$notify({
+                    title: '修改失败！',
+                    message: '该昵称已经存在了，换个吧！',
+                    type: 'warning'
+                  })
+                } else {
+                  this.$notify({
+                    title: '修改失败！',
+                    message: '未知错误，昵称修改失败！',
+                    type: 'error'
+                  })
+                  this.user.nickname = this.$store.state.userCenter.user.nickname//恢复至未更改状态
+                }
+                this.show(0, false)
+                this.editNickname = false
+              })
+            }
             break
           case 'gender':
             sendData = {gender: value}
@@ -707,35 +749,43 @@
             })
             break
           case 'password':
-            this.newPassword = $md5(this.newPassword.split('').reverse().join(''))//逆序并计算MD5值
-            sendData = {password: this.newPassword, user_id: this.user.user_id}
-            this.$utils.proxyOne(sendData, $Api.UserApi().updatePassword).then((result) => {
-              if (result.status === $Status.SUCCESS) {
-                this.$notify({
-                  title: '修改成功！',
-                  message: '您的密码修改成功！',
-                  type: 'success'
-                })
-              } else if (result.status === this.$status.OUT_OF_TIME) {
-                this.isVerify = false
-                this.$notify({
-                  title: '修改失败！',
-                  message: '您的用户验证已过期，请重新验证！',
-                  type: 'warning'
-                })
-              } else {
-                this.isVerify = false
-                this.$notify({
-                  title: '修改失败！',
-                  message: '未知错误！',
-                  type: 'error'
-                })
-              }
-              this.editPassword = false
-              this.show(4, false)
-            })
+            if (this.strength < 1) {
+              this.$message.warning('密码太简单啦！')
+            } else {
+              this.newPassword = $md5(this.newPassword.split('').reverse().join(''))//逆序并计算MD5值
+              sendData = {password: this.newPassword, user_id: this.user.user_id}
+              this.$utils.proxyOne(sendData, $Api.UserApi().updatePassword).then((result) => {
+                if (result.status === $Status.SUCCESS) {
+                  this.$notify({
+                    title: '修改成功！',
+                    message: '您的密码修改成功！',
+                    type: 'success'
+                  })
+                } else if (result.status === this.$status.OUT_OF_TIME) {
+                  this.isVerify = false
+                  this.$notify({
+                    title: '修改失败！',
+                    message: '您的用户验证已过期，请重新验证！',
+                    type: 'warning'
+                  })
+                } else {
+                  this.isVerify = false
+                  this.$notify({
+                    title: '修改失败！',
+                    message: '未知错误！',
+                    type: 'error'
+                  })
+                }
+                this.editPassword = false
+                this.show(4, false)
+              })
+            }
+
             break
           case 'introduce':
+            if (this.user.introduce.length === 0) {
+              this.user.introduce = '这个人很懒，连介绍都没有(￢︿̫̿￢☆)'
+            }
             sendData = {introduce: this.user.introduce}
             this.$utils.proxyOne(sendData, $Api.UserApi().updateIntroduce, this.$store).then((result) => {
               if (result.status === $Status.SUCCESS) {
@@ -812,6 +862,7 @@
     },
     data: function () {
       return {
+        accessType: ['image/jpeg', 'image/png'],
         isVerify: false,
         items: [
           '使用手机号' + this.user.phone + '验证',

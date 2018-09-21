@@ -37,7 +37,6 @@
 </template>
 <script>
   import toolbar from '~/components/user/userToolBar.vue'
-  import upload from '~/components/other/upload/Upload.vue'
 
   export default {
     name: 'App',
@@ -55,7 +54,7 @@
       }
     },
     components: {
-      toolbar, upload
+      toolbar
     }
   }
 </script>

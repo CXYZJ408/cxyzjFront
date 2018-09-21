@@ -41,6 +41,20 @@ body::-webkit-scrollbar {
     opacity: 0;
 }
 
+.v-overlay:before {
+    background-color: #D0D3D4;
+}
+
+.avatar-img-width {
+    height: auto !important;
+    width: 100% !important;
+}
+
+.avatar-img-height {
+    height: 100% !important;
+    width: auto !important;
+}
+
 .slide-fade-leave-active {
     transition: all .8s cubic-bezier(0, 0, .58, 1)
 }

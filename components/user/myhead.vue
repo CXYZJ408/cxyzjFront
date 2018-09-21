@@ -5,7 +5,7 @@
         <v-flex md2 ml-3>
             <div class="card">
                 <v-avatar class="avatar" :tile="true">
-                    <img :src="$store.state.userCenter.user.head_url" alt="">
+                    <img :src="$store.state.userCenter.user.head_url" v-bind:class="widthHeight" alt="">
                 </v-avatar>
                 <span class="d-block title text-md-center mt-2 px-2" style="text-transform: capitalize">
                         {{$store.state.userCenter.user.nickname}}
@@ -24,7 +24,7 @@
                            :to="'/user/setting/'+$store.state.userCenter.user.user_id"><strong>编辑个人资料</strong>
                     </v-btn>
                     <v-btn v-else large block dark :color="color" depressed @mouseover="isAttention(true)"
-                           @mouseleave="isAttention(false)" @click="clickAttention" class="title">
+                           @mouseleave="isAttention(false)" @click="Attention" class="title">
                         <v-icon :size="24">{{icon}}</v-icon>
                         {{attention}}
                     </v-btn>
@@ -51,20 +51,66 @@
 </template>
 
 <script>
+  import Api from '~/api/Api'
+  import $Status from '~/utils/status'
+
+  let $Api
   export default {
     name: 'myhead',
     data: function () {
       return {
         attention: '',
         color: '',
-        icon: ''
+        icon: '',
+        widthHeight: 'avatar-img-width',
       }
     },
     methods: {
-      clickAttention () {
-        // this.$store.state.userCenter.user.is_followed = !this.$store.state.userCenter.user.is_followed
-        //TODO 关注处理
-        this.isAttention(false)
+      widthOrHeight () {
+        let img = new Image()
+        console.log(this.$store.state.userCenter.user.head_url)
+        img.src = this.$store.state.userCenter.user.head_url
+        if (img.width < img.height) {
+          return 'width'
+        } else {
+          return 'height'
+        }
+      },
+      Attention () {
+        if (this.$store.state.userCenter.user.is_followed) {
+          //已关注则取消关注
+          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $Api.UserApi().disFollowUser, this.$store).then((result) => {
+            if (result.status === $Status.SUCCESS) {
+              this.$message.success(`您成功取消关注${this.$store.state.userCenter.user.nickname}`)
+              this.$store.commit('userCenter/updateFollow', false)
+              this.$store.commit('/userCenter/updateFans', result.data.fans)
+              this.isAttention(true)
+            } else if (result.status === $Status.USER_NOT_FOLLOWED) {
+              this.$message.warning('您还未关注该用户')
+              this.$store.commit('userCenter/updateFollow', false)
+              this.isAttention(true)
+            } else {
+              this.$message.error('未知错误')
+            }
+          })
+        } else {
+          //未关注则进行关注
+          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $Api.UserApi().followUser, this.$store).then((result) => {
+            if (result.status === $Status.SUCCESS) {
+              this.$message.success(`您成功关注了${this.$store.state.userCenter.user.nickname}`)
+              this.$store.commit('userCenter/updateFollow', true)
+              this.$store.commit('/userCenter/updateFans', result.data.fans)
+              this.isAttention(true)
+            } else if (result.status === $Status.USER_HAS_FOLLOWED) {
+              this.$message.warning('您已经关注过该用户了')
+              this.$store.commit('userCenter/updateFollow', true)
+              this.isAttention(true)
+            } else {
+              this.$message.error('未知错误')
+            }
+          })
+        }
+
       },
       isAttention (hover) {
         if (this.$store.state.user.user_id !== this.$store.state.userCenter.user.user_id) {
@@ -94,6 +140,13 @@
     },
     mounted () {
       this.isAttention(false)
+      $Api = new Api(this.$store)
+      let res = this.widthOrHeight()
+      if (res === 'width') {
+        this.widthHeight = 'avatar-img-width'
+      } else {
+        this.widthHeight = 'avatar-img-height'
+      }
     }
   }
 </script>
@@ -147,7 +200,4 @@
         overflow: hidden;
     }
 
-    .avatar img {
-        height: 100%;
-    }
 </style>

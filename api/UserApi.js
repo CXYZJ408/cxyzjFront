@@ -15,9 +15,9 @@ export default class UserApi {
   async loginPassword (data) {
     console.log('loginPassword')
     let url = Auth + '/login_password'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, data))
-    }))
+    })
   }
 
   async loginCode (data) {
@@ -93,113 +93,130 @@ export default class UserApi {
   async getUserSimple () {
     console.log('getUserSimple')
     let url = User + '/simple/own'
-    return new Promise(((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       resolve($axios.get(url))
-    }))
+    })
   }
 
   async getUserDetails () {
     console.log('getUserDetails')
     let url = User + '/details/own'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.get(url))
-    }))
+    })
   }
 
   async getOtherUserDetails (userID) {
     console.log('getOtherUserDetails')
     let url = User + `/details/other/${userID}`
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.get(url))
-    }))
+    })
+  }
+
+  //用户操作
+  async disFollowUser (user) {
+    console.log('disFollowUser')
+    let url = User + `/follow/${user}`
+    return new Promise((resolve) => {
+      resolve($axios.delete(url))
+    })
+  }
+
+  async followUser (user) {
+    console.log('followUser')
+    let url = User + `/follow/${user}`
+    return new Promise((resolve) => {
+      resolve($axios.put(url))
+    })
   }
 
   //用户信息更新
   async updateNickname (nickname) {
     console.log('updateNickname')
     let url = User + '/update_nickname'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, nickname))
-    }))
+    })
   }
 
   async updateHead (headUrl) {
     console.log('updateHead')
     let url = User + '/update_head'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, headUrl))
-    }))
+    })
   }
 
   async updateGender (gender) {
     console.log('updateGender')
     let url = User + '/update_gender'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, gender))
-    }))
+    })
   }
 
   async updateIntroduce (Introduce) {
     console.log('updateIntroduce')
     let url = User + '/update_introduce'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, Introduce))
-    }))
+    })
   }
 
   async updateThemeColor (themeColor) {
     console.log('updateThemeColor')
     let url = User + '/update_theme_color'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, themeColor))
-    }))
+    })
   }
 
   async updateBgUrl (BgUrl) {
     console.log('updateBgUrl')
     let url = User + '/update_bg'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, BgUrl))
-    }))
+    })
   }
 
   async verifySendCode (params) {
     console.log('verifySendCode')
     let url = User + '/verify_user/send_code'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.get(url, params))
-    }))
+    })
   }
 
   async verifyUser (params) {
     console.log('verifyUser')
     let url = User + '/verify_user'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.get(url, params))
-    }))
+    })
   }
 
   async updatePassword (password) {
     console.log('updatePassword')
     let url = User + '/update_password'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, password))
-    }))
+    })
   }
 
   async updatePhone (phone) {
     console.log('updatePhone')
     let url = User + '/update_phone'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, phone))
-    }))
+    })
   }
 
-  async updateEmail(email) {
+  async updateEmail (email) {
     console.log('updateEmail')
     let url = User + '/update_email'
-    return new Promise(((resolve) => {
+    return new Promise((resolve) => {
       resolve($axios.post(url, email))
-    }))
+    })
   }
 }

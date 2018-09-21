@@ -15,29 +15,9 @@
                     <v-form v-model="valid[0]" class="pt-3" ref="form0">
                         <v-layout algin-center justify-start row xs12 sm8 wrap>
                             <v-flex md3 xs12 sm10>
-                                <el-upload class="avatar-uploader"
-                                           action="#"
-                                           :show-file-list="false"
-                                           :multiple="false"
-                                           :http-request="upload"
-                                           :on-success="handleAvatarSuccess"
-                                           :on-progress="handleAvatarProgress"
-                                           :on-error="handleAvatarError"
-                                           :before-upload="beforeAvatarUpload">
-                                    <v-avatar size="100" color="grey lighten-4">
-                                        <v-progress-circular
-                                                :rotate="-90"
-                                                :size="100"
-                                                :width="15"
-                                                v-if="progress"
-                                                :value="percentProgress"
-                                                color="green"
-                                        >
-                                            {{percentProgress}}%
-                                        </v-progress-circular>
-                                        <img v-else :src="user.head_url" alt="avatar">
-                                    </v-avatar>
-                                </el-upload>
+                                <no-ssr>
+                                    <avatarUpload></avatarUpload>
+                                </no-ssr>
                             </v-flex>
                             <v-flex md7 xs12 sm10>
                                 <v-text-field label="昵称" class="text" v-model="user.nickname" :rules="nickRules"
@@ -412,26 +392,31 @@
         } else if (!this.$refs.form2.validate()) {
           this.step = '3'
         } else if (this.$refs.form3.validate()) {
-          this.user.password = $md5(this.password1.split('').reverse().join(''))//逆序并计算MD5值
-          this.$utils.proxyOne(this.user, $Api.UserApi().registerUser).then((res) => {
-            //再次检测
-            if (res.status === this.$status.NICKNAME_EXIST) {
-              this.step = '1'
-              this.$message.warning('昵称已经被注册啦，换个吧！')
-            } else if (res.status === this.$status.PHONE_HAS_REGISTER) {
-              this.step = '2'
-              this.$message.warning('手机已经被注册啦，换个吧！')
-            } else if (res.status === this.$status.EMAIL_HAS_REGISTER) {
-              this.step = '3'
-              this.$message.warning('邮箱已经被注册啦，换个吧！')
-            } else if (res.status === this.$status.SUCCESS) {
-              //注册成功
-              this.$store.commit('login', res.data)
-              Cookie.set('token', res.data.token)
-              Cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
-              this.$router.push({path: `/`})
-            }
-          })
+          if (this.strength < 1) {
+            this.$message.warning('密码太简单啦，加强一下吧！')
+          } else {
+            this.user.password = $md5(this.password1.split('').reverse().join(''))//逆序并计算MD5值
+            this.$utils.proxyOne(this.user, $Api.UserApi().registerUser).then((res) => {
+              //再次检测
+              if (res.status === this.$status.NICKNAME_EXIST) {
+                this.step = '1'
+                this.$message.warning('昵称已经被注册啦，换个吧！')
+              } else if (res.status === this.$status.PHONE_HAS_REGISTER) {
+                this.step = '2'
+                this.$message.warning('手机已经被注册啦，换个吧！')
+              } else if (res.status === this.$status.EMAIL_HAS_REGISTER) {
+                this.step = '3'
+                this.$message.warning('邮箱已经被注册啦，换个吧！')
+              } else if (res.status === this.$status.SUCCESS) {
+                //注册成功
+                this.$store.commit('login', res.data)
+                Cookie.set('token', res.data.token)
+                Cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
+                this.$router.push({path: `/`})
+              }
+            })
+          }
+
         }
       }
     },
