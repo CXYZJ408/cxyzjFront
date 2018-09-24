@@ -1,5 +1,5 @@
 <template>
-    <v-card class="main pt-3">
+    <v-card class="main pt-3" >
         <v-layout row wrap align-center px-2>
             <v-flex md4 xl3 v-for="(item,index) in fans" :key="index">
                 <userCard :index="index" :key="index" :user="item"></userCard>
@@ -123,8 +123,9 @@
 
 <style scoped>
     .main {
+        background-color: unset;
+
         box-shadow: none;
-        background-color: rgba(255, 255, 255, .5);
         height: 100%;
         min-height: 800px;
 

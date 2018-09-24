@@ -1,5 +1,5 @@
 <template>
-    <v-card class="main pt-3 ">
+    <v-card class="main pt-3 " >
         <myDiscussion v-for="(item,index) in discussionList" v-if="item!==undefined" :key="index" :index="index"
                       @del="del"
                       :discussion="item"></myDiscussion>
@@ -74,8 +74,9 @@
 <style scoped>
     .main {
         box-shadow: none;
-        background-color: rgba(255, 255, 255, .5);
         height: 100%;
         min-height: 800px;
+        background-color: unset;
+
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <v-card class="main elevation-5 pa-3 ">
+    <v-card class="main elevation-5 pa-3" :style="{'background-color':$store.state.userCenter.user.theme_color}">
         <v-layout wrap row justify-center>
             <v-flex md8 offset-md3 class="text-md-right">
                 <nuxt-link class="blue--text " :to="'/user/'+user.user_id+'/articles'">返回我的主页></nuxt-link>
@@ -7,30 +7,9 @@
         </v-layout>
         <v-layout>
             <v-flex md12 mt-3 class="text-md-center">
-                <el-upload class="avatar-uploader"
-                           action="#"
-                           accept="image/*"
-                           :show-file-list="false"
-                           :multiple="false"
-                           :http-request="upload"
-                           :on-success="handleAvatarSuccess"
-                           :on-progress="handleProgress"
-                           :on-error="handleError"
-                           :before-upload="beforeAvatarUpload">
-                    <v-avatar size="100" color="grey lighten-4">
-                        <v-progress-circular
-                                :rotate="-90"
-                                :size="100"
-                                :width="15"
-                                v-if="progress"
-                                :value="percentProgress"
-                                color="green"
-                        >
-                            {{percentProgress}}%
-                        </v-progress-circular>
-                        <img v-else :src="user.head_url" alt="avatar">
-                    </v-avatar>
-                </el-upload>
+                <no-ssr>
+                    <avatarUpload v-model="user.head_url" :size="80" :Success="handleAvatarSuccess"></avatarUpload>
+                </no-ssr>
             </v-flex>
         </v-layout>
         <v-layout align-center justify-center mt-3>
@@ -144,7 +123,7 @@
             </v-flex>
         </v-layout>
         <v-layout row wrap align-center justify-center mt-2>
-            <v-flex md10>
+            <v-flex md10 class="pt-3">
                 <span class="grey--text title">个人介绍：</span>
             </v-flex>
             <v-flex md10 v-if="editIntroduce">
@@ -311,7 +290,7 @@
 <script>
   import Api from '~/api/Api'
   import $Status from '~/utils/status'
-
+//todo 待添加功能：个人介绍使用markdown格式
   let $md5
   let $Strength
   let $Api
@@ -356,8 +335,7 @@
           }
         })
       },
-      handleAvatarSuccess (res, file) {
-        this.progress = false//隐藏进度条
+      handleAvatarSuccess (res) {
         let sendData = {head_url: res.data.url}
         this.$utils.proxyOne(sendData, $Api.UserApi().updateHead, this.$store).then((result) => {
           if (result.status === $Status.SUCCESS) {
@@ -400,33 +378,6 @@
         this.progress = false
         this.$message.error('图片上传失败')
       },
-      beforeAvatarUpload (file) {
-        console.log(file)
-        return new Promise((resolve, reject) => {
-          this.getPictureWidthHeight(file).then((result) => {
-            console.log(result)
-            if (result) {
-              const isAccess = this.accessType.includes(file.type)
-              const isLt1M = file.size / 1024 / 1024 < 1
-              if (!isAccess) {
-                this.$message.warning('上传的头像图片只能是 JPG 格式!')
-              }
-              if (!isLt1M) {
-                this.$message.warning('上传的头像图片大小不能超过 1MB!')
-              }
-              if (isAccess && isLt1M) {
-                resolve(true)
-              } else {
-                reject(false)
-              }
-            } else {
-              this.$message.warning('图片大小至少为190*190！')
-              reject(false)
-            }
-          })
-        })
-
-      },
       beforeBackgroundUpload (file) {
         const isJPG = file.type === 'image/jpeg'
         const isLt2M = file.size / 1024 / 1024 < 2
@@ -438,22 +389,7 @@
         }
         return isJPG && isLt2M
       },
-      getPictureWidthHeight (file) {
-        // 获取文件尺寸，判断尺寸在不在规定范围之内
-        return new Promise((resolve, reject) => {
-          let reader = new FileReader()
-          reader.readAsDataURL(file)
-          reader.onload = function (theFile) {
-            let image = new Image()
-            image.src = theFile.target.result
-            image.onload = function () {
-              console.log(this.width, this.height)
-              resolve(this.width >= 190 && this.height >= 190)
-            }
-          }
-        })
 
-      },
       show (index, state) {
         this.$set(this.shows, index, state)
       },
@@ -705,6 +641,8 @@
                     message: '您的昵称修改成功！',
                     type: 'success'
                   })
+                  this.show(0, false)
+                  this.editNickname = false
                 } else if (result.status === $Status.NICKNAME_EXIST) {
                   this.$notify({
                     title: '修改失败！',
@@ -718,9 +656,9 @@
                     type: 'error'
                   })
                   this.user.nickname = this.$store.state.userCenter.user.nickname//恢复至未更改状态
+                  this.show(0, false)
+                  this.editNickname = false
                 }
-                this.show(0, false)
-                this.editNickname = false
               })
             }
             break
@@ -862,7 +800,6 @@
     },
     data: function () {
       return {
-        accessType: ['image/jpeg', 'image/png'],
         isVerify: false,
         items: [
           '使用手机号' + this.user.phone + '验证',
@@ -982,7 +919,6 @@
 <style scoped>
     .main {
         box-shadow: none;
-        background-color: rgba(255, 255, 255, .85);
         margin-top: 10%;
         height: 100%;
     }

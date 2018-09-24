@@ -94,3 +94,15 @@ body {
     padding: 0 !important;
     margin: 0 !important;
 }
+
+.limit-2line {
+    line-height: 22px !important;
+    max-height: 44px !important;
+    margin: 0 0 3px !important;
+    overflow: hidden !important;
+    font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
+    font-size: 14px !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}

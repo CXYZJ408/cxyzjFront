@@ -16,7 +16,7 @@
         </v-tabs>
         <v-tabs-items v-model="tab">
             <v-tab-item>
-                <v-card flat class="main">
+                <v-card flat class="main" >
                     <div class="pt-3"></div>
                     <myArticle v-for="(item,index) in articleList" v-if="item!==undefined" :key="index"
                                :index="index"
@@ -513,9 +513,9 @@
 <style scoped>
     .main {
         box-shadow: none;
-        background-color: rgba(255, 255, 255, .5);
         height: 100%;
         min-height: 800px;
+        background-color: unset;
 
     }
 </style>

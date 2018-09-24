@@ -19,7 +19,7 @@
 
                         <v-flex md12>
                             <nuxt-link :to="'/'+dynamic.type+'/'+dynamic.dynamic_id">
-                                <p class="dynamic">{{dynamic.text}}</p>
+                                <p class=" limit-2line">{{dynamic.text}}</p>
                             </nuxt-link>
                         </v-flex>
                     </v-layout>
@@ -46,7 +46,7 @@
                             </v-card-title>
                         </v-flex>
                         <v-flex md12>
-                            <p class="dynamic">{{dynamic.text}}</p>
+                            <p class=" limit-2line">{{dynamic.text}}</p>
                         </v-flex>
                     </v-layout>
                 </v-flex>
@@ -125,20 +125,6 @@
 
     .user:hover {
         color: #18ADED
-    }
-
-    p {
-        position: relative;
-        line-height: 22px;
-        max-height: 44px;
-        margin: 0 0 3px;
-        overflow: hidden;
-        color: #888;
-        font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
-        font-size: 14px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
     }
 
     .userCard {

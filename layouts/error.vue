@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <updateCookie></updateCookie>
         <h1 v-if="error.statusCode === 404">找不到你想要的。。。</h1>
         <h1 v-else-if="error.statusCode >= 500">服务器内部错误！</h1>
         <h1 v-else>前方没路啦！</h1>

@@ -3,10 +3,10 @@
         <v-flex md12 xl9 class=" back mb-5">
             <myhead></myhead>
             <v-layout class="elevation-12">
-                <v-flex md2 class="left">
+                <v-flex md2 class="left" :style="{'background-color':$store.state.userCenter.user.theme_color}">
                     <leftMenu></leftMenu>
                 </v-flex>
-                <v-flex md10 class="pr-3 content">
+                <v-flex md10 class="pr-3 content" :style="{'background-color':$store.state.userCenter.user.theme_color}">
                     <nuxt-child/>
                 </v-flex>
             </v-layout>
@@ -76,6 +76,5 @@
 
     .content {
         padding: 0 !important;
-        background-color: rgba(255, 255, 255, .9);
     }
 </style>

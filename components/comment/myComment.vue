@@ -192,7 +192,6 @@
     .comment {
         box-shadow: none;
         background-color: rgb(255, 255, 255);
-        /*height: 190px;*/
     }
 
     .title2 {

@@ -43,7 +43,9 @@
                 <v-icon class="ml-1" size="20" color="grey" v-if="user.gender===2">iconfont icon-suo</v-icon>
             </v-flex>
             <v-flex md12 sm12 class=" pb-2">
-                <p class="grey--text">{{user.introduce}}</p>
+                <p class="grey--text limit-2line" style="word-break:break-all;"
+                      v-html="user.introduce">
+                                </p>
             </v-flex>
             <v-flex md6 sm6 class=" pb-2">
                 <v-btn outline block flat :color="color" round @mouseover="isAttention(true)"
@@ -152,4 +154,6 @@
     .user:hover {
         color: #18ADED;
     }
+
+
 </style>

@@ -90,18 +90,9 @@
       }
     },
     methods: {
-      widthOrHeight () {
-        let img = new Image()
-        console.log(this.$store.state.userCenter.user.head_url)
-        img.src = this.$store.state.userCenter.user.head_url
-        if (img.width < img.height) {
-          return 'width'
-        } else {
-          return 'height'
-        }
-      },
       click () {
         console.log('111')
+        //TODO 需要修改
       },
       handleCommand (command) {
         if (command === 'logout') {
@@ -116,14 +107,7 @@
 
       }
     },
-    mounted(){
-      let res = this.widthOrHeight()
-      if (res === 'width') {
-        this.widthHeight = 'avatar-img-width'
-      } else {
-        this.widthHeight = 'avatar-img-height'
-      }
-    }
+
   }
 </script>
 

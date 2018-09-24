@@ -1,5 +1,6 @@
 <template>
     <v-app class="back" :style="{'background-image':'url('+ background +')'}">
+        <updateCookie></updateCookie>
         <v-container grid-list-md text-xs-center fluid>
             <v-layout align-center justify-center pt-3>
                 <v-flex id="logo" md2 sm3 xs6>

@@ -16,7 +16,7 @@
                         <v-layout algin-center justify-start row xs12 sm8 wrap>
                             <v-flex md3 xs12 sm10>
                                 <no-ssr>
-                                    <avatarUpload></avatarUpload>
+                                    <avatarUpload v-model="image"></avatarUpload>
                                 </no-ssr>
                             </v-flex>
                             <v-flex md7 xs12 sm10>
@@ -301,40 +301,6 @@
           }
         })
       },
-      upload: function (options) {
-        console.log('upload')
-        return $Api.UtilApi().uploadFile(options.file).then((res) => {
-          if (res.data.status === this.$status.SUCCESS) {
-            return Promise.resolve(res.data)
-          } else {
-            return Promise.reject()
-          }
-        })
-      },
-      handleAvatarSuccess (res, file) {
-        this.user.head_url = res.data.url//设置图片
-        this.progress = false//隐藏进度条
-      },
-      handleProgress (event, rawFile) {
-        this.percentProgress = Math.floor(event.percent)//进度条
-        this.progress = true//显示进度条，隐藏图片
-      },
-      handleError () {
-        this.progress = false
-        this.$message.error('头像上传失败')
-      },
-      beforeAvatarUpload (file) {
-        const isJPG = file.type === 'image/jpeg'
-        const isLt1M = file.size / 1024 / 1024 < 1
-        if (!isJPG) {
-          this.$message.error('上传的头像图片只能是 JPG 格式!')
-        }
-        if (!isLt1M) {
-          this.$message.error('上传的头像图片大小不能超过 1MB!')
-        }
-        console.log(isJPG && isLt1M)
-        return isJPG && isLt1M
-      },
       async next (step) {
         let able = false
         switch (step - 1) {
@@ -479,13 +445,12 @@
     },
     data: function () {
       return {
+        image: '/test.png',
         strength: 0,
         phoneCodeMsg: '发送手机验证码',
         emailCodeMsg: '发送邮箱验证码',
         phoneHasSend: false,
         emailHasSend: false,
-        progress: false,
-        percentProgress: 0,
         step: '1',
         phoneRest: false,
         emailRest: false,

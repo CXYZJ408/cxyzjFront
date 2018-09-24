@@ -114,6 +114,14 @@ export default class UserApi {
     })
   }
 
+  async getAttentions (params) {
+    console.log('getAttentions')
+    let url = User + `/${params.user_id}/attention_list/${params.pageNum}`
+    return new Promise(resolve => {
+      resolve($axios.get(url))
+    })
+  }
+
   //用户操作
   async disFollowUser (user) {
     console.log('disFollowUser')

@@ -1,5 +1,6 @@
 <template>
     <v-app class="background">
+        <updateCookie></updateCookie>
         <nuxt/>
         <no-ssr class="mt-5">
             <Footer color='white'></Footer>

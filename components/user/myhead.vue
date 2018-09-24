@@ -1,7 +1,7 @@
 <template>
-    <v-layout row class="py-3 head ">
+    <v-layout row class="py-3 head " :style="{'background-color':$store.state.userCenter.user.theme_color}">
         <!--<img :src="$store.state.userCenter.user.bg_url" class="backImage">-->
-        <div class="mask" :style="{'background':'url('+ $store.state.userCenter.user.bg_url+')0/cover fixed '}"></div>
+        <div class="mask" :style="{'background':'url('+ $store.state.userCenter.user.bg_url+')0 0/cover fixed '}"></div>
         <v-flex md2 ml-3>
             <div class="card">
                 <v-avatar class="avatar" :tile="true">
@@ -9,11 +9,16 @@
                 </v-avatar>
                 <span class="d-block title text-md-center mt-2 px-2" style="text-transform: capitalize">
                         {{$store.state.userCenter.user.nickname}}
-                        <v-icon color="red"
-                                v-if="$store.state.userCenter.user.gender===0">iconfont icon-nv</v-icon>
-                         <v-icon color="blue" v-if="$store.state.userCenter.user.gender===1">iconfont icon-nan</v-icon>
-                         <v-icon color="grey" v-if="$store.state.userCenter.user.gender===2">iconfont icon-suo</v-icon>
-                    </span>
+                </span>
+                <v-icon color="red" :size="23" class="sex" v-if="$store.state.userCenter.user.gender===0">iconfont
+                    icon-nv
+                </v-icon>
+                <v-icon color="blue" :size="23" class="sex" v-else-if="$store.state.userCenter.user.gender===1">iconfont
+                    icon-nan
+                </v-icon>
+                <v-icon color="grey" :size="23" class="sex" v-else="$store.state.userCenter.user.gender===2">iconfont
+                    icon-suo
+                </v-icon>
             </div>
         </v-flex>
         <v-flex md10 class="ml-4">
@@ -154,7 +159,6 @@
 <style scoped>
 
     .head {
-        background-color: rgba(255, 255, 255, 0.4);
         margin: 30px auto;
         border-top-left-radius: 8px !important;
         border-top-right-radius: 8px !important;
@@ -171,7 +175,7 @@
         right: 0;
         bottom: 0;
         z-index: -1;
-        filter: blur(6px);
+        filter: blur(15px);
         margin: -30px
     }
 
@@ -190,6 +194,13 @@
         background-color: white;
         border-radius: 8px;
         text-align: center;
+        position: relative;
+    }
+
+    .sex {
+        position: absolute;
+        top: 160px;
+        left: 157px;
     }
 
     .avatar {

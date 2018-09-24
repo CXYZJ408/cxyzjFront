@@ -98,8 +98,8 @@ export const actions = {
   async nuxtServerInit (store, {req}) {//在跳转其它的页面或是刷新页面的时候，nuxt会自动调用
     //读取req中的cookie
     if (Object.keys(store.state.user).length === 0) {//用户还没有登陆
-      let refreshToken = await $utils.parseCookieByName(req.headers.cookie, 'refreshToken')//获取refresh
-      let token = await $utils.parseCookieByName(req.headers.cookie, 'token')//获取token
+      let refreshToken = $utils.parseCookieByName(req.headers.cookie, 'refreshToken')//获取refresh
+      let token = $utils.parseCookieByName(req.headers.cookie, 'token')//获取token
       let tokens = {
         token: token,
         refreshToken: refreshToken

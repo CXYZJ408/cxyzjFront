@@ -1,5 +1,5 @@
 <template>
-    <v-card class="main pt-3 pb-5">
+    <v-card class="main pt-3 pb-5" >
         <myComment v-for="(item,index) in commentList" :comment="item" v-if="item!==undefined" :index=index :key="index"
                    @del="del"></myComment>
         <div class="py-3 text-md-center">
@@ -240,8 +240,9 @@
 
 <style scoped>
     .main {
+        background-color: unset;
+
         box-shadow: none;
-        background-color: rgba(255, 255, 255, .5);
         height: 100%;
         min-height: 800px;
     }
