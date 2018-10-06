@@ -3,11 +3,12 @@
         <updateCookie></updateCookie>
         <nuxt/>
         <no-ssr>
-            <Footer color='#8590A6'></Footer>
+            <Footer color='#BDC3C7'></Footer>
         </no-ssr>
     </v-app>
 </template>
 <script>
+
   export default {
   }
 </script>

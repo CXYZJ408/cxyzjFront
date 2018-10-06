@@ -11,7 +11,8 @@ export const state = () => ({
   user: {},//user information
   tokenHasUpdate: false,//should client need to flush the cookie
   tokenExpired: false,//whether token is expired
-  Welcome: false
+  Welcome: false,
+  background: ''
 })
 
 export const mutations = {
@@ -81,6 +82,9 @@ export const mutations = {
   },
   tokenIsExpired (state, data) {
     state.tokenExpired = data
+  },
+  setBackground (state, background) {
+    state.background = background
   },
   //clear the cache of token
   clearToken (state) {

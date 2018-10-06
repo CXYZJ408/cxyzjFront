@@ -16,7 +16,7 @@
                         <v-layout algin-center justify-start row xs12 sm8 wrap>
                             <v-flex md3 xs12 sm10>
                                 <no-ssr>
-                                    <avatarUpload v-model="image"></avatarUpload>
+                                    <avatarUpload v-model="user.head_url" :size="80"></avatarUpload>
                                 </no-ssr>
                             </v-flex>
                             <v-flex md7 xs12 sm10>
@@ -200,7 +200,7 @@
         switch (this.step) {
           case '1':
             this.$refs.form0.reset()
-            this.user.head_url = '/test.png'
+            this.user.head_url = '/img/Avatar/cxyzj.png'
             break
           case '2':
             this.$refs.form1.reset()
@@ -258,12 +258,7 @@
             return false
           } else {
             call = $Api.UserApi().sendCode
-            return this.$utils.proxyOne(sendData, call)
-          }
-        }).then((res) => {
-          if (!res) return false
-          if (res.status === this.$status.SUCCESS) {
-            //成功发送验证码
+            this.$utils.proxyOne(sendData, call)
             this.$message.success('验证码发送成功')
             if (mode === 'phone') {
               this.phoneHasSend = true
@@ -296,8 +291,6 @@
                 }
               }
             }, 1000)
-          } else if (res.status === this.$status.CODE_SEND_FAILURE) {
-            this.$message.error('验证码发送失败，请尝试重新发送')
           }
         })
       },
@@ -445,7 +438,7 @@
     },
     data: function () {
       return {
-        image: '/test.png',
+        image: '/img/Avatar/cxyzj.png',
         strength: 0,
         phoneCodeMsg: '发送手机验证码',
         emailCodeMsg: '发送邮箱验证码',
@@ -459,7 +452,7 @@
           phone: '',
           email: '',
           nickname: '',
-          head_url: '/test.png',
+          head_url: '/img/Avatar/cxyzj.png',
           gender: '',
           password: ''
         },

@@ -10,7 +10,7 @@
                             </nuxt-link>
                             <mymenu :icon_size="icon_size" :font_size=font_size :about=about
                                     :index=index :userCenter=userCenter :discussion="discussion"
-                                    :education="education"
+                                    :education="education" :none="none"
                                     :distance="distance" :write="write"></mymenu>
                         </v-flex>
                         <v-spacer></v-spacer>
@@ -80,6 +80,10 @@
       },
       distance: {
         type: String
+      },
+      none: {
+        type: Boolean,
+        default: false
       }
     },
     data: function () {

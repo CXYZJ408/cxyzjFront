@@ -1,5 +1,5 @@
 <template>
-    <div id="myindnex">
+    <div id="myIndex" class="mb-3">
         <v-container v-scroll="onScroll" grid-list-md class="clearPadding">
             <v-layout row wrap>
                 <toolbar :font_size=28 :icon_size=28 :index=true></toolbar>
@@ -20,36 +20,70 @@
             <v-layout row wrap justify-center mt-3>
                 <v-flex md9 xl7>
                     <v-card id="main">
-                        <v-layout row wrap justify-center>
+                        <v-layout row wrap justify-center align-center>
                             <v-flex md3>
                                 <v-card-title class="headline green--text pb-2">
                                     <strong class="mt-1 pl-2">热门文章</strong>
                                 </v-card-title>
                             </v-flex>
-                            <v-flex md9 class="mt-3">
+                            <v-flex md8 class="mt-3">
                                 <v-tabs
-                                        slot="extension"
-                                        v-model="tabs"
+                                        v-model="currentItem"
                                         right
-                                        class="mr-2">
+                                        class="mr-2"
+                                        grow
+                                >
                                     <v-tab
-                                            v-for="(n,i) in types"
-                                            :key="i"
-                                            ripple>
-                                        <span class="title2">{{n}}</span>
+                                            v-for="(label,index) in userLabels"
+                                            :key="index"
+                                            :href="'#tab-'+label.label_id"
+                                            ripple
+                                            active-class="active">
+                                        <span class="label">{{label.label_name}}</span>
                                     </v-tab>
-                                    <v-tabs-slider color="blue"></v-tabs-slider>
+                                    <v-tabs-slider color="#18ADED"></v-tabs-slider>
+                                    <v-menu
+                                            v-if="more.length"
+                                            bottom
+                                            class="v-tabs__div"
+                                            right
+                                            style="width: 20px"
+                                    >
+                                        <a slot="activator" class="v-tabs__item">
+                                            <v-icon size="25" color="grey">more_vert</v-icon>
+                                        </a>
+                                        <v-list>
+                                            <v-list-tile
+                                                    v-for="(item,index) in more"
+                                                    :key="index"
+                                                    @click="addItem(item)"
+                                                    :ripple="true"
+                                            >
+                                                {{ item.label_name }}
+                                            </v-list-tile>
+                                        </v-list>
+                                    </v-menu>
                                 </v-tabs>
+                            </v-flex>
+                            <v-flex md1 class="mt-3">
+                                <nuxt-link :to="{path:'/article/labels?tab=user'}">
+                                    <el-tooltip>
+                                        <div slot="content">标签管理</div>
+                                        <v-icon class="label-manager" @click="" :size="33">iconfont
+                                            icon-label
+                                        </v-icon>
+                                    </el-tooltip>
+                                </nuxt-link>
                             </v-flex>
                             <v-flex md12>
                                 <hr style="border: 1.5px solid #BBBBBB;">
                             </v-flex>
                             <v-flex md12>
-                                <v-tabs-items v-model="tabs">
+                                <v-tabs-items v-model="currentItem">
                                     <v-tab-item
-                                            v-for="n in 7"
-                                            :key="n"
-                                            lazy
+                                            v-for="(label,index) in userLabels"
+                                            :key="index"
+                                            :id="'tab-'+label.label_id"
                                     >
                                         <dynamic v-for="(item,index) in dynamics" :dynamic="item"
                                                  :key="index"></dynamic>
@@ -75,11 +109,27 @@
                         </v-layout>
                     </v-card>
                 </v-flex>
-                <v-flex md3 xl2 wrap class="father " ref="father">
+                <v-flex md3 xl2 wrap class="father " ref="father" style="text-align: center">
                     <div :class="{fixed:isFixed}" :style="topicstyle" ref="hotTopic">
-                        <hotTopic :topics="topics"></hotTopic>
+                        <v-card class="card py-3">
+                            <v-layout row wrap align-center justify-center px-2>
+                                <v-flex md4>
+                                    <span class="title2">热门标签</span>
+                                </v-flex>
+                                <v-spacer></v-spacer>
+                                <v-flex md5>
+                                    <nuxt-link class="title3" :to="{path:'/article/labels?tab=all'}">
+                                        查看全部&nbsp;&nbsp;>>
+                                    </nuxt-link>
+                                </v-flex>
+                            </v-layout>
+                            <v-divider class="mt-2"></v-divider>
+                            <v-layout row wrap px-2 py-2>
+                                <myLabel v-for="(label,index) in labels" :label="label" :key="index"></myLabel>
+                            </v-layout>
+                        </v-card>
                     </div>
-                    <div :class="{fixed2:isFixed}" class="mt-3" :style="boardstyle" v-if="$store.state.isLogin">
+                    <div :class="{fixed2:isFixed}" class="mt-4 px-2" :style="boardstyle">
                         <board :board="board" v-for="(board ,index) in boards"
                                :class="{'top35':index>0}"
                                :key="index"></board>
@@ -99,14 +149,27 @@
   import toolbar from '~/components/user/userToolBar.vue'
   import dynamic from '~/components/index/dynamic.vue'
   import board from '~/components/index/board.vue'
-  import hotTopic from '~/components/index/hotTopic.vue'
+  import myLabel from '~/components/article/labelSimple.vue'
+  import Api from '~/api/Api'
 
+  let _ = require('lodash')
+  let $API
   export default {
     name: 'index',
     components: {
-      toolbar, dynamic, board, hotTopic
+      toolbar, dynamic, board, myLabel
     },
     methods: {
+      addItem (item) {
+        const removed = _.head(this.userLabels) //删除头元素,为新的元素腾出位置
+        this.userLabels = _.drop(this.userLabels)
+        this.userLabels.push(item)//将新元素加入userlabel
+        _.pull(this.more, item)//在more中删除新加入的元素
+        this.more.push(removed)//在more中加入从userlabel中删除的元素
+        this.$nextTick(() => {
+          this.currentItem = 'tab-' + item.label_id//更新当前item
+        })
+      },
       PerLoad () {
         if (this.loadTimes % 3 === 0) {
           this.scrollDisabled = true// 如果加载的次数可以被3整除则暂停加载，同时显示加载更多的按钮
@@ -133,7 +196,7 @@
           this.loadTimes++ // 加载次数计数
         }, 800)
       },
-      onScroll (e) {
+      onScroll () {
         let offsetTop = window.pageYOffset
         if (offsetTop + window.screen.availHeight > document.body.scrollHeight - 200) {
           // 如果当前浏览部分的上端距离页面顶端的距离加上屏幕的高度大于页面高度-200 提前加载
@@ -162,6 +225,10 @@
         this.$store.commit('cancelWelcome')
       }
     },
+    asyncData ({store}) {
+      $API = new Api(store)
+
+    },
     data: function () {
       return {
         isFixed: false,
@@ -171,43 +238,74 @@
         showLoadMore: false,
         loadTimes: 1,
         showLoad: false,
-        tabs: 0,
-        types: ['推荐', '前端', '后端', 'Android', '运维', '算法', '人工智能'],
+        currentItem: '',
         items: [
-          '/img/test/2.jpg', '/img/test/5.jpg', '/img/test/3.jpg'
+          '/img/Temp/1.jpg', '/img/Temp/2.jpg', '/img/Temp/3.jpg', '/img/Temp/4.jpg'
         ],
-        topics: [
+        userLabels: [
           {
-            name: '前端开发',
-            href: '/',
+            label_id: 'e',
+            label_name: '操作系统',
+            link: '#icon-os'
           },
           {
-            name: '后端开发',
-            href: '/'
+            label_id: 'f',
+            label_name: '前端',
+            link: '#icon-front'
           },
           {
-            name: '数据库',
-            href: '/'
+            label_id: 'g',
+            label_name: '人工智能',
+            link: '#icon-AI'
           },
           {
-            name: '安卓开发',
-            href: '/'
+            label_id: 'h',
+            label_name: 'Android',
+            link: '#icon-android'
+          }
+        ],
+        more: [
+          {
+            label_id: 'a',
+            label_name: '算法',
+            link: '#icon-os'
           },
           {
-            name: '架构',
-            href: '/'
+            label_id: 'b',
+            label_name: '设计模式',
+            link: '#icon-front'
           },
           {
-            name: 'JavaScript',
-            href: '/'
+            label_id: 'v',
+            label_name: '架构',
+            link: '#icon-AI'
           },
           {
-            name: '设计模式',
-            href: '/'
+            label_id: 'd',
+            label_name: 'IOS',
+            link: '#icon-android'
+          }
+        ],
+        labels: [
+          {
+            label_id: '123456',
+            label_name: '操作系统',
+            link: '#icon-os'
           },
           {
-            name: '算法',
-            href: '/'
+            label_id: '123456',
+            label_name: '前端',
+            link: '#icon-front'
+          },
+          {
+            label_id: '123456',
+            label_name: '人工智能',
+            link: '#icon-AI'
+          },
+          {
+            label_id: '123456',
+            label_name: 'Android',
+            link: '#icon-android'
           }],
         boards: [
           {
@@ -230,7 +328,7 @@
               background: 'rgba(166, 57, 168, .4)'
             },
             text: '写文章',
-            href: '/write'
+            href: '/article/write'
           },
           {
             icon: 'icon-educate',
@@ -270,7 +368,7 @@
               '链接：https://www.jianshu.com/p/4ba393be278b\n' +
               '來源：简书\n' +
               '简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。',
-            thumbnail: '/img/test/1.jpg',
+            thumbnail: '/img/Temp/2.jpg',
             views: 12,
             comments: 5,
             collections: 4,
@@ -280,7 +378,7 @@
             user: {
               user_id: '490538974364827648',
               nickname: '野望',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/9f966f29-c496-4347-aa12-7384a789d0e2.jpeg',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -301,7 +399,7 @@
           {
             title: '学习Python的建议',
             text: 'Python是最容易入门的编程语言，没有之一。如果初学者接触的第一门语言是C或者C++，对他们来说最难的不是语法，而是容易出现内存泄漏、指针等问题。有时候排查这些问题对初学者的打击很大，尤其是没掌握排查BUG技巧时。',
-            thumbnail: '/img/test/2.jpg',
+            thumbnail: '/img/Temp/1.jpg',
             views: 2,
             comments: 5,
             collections: 4,
@@ -311,7 +409,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: '野望',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/cxyzj.png',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -342,7 +440,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: '野望',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/87ea13f3-e1f0-4ee8-bfa1-063647765620.jpeg',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -363,7 +461,7 @@
           {
             title: '「Android」SocialSdk-快速接入社会化登录分享',
             text: '使用 微博、QQ、微信、钉钉 原生 SDK 接入，提供这些平台的登录、分享功能支持。针对业务逻辑对各个平台的接口进行封装，对外提供一致的表现，在减轻接入压力的同时，又能获得原生 SDK 最大的灵活性',
-            thumbnail: '/img/test/1.jpg',
+            thumbnail: '/img/Temp/4.jpg',
             views: 12,
             comments: 5,
             collections: 4,
@@ -373,7 +471,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: '野望',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -397,7 +495,7 @@
               '数据分析实战—北京二手房房价分析\n' +
               '数据分析实战—北京二手房房价分析（建模篇）\n' +
               '除了数据',
-            thumbnail: '/img/test/3.jpg',
+            thumbnail: '/img/login/4.jpg',
             views: 12,
             comments: 5,
             collections: 4,
@@ -407,7 +505,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: '野望',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/login/9.jpg',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -425,35 +523,35 @@
             },
             update_time: '两天前'
           }
-        ]
+        ],
       }
     }
   }
 </script>
 
 <style>
-    #myindnex #slide .v-carousel__controls {
+    #myIndex #slide .v-carousel__controls {
         background: none !important;
     }
 
-    #myindnex #slide {
+    #myIndex #slide {
         border-radius: 15px
     }
 
-    #myindnex #main {
+    #myIndex #main {
         border-radius: 15px;
     }
 
-    #myindnex .fixed {
+    #myIndex .fixed {
         position: fixed;
         top: 70px;
     }
 
-    #myindnex .fixed2 {
+    #myIndex .fixed2 {
         position: fixed;
     }
 
-    #myindnex .feedback {
+    #myIndex .feedback {
         position: fixed;
         top: 93%;
         left: 95%;
@@ -461,15 +559,54 @@
         border-radius: 50px;
     }
 
-    #myindnex .top35 {
+    #myIndex .top35 {
         margin-top: 35px;
     }
 
     #main .title2 {
+        font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
         font-size: 18px;
     }
 
-    #myindnex .father {
+    #myIndex .father {
         position: relative;
     }
+
+    #myIndex .label:hover {
+        color: #007FFF;
+    }
+
+    #myIndex .label {
+        font-size: 25px;
+        font-family: Arial, sans-serif;
+        transition: all .3s ease-in !important;
+    }
+
+    #myIndex .label-manager {
+        transition: all .3s ease-in !important;
+        color: grey;
+    }
+
+    #myIndex .label-manager:hover {
+        color: #2ECC71;
+    }
+
+    #myIndex .active {
+        color: #18ADED !important;
+    }
+
+    #myIndex .card {
+        border-radius: 5px;
+    }
+
+    #myIndex .title3 {
+        font-size: 16px;
+        color: #85C1E9;
+        transition: all .3s ease-in;
+    }
+
+    #myIndex .title3:hover {
+        color: #299BE7;
+    }
+
 </style>

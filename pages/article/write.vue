@@ -1,7 +1,7 @@
 <template>
     <v-container mb-3 grid-list-md wrap class="clearPadding">
         <v-layout row wrap style="height:65px ">
-            <toolbar :font_size=25 :write=true></toolbar>
+            <toolbar :font_size=28 :icon_size=28 :write=true></toolbar>
         </v-layout>
         <v-layout mt-4 row align-center justify-center style="height:80vh">
             <v-flex md12 xl9 style="height: 100%;z-index:99">
@@ -40,12 +40,11 @@
 
   export default {
     name: 'App',
-    layout: 'full',
+    layout: 'imageBack',
     data () {
       return {
         value: '',
         down: false,
-
       }
     },
     methods: {
@@ -55,6 +54,9 @@
     },
     components: {
       toolbar
+    },
+    created () {
+      this.$store.commit('setBackground', '/img/Article/writeBack.jpg')
     }
   }
 </script>

@@ -1,8 +1,24 @@
 <template>
-    <v-card class="main pt-3" >
-        <v-layout row wrap align-center px-2>
-            <v-flex md4 xl3 v-for="(item,index) in fans" :key="index">
-                <userCard :index="index" :key="index" :user="item"></userCard>
+    <v-card class="main pt-3">
+        <div v-if="size>0">
+            <v-layout row wrap align-center px-2>
+                <v-flex md4 xl3 v-for="(item,index) in fans" :key="index">
+                    <userCard :index="index" :key="index" :user="item"></userCard>
+                </v-flex>
+            </v-layout>
+            <div class="py-3 text-md-center">
+                <el-pagination
+                        layout="prev, pager, next"
+                        :page-count="page.total"
+                        :current-page="page.page_num+1">
+                </el-pagination>
+            </div>
+        </div>
+        <v-layout v-else justify-center>
+            <v-flex md12>
+                <v-card class="mycard">
+                    <p class="word"><i>还没有任何人关注你哦！</i></p>
+                </v-card>
             </v-flex>
         </v-layout>
     </v-card>
@@ -10,113 +26,32 @@
 
 <script>
   import userCard from '~/components/user/userCard.vue'
+  import Api from '~/api/Api'
+  import * as $utils from '~/utils'
+  import $Status from '~/utils/status'
 
+  let $API
   export default {
     name: 'fans',
     components: {
       userCard
     },
-    data: function () {
-      return {
-        fans: [
-          {
-            user_id: 'xxxxx',
-            nickname: '野望',
-            head_url: '/img/test/head.jpg',
-            bg_url: 'xxx',
-            theme_color: 'xxxx',
-            role: 'user',
-            introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-            gender: 0,
-            attentions: 11,
-            fans: 1,
-            articles: 23,
-            discussions: 4,
-            comments: 3,
-            is_followed: false
-          },
-          {
-            user_id: 'xxxxx',
-            nickname: 'yaser',
-            head_url: '/img/test/head.jpg',
-            bg_url: 'xxx',
-            theme_color: 'xxxx',
-            role: 'user',
-            introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-            gender: 1,
-            attentions: 11,
-            fans: 1,
-            articles: 23,
-            discussions: 4,
-            comments: 3,
-            is_followed: true
-          },
-          {
-            user_id: 'xxxxx',
-            nickname: 'yaser',
-            head_url: '/img/test/head.jpg',
-            bg_url: 'xxx',
-            theme_color: 'xxxx',
-            role: 'user',
-            introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-            gender: 1,
-            attentions: 11,
-            fans: 1,
-            articles: 23,
-            discussions: 4,
-            comments: 3,
-            is_followed: true
-          },
-          {
-            user_id: 'xxxxx',
-            nickname: 'yaser',
-            head_url: '/img/test/head.jpg',
-            bg_url: 'xxx',
-            theme_color: 'xxxx',
-            role: 'user',
-            introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-            gender: 1,
-            attentions: 11,
-            fans: 1,
-            articles: 23,
-            discussions: 4,
-            comments: 3,
-            is_followed: true
-          },
-          {
-            user_id: 'xxxxx',
-            nickname: 'yaser',
-            head_url: '/img/test/head.jpg',
-            bg_url: 'xxx',
-            theme_color: 'xxxx',
-            role: 'user',
-            introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-            gender: 1,
-            attentions: 11,
-            fans: 1,
-            articles: 23,
-            discussions: 4,
-            comments: 3,
-            is_followed: true
-          },
-          {
-            user_id: 'xxxxx',
-            nickname: 'yaser',
-            head_url: '/img/test/head.jpg',
-            bg_url: 'xxx',
-            theme_color: 'xxxx',
-            role: 'user',
-            introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-            gender: 1,
-            attentions: 11,
-            fans: 1,
-            articles: 23,
-            discussions: 4,
-            comments: 3,
-            is_followed: true
-          }
-        ]
+    async asyncData ({store}) {
+      $API = new Api(store)
+      let params = {
+        user_id: store.state.userCenter.user.user_id,
+        pageNum: 0 //页码从0开始
       }
+      return await $utils.proxyOne(params, $API.UserApi().getFans, store).then(res => {
+        let fans = []
+        if (res.status === $Status.SUCCESS) {
+          fans = res.data.fans
+        }
+        let size = fans.length
+        return {fans: fans, page: res.data.page, size: size}
+      }).catch(error => {
+        error({statusCode: 500, message: '未知错误！'})
+      })
     }
   }
 </script>
@@ -124,10 +59,8 @@
 <style scoped>
     .main {
         background-color: unset;
-
         box-shadow: none;
         height: 100%;
         min-height: 800px;
-
     }
 </style>

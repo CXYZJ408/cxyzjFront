@@ -1,15 +1,17 @@
 <template>
-    <div class="d-inline-block pt-1" style="float:left;">
-        <div class="text-md-center d-inline-block ml-2">
-            <v-icon v-bind:style="{ 'font-size':`${icon_size}px`,'color':icons[0].iconColor }">
-                {{icons[0].class}}
-            </v-icon>
-            <strong v-bind:style="{ 'font-size':font_size +'px',color:icons[0].iconColor}"
-                    class="pl-2">{{icons[0].name}}</strong>
+    <div class="d-inline-block pt-1" style="float:left;" :class="{'pt-2':none}">
+        <div class="text-md-center d-inline-block ml-2" v-if="!none">
+            <nuxt-link :to="icons[0].href">
+                <v-icon v-bind:style="{ 'font-size':`${icon_size}px`,'color':icons[0].iconColor }">
+                    {{icons[0].class}}
+                </v-icon>
+                <strong v-bind:style="{ 'font-size':font_size +'px',color:icons[0].iconColor}"
+                        class="pl-2">{{icons[0].name}}</strong>
+            </nuxt-link>
         </div>
         <div class="text-md-center d-inline-block">
             <el-tooltip class="ml-3" v-for="(item,index) in icons" v-if="index>0"
-                        :key="index" effect="dark" :content="item.name" placement="bottom" >
+                        :key="index" effect="dark" :content="item.name" placement="bottom">
                 <nuxt-link :to="item.href">
                     <v-icon @mouseover="change_color(index,item.iconColor)"
                             @mouseout="change_color(index, '#BBBBBB')"
@@ -61,6 +63,10 @@
       about: {
         type: Boolean,
         default: false
+      },
+      none: {
+        type: Boolean,
+        default: false
       }
     },
     data: function () {
@@ -71,10 +77,11 @@
           {class: 'iconfont icon-compass', name: '首页', iconColor: '#2C3E50', href: '/'},
           {class: 'iconfont icon-discussion', name: '讨论', iconColor: '#18ADED', href: '/discussions'},
           {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24', href: '/educations'},
-          {class: 'iconfont icon-write', name: '写作', iconColor: '#8E44AD', href: '/write'},
+          {class: 'iconfont icon-write', name: '写作', iconColor: '#8E44AD', href: '/article/write'},
           {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800', href: '/about'},
           {class: 'iconfont icon-yonghu', name: '个人中心', iconColor: '#18ADED', href: '/user'}],
-        icons: []
+        icons: [],
+        empty: {class: '', name: '', iconColor: '', href: ''}
       }
     },
     methods: {
@@ -92,7 +99,12 @@
         } else if (this.userCenter) {
           first = 5
         }
-        this.icons.push(this.iconList[first])
+        if (this.none) {
+          this.icons.push(this.empty)
+          first = -1
+        } else {
+          this.icons.push(this.iconList[first])
+        }
         for (let i = 0; i < 5; i++) {//个人中心只在是第一个的时候才放入
           if (i !== first) {
             this.icons.push(this.iconList[i])

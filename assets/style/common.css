@@ -4,7 +4,7 @@
     vertical-align: -0.15em;
     fill: currentColor;
     overflow: hidden;
-    font-size: 30px;
+    font-size: 25px;
 }
 
 body::-webkit-scrollbar {
@@ -86,13 +86,26 @@ a {
     opacity: 0;
 }
 
-.icon {
-    height: auto;
-}
-
 body {
     padding: 0 !important;
     margin: 0 !important;
+}
+
+.mycard {
+    width: 95%;
+    margin-left: 2.5%;
+    height: 700px;
+    box-shadow: none;
+    border-radius: 15px;
+}
+
+.word {
+    padding-top: 25%;
+    padding-left: 30%;
+    font-weight: 600;
+    font-size: 40px;
+    font-family: 楷体, serif;
+    color: #BBBBBB;
 }
 
 .limit-2line {
@@ -101,8 +114,18 @@ body {
     margin: 0 0 3px !important;
     overflow: hidden !important;
     font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
-    font-size: 14px !important;
     display: -webkit-box !important;
     -webkit-box-orient: vertical !important;
     -webkit-line-clamp: 2 !important;
+}
+
+.hr {
+    width: 98%;
+    margin-left: 1%;
+    border: none;
+    border-top: 1.5px solid #BBBBBB;
+}
+
+.v-tabs__div {
+    text-transform: none;
 }

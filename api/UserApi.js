@@ -1,13 +1,14 @@
-import $axios from '../utils/axios'
+import axios from '../utils/axios'
 import Status from '../utils/status'
 
 //user的Api实现层
 let Auth = '/v1/user/auth'
 let User = '/v1/user'
+let $axios = axios
 export default class UserApi {
   constructor (store) {
-    console.log('UserApi')
-    this.store = store
+    console.log('UserApi setStore')
+    this.$store = store
     $axios.setStore(store)
   }
 
@@ -61,13 +62,13 @@ export default class UserApi {
       if (result.data.status === Status.SUCCESS) {
         console.log('refreshSuccess')
         //刷新成功
-        that.store.commit('setToken', result.data.data.token)
-        that.store.commit('shouldUpdateToken', true)//提醒客户端需要更新cookie中的token
+        that.$store.commit('setToken', result.data.data.token)
+        that.$store.commit('shouldUpdateToken', true)//提醒客户端需要更新cookie中的token
         return true
       } else {
         //刷新失败
-        that.store.commit('tokenIsExpired', true)
-        that.store.commit('clearAll')
+        that.$store.commit('tokenIsExpired', true)
+        that.$store.commit('clearAll')
         return false
       }
     })
@@ -121,10 +122,16 @@ export default class UserApi {
       resolve($axios.get(url))
     })
   }
-
+  async getFans (params) {
+    console.log('getFans')
+    let url = User + `/${params.user_id}/fans_list/${params.pageNum}`
+    return new Promise(resolve => {
+      resolve($axios.get(url))
+    })
+  }
   //用户操作
   async disFollowUser (user) {
-    console.log('disFollowUser')
+    console.log('disFollowUser------')
     let url = User + `/follow/${user}`
     return new Promise((resolve) => {
       resolve($axios.delete(url))

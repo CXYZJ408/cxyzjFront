@@ -177,6 +177,7 @@
                            action="#"
                            :show-file-list="false"
                            :multiple="false"
+                           accept="image/*"
                            :http-request="upload"
                            :on-success="handleBackgroundSuccess"
                            :on-progress="handleProgress"
@@ -290,7 +291,7 @@
 <script>
   import Api from '~/api/Api'
   import $Status from '~/utils/status'
-//todo 待添加功能：个人介绍使用markdown格式
+  //todo 待添加功能：个人介绍使用markdown格式
   let $md5
   let $Strength
   let $Api
@@ -327,7 +328,11 @@
       },
       upload: function (options) {
         console.log('upload')
-        return this.$utils.proxyOne(options.file, $Api.UtilApi().uploadFile, this.$store).then((res) => {
+        let data = {
+          file: options.file,
+          type: 'background'
+        }
+        return this.$utils.proxyOne(data, $Api.UtilApi().uploadFile, this.$store).then((res) => {
           if (res.status === $Status.SUCCESS) {
             return Promise.resolve(res)
           } else {
@@ -379,15 +384,16 @@
         this.$message.error('图片上传失败')
       },
       beforeBackgroundUpload (file) {
-        const isJPG = file.type === 'image/jpeg'
+
+        const isAccess = this.accessType.includes(file.type)
         const isLt2M = file.size / 1024 / 1024 < 2
-        if (!isJPG) {
-          this.$message.warning('上传的背景图片只能是 JPG 格式!')
+        if (!isAccess) {
+          this.$message.warning('上传的背景图片只能是 JPG、PNG 等格式!')
         }
         if (!isLt2M) {
           this.$message.warning('上传的背景图片大小不能超过 2MB!')
         }
-        return isJPG && isLt2M
+        return isAccess && isLt2M
       },
 
       show (index, state) {
@@ -855,7 +861,7 @@
         strength: 0,
         progress: false,
         percentProgress: 0,
-
+        accessType: ['image/jpeg', 'image/png'],
       }
     },
     computed: {

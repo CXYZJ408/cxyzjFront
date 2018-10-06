@@ -12,24 +12,23 @@ module.exports = {
     link: [
       {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'},
       {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'},
-      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_ypdzsdme6er.css'}
+      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_319haek6rql.css'}
     ]
   },
   plugins: [
     {src: '~/plugins/vuetify.js'},
-    {src: '~/assets/js/iconfont.js', ssr: false},
     {src: '~/plugins/element.js'},
     {src: '~/plugins/menu.js'},
     {src: '~/plugins/component.js'},
     {src: '~/plugins/markdown.js', ssr: false},
     {src: '~/plugins/Utils.js', ssr: false},
-    {src: '~/plugins/vue-croppa.js', ssr: false}
+    {src: '~/plugins/vue-croppa.js', ssr: false},
+    {src:'./static/js/iconfont.js', ssr: false}
 
   ],
   css: [
     '~/assets/style/app.styl',
     '~/assets/style/common.css',
-    '~/assets/style/iconfont.css',
     'element-ui/lib/theme-chalk/index.css'],
   router: {
     middleware: ['Auth'],

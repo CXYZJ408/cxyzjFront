@@ -1,8 +1,8 @@
 <template>
     <div>
         <v-card class=" mx-3 mb-1 pa-3" flat>
-            <v-layout row v-if="dynamic.thumbnail.length!==0">
-                <v-flex md10>
+            <v-layout row>
+                <v-flex :class="{md10:dynamic.thumbnail.length!==0,md12:dynamic.thumbnail.length===0}">
                     <v-layout row wrap>
                         <v-flex md12>
                             <v-card-title style="padding: 0">
@@ -10,7 +10,7 @@
                                     <span class="title2">{{dynamic.title}}</span>
                                 </nuxt-link>
                                 <v-hover close-delay="50" class="ml-3">
-                                    <v-chip slot-scope="{ hover }" small :class="{'chip2':hover}" class="chip px-1">
+                                    <v-chip slot-scope="{ hover }" :class="{'chip2':hover}" class="chip px-1">
                                         <nuxt-link to="/">{{dynamic.topic.name}}</nuxt-link>
                                     </v-chip>
                                 </v-hover>
@@ -19,36 +19,15 @@
 
                         <v-flex md12>
                             <nuxt-link :to="'/'+dynamic.type+'/'+dynamic.dynamic_id">
-                                <p class=" limit-2line">{{dynamic.text}}</p>
+                                <p class="myText limit-2line">{{dynamic.text}}</p>
                             </nuxt-link>
                         </v-flex>
                     </v-layout>
                 </v-flex>
-                <v-flex md2>
+                <v-flex md2 v-if="dynamic.thumbnail.length!==0">
                     <nuxt-link class="d-inline-block wrap_image" :to="'/'+dynamic.type+'/'+dynamic.dynamic_id">
                         <img :src="dynamic.thumbnail" class="image" alt="">
                     </nuxt-link>
-                </v-flex>
-            </v-layout>
-            <v-layout row v-else>
-                <v-flex md12>
-                    <v-layout row wrap>
-                        <v-flex md12>
-                            <v-card-title style="padding: 0">
-                                <nuxt-link :to="'/'+dynamic.type+'/'+dynamic.dynamic_id">
-                                    <span class="title2">{{dynamic.title}}</span>
-                                </nuxt-link>
-                                <v-hover close-delay="50" class="ml-3">
-                                    <v-chip slot-scope="{ hover }" small :class="{'chip2':hover}" class="chip px-1">
-                                        <nuxt-link to="/">{{dynamic.topic.name}}</nuxt-link>
-                                    </v-chip>
-                                </v-hover>
-                            </v-card-title>
-                        </v-flex>
-                        <v-flex md12>
-                            <p class=" limit-2line">{{dynamic.text}}</p>
-                        </v-flex>
-                    </v-layout>
                 </v-flex>
             </v-layout>
             <v-layout>
@@ -115,7 +94,8 @@
 
 <style scoped>
     .title2 {
-        font-size: 22px;
+        font-size: 22px !important;
+        font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
         font-weight: 600;
     }
 
@@ -150,9 +130,18 @@
         transition: all .3s ease-out;
     }
 
+    .myText {
+        color: #626567;
+    }
+
     .chip {
         background-color: #FDF2E9;
+        font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
         transition: all .3s ease-out;
+        height: 30px;
+        margin-top: 0;
+        font-size: 14px;
+        margin-bottom: 0;
     }
 
     .redfont {

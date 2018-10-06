@@ -11,10 +11,10 @@ export default class UtilsApi {
     $axios.setStore(store)
   }
 
-  async uploadFile (file) {
-    let url = util + '/upload'
+  async uploadFile (data) {
+    let url = util + `/upload/${data.type}`
     let formData = new FormData()
-    formData.append('file', file)
+    formData.append('file', data.file)
     let header = {
       'Content-Type': 'multipart/form-data'
     }

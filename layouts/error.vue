@@ -1,5 +1,6 @@
 <template>
-    <div class="container">
+    <!--todo 放置一个扫雷的小游戏-->
+    <div class="container err">
         <updateCookie></updateCookie>
         <h1 v-if="error.statusCode === 404">找不到你想要的。。。</h1>
         <h1 v-else-if="error.statusCode >= 500">服务器内部错误！</h1>
@@ -17,5 +18,7 @@
 </script>
 
 <style scoped>
+    .err {
 
+    }
 </style>

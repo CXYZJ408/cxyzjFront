@@ -1,11 +1,10 @@
 <template>
     <v-layout row class="py-3 head " :style="{'background-color':$store.state.userCenter.user.theme_color}">
-        <!--<img :src="$store.state.userCenter.user.bg_url" class="backImage">-->
         <div class="mask" :style="{'background':'url('+ $store.state.userCenter.user.bg_url+')0 0/cover fixed '}"></div>
         <v-flex md2 ml-3>
             <div class="card">
                 <v-avatar class="avatar" :tile="true">
-                    <img :src="$store.state.userCenter.user.head_url" v-bind:class="widthHeight" alt="">
+                    <img :src="$store.state.userCenter.user.head_url"  alt="">
                 </v-avatar>
                 <span class="d-block title text-md-center mt-2 px-2" style="text-transform: capitalize">
                         {{$store.state.userCenter.user.nickname}}
@@ -36,7 +35,7 @@
                 </v-flex>
             </v-layout>
             <v-layout align-end mt-4>
-                <v-flex md11>
+                <v-flex md12 class="pr-4">
                     <v-card-title class="introduce">
                         <v-layout row wrap>
                             <v-flex md12><p class=" title pl-3  black--text ">个人介绍:</p></v-flex>
@@ -88,7 +87,7 @@
             if (result.status === $Status.SUCCESS) {
               this.$message.success(`您成功取消关注${this.$store.state.userCenter.user.nickname}`)
               this.$store.commit('userCenter/updateFollow', false)
-              this.$store.commit('/userCenter/updateFans', result.data.fans)
+              this.$store.commit('userCenter/updateFans', result.data.fans)
               this.isAttention(true)
             } else if (result.status === $Status.USER_NOT_FOLLOWED) {
               this.$message.warning('您还未关注该用户')
@@ -104,7 +103,7 @@
             if (result.status === $Status.SUCCESS) {
               this.$message.success(`您成功关注了${this.$store.state.userCenter.user.nickname}`)
               this.$store.commit('userCenter/updateFollow', true)
-              this.$store.commit('/userCenter/updateFans', result.data.fans)
+              this.$store.commit('userCenter/updateFans', result.data.fans)
               this.isAttention(true)
             } else if (result.status === $Status.USER_HAS_FOLLOWED) {
               this.$message.warning('您已经关注过该用户了')

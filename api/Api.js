@@ -5,6 +5,7 @@ export default class Api {
   constructor (store) {
     this.$UserApi = new UserApi(store)
     this.$UtilApi = new UtilApi(store)
+    this.$store = store
   }
 
   UserApi () {
@@ -13,5 +14,8 @@ export default class Api {
 
   UtilApi () {
     return this.$UtilApi
+  }
+  getStore(){
+    return this.$store
   }
 }

@@ -187,9 +187,13 @@
     },
     methods: {
       uploadCroppedImage () {
-        let file = this.$utils.dataURLtoFile(this.image, 'file')
+        let file = this.$utils.dataURLtoFile(this.image, 'image.jpeg')
+        let data = {
+          file: file,
+          type: 'avatar'
+        }
         this.beforeUpload(file).then(() => {
-          this.$utils.proxyOne(file, $Api.UtilApi().uploadFile, this.$store).then((res) => {
+          this.$utils.proxyOne(data, $Api.UtilApi().uploadFile, this.$store).then((res) => {
             if (res.status === this.$status.SUCCESS) {
               this.handleSuccess(res)
             } else {
