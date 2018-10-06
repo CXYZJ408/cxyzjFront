@@ -1,6 +1,6 @@
 <template>
-    <div id="myIndex" class="mb-3">
-        <v-container v-scroll="onScroll" grid-list-md class="clearPadding">
+    <div id="myIndex">
+        <v-container v-scroll="onScroll" grid-list-md class="clearPadding mb-5">
             <v-layout row wrap>
                 <toolbar :font_size=28 :icon_size=28 :index=true></toolbar>
             </v-layout>
@@ -110,7 +110,7 @@
                     </v-card>
                 </v-flex>
                 <v-flex md3 xl2 wrap class="father " ref="father" style="text-align: center">
-                    <div :class="{fixed:isFixed}" :style="topicstyle" ref="hotTopic">
+                    <div :class="{fixed:isFixed}" :style="topicStyle" ref="hotTopic">
                         <v-card class="card py-3">
                             <v-layout row wrap align-center justify-center px-2>
                                 <v-flex md4>
@@ -129,7 +129,7 @@
                             </v-layout>
                         </v-card>
                     </div>
-                    <div :class="{fixed2:isFixed}" class="mt-4 px-2" :style="boardstyle">
+                    <div :class="{fixed2:isFixed}" class="mt-4 px-2" :style="boardStyle">
                         <board :board="board" v-for="(board ,index) in boards"
                                :class="{'top35':index>0}"
                                :key="index"></board>
@@ -142,6 +142,9 @@
                 iconfont icon-feedback
             </v-icon>
         </el-tooltip>
+        <no-ssr>
+            <Footer color='#BDC3C7'></Footer>
+        </no-ssr>
     </div>
 </template>
 
@@ -153,7 +156,7 @@
   import Api from '~/api/Api'
 
   let _ = require('lodash')
-  let $API
+  let $api
   export default {
     name: 'index',
     components: {
@@ -207,8 +210,8 @@
           this.isFixed = true
           let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
           let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
-          this.boardstyle = 'width:' + width + 'px;top:' + height + 'px'
-          this.topicstyle = 'width:' + width + 'px'
+          this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
+          this.topicStyle = 'width:' + width + 'px'
         } else {
           this.isFixed = false
           this.style = ''
@@ -216,7 +219,7 @@
       }
     },
     mounted () {
-      if (this.$store.state.Welcome) {
+      if (this.$store.state.welcome) {
         this.$notify({
           title: '登录成功！',
           message: `你好${this.$store.state.user.nickname}，欢迎登录程序员之家！`,
@@ -226,14 +229,14 @@
       }
     },
     asyncData ({store}) {
-      $API = new Api(store)
+      $api = new Api(store)
 
     },
     data: function () {
       return {
         isFixed: false,
-        boardstyle: '',
-        topicstyle: '',
+        boardStyle: '',
+        topicStyle: '',
         scrollDisabled: false,
         showLoadMore: false,
         loadTimes: 1,

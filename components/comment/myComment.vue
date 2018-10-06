@@ -18,7 +18,7 @@
                     <v-flex md12 v-if="!comment.commentInfo.is_reply">
                         <div @mouseleave="showDiscusser=false" class="d-inline-block">
                             <transition name="fade">
-                                <div v-show="showDiscusser" class="userCard" @mouseleave="show=false">
+                                <div v-show="showDiscusser" class="user-card" @mouseleave="show=false">
                                     <card :user="comment.discusser" class=" elevation-3"></card>
                                 </div>
                             </transition>
@@ -32,7 +32,7 @@
                     <v-flex md12 v-if="comment.commentInfo.is_reply">
                         <div @mouseleave="showReplier=false" class="d-inline-block">
                             <transition name="fade">
-                                <div v-show="showReplier" class="userCard" @mouseleave="showReplier=false">
+                                <div v-show="showReplier" class="user-card" @mouseleave="showReplier=false">
                                     <card :user="comment.replier" class=" elevation-3"></card>
                                 </div>
                             </transition>
@@ -219,7 +219,7 @@
         color: #18ADED
     }
 
-    .userCard {
+    .user-card {
         position: absolute;
         z-index: 999;
         width: 300px;

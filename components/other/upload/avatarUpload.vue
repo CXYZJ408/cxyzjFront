@@ -153,7 +153,7 @@
 <script>
   import Api from '~/api/Api'
 
-  let $Api
+  let $api
 
   export default {
     name: 'test',
@@ -181,7 +181,7 @@
       }
     },
     mounted () {
-      $Api = new Api(this.$store)
+      $api = new Api(this.$store)
       this.image = this.initImage
       this.nowImage = this.initImage
     },
@@ -193,7 +193,7 @@
           type: 'avatar'
         }
         this.beforeUpload(file).then(() => {
-          this.$utils.proxyOne(data, $Api.UtilApi().uploadFile, this.$store).then((res) => {
+          this.$utils.proxyOne(data, $api.UtilApi().uploadFile, this.$store).then((res) => {
             if (res.status === this.$status.SUCCESS) {
               this.handleSuccess(res)
             } else {

@@ -173,7 +173,7 @@
                 <span class="grey--text title">背景：</span>
             </v-flex>
             <v-flex md3>
-                <el-upload class="avatar-uploader backPicture"
+                <el-upload class="avatar-uploader back-picture"
                            action="#"
                            :show-file-list="false"
                            :multiple="false"
@@ -193,7 +193,7 @@
                     >
                         {{percentProgress}}%
                     </v-progress-circular>
-                    <img v-else :src="user.bg_url" class="backPicture">
+                    <img v-else :src="user.bg_url" class="back-picture">
                 </el-upload>
             </v-flex>
         </v-layout>
@@ -234,7 +234,7 @@
                     <v-layout algin-center justify-start row xs12 sm8 wrap>
                         <v-flex md11 xs12>
                             <v-text-field prepend-icon="email" v-model="newEmail"
-                                          :error="email_error" :error-messages="email_msg"
+                                          :error="emailError" :error-messages="emailMsg"
                                           label="邮箱" required></v-text-field>
                             <v-layout algin-center mt-2 justify-start row xs12 sm8 wrap>
                                 <v-flex md8 xs12>
@@ -261,7 +261,7 @@
                     <v-layout algin-center justify-start row xs12 sm8 wrap>
                         <v-flex md11 xs12>
                             <v-text-field prepend-icon="phone" v-model="newPhone"
-                                          :error="phone_error" :error-messages="phone_msg"
+                                          :error="phoneError" :error-messages="phoneMsg"
                                           label="手机" required></v-text-field>
                             <v-layout algin-center mt-2 justify-start row xs12 sm8 wrap>
                                 <v-flex md8 xs12>
@@ -290,16 +290,16 @@
 </template>
 <script>
   import Api from '~/api/Api'
-  import $Status from '~/utils/status'
+  import $status from '~/utils/status'
   //todo 待添加功能：个人介绍使用markdown格式
   let $md5
-  let $Strength
-  let $Api
+  let $strength
+  let $api
   export default {
     name: 'userSetting',
     mounted () {
-      $Api = new Api(this.$store)
-      $Strength = require('zxcvbn')
+      $api = new Api(this.$store)
+      $strength = require('zxcvbn')
       $md5 = require('js-md5')
     },
     props: {
@@ -310,7 +310,7 @@
     methods: {
       verify () {
         let sendData = {code: this.code}
-        this.$utils.proxyOne(sendData, $Api.UserApi().verifyUser, this.$store).then((result) => {
+        this.$utils.proxyOne(sendData, $api.UserApi().verifyUser, this.$store).then((result) => {
           if (result.status === this.$status.SUCCESS) {
             this.$notify({
               title: '验证成功',
@@ -332,8 +332,8 @@
           file: options.file,
           type: 'background'
         }
-        return this.$utils.proxyOne(data, $Api.UtilApi().uploadFile, this.$store).then((res) => {
-          if (res.status === $Status.SUCCESS) {
+        return this.$utils.proxyOne(data, $api.UtilApi().uploadFile, this.$store).then((res) => {
+          if (res.status === $status.SUCCESS) {
             return Promise.resolve(res)
           } else {
             return Promise.reject()
@@ -342,8 +342,8 @@
       },
       handleAvatarSuccess (res) {
         let sendData = {head_url: res.data.url}
-        this.$utils.proxyOne(sendData, $Api.UserApi().updateHead, this.$store).then((result) => {
-          if (result.status === $Status.SUCCESS) {
+        this.$utils.proxyOne(sendData, $api.UserApi().updateHead, this.$store).then((result) => {
+          if (result.status === $status.SUCCESS) {
             this.$notify({
               title: '修改成功',
               message: '用户头像修改成功！',
@@ -360,8 +360,8 @@
       handleBackgroundSuccess (res, file) {
         this.progress = false//隐藏进度条
         let sendData = {bg_url: res.data.url}
-        this.$utils.proxyOne(sendData, $Api.UserApi().updateBgUrl, this.$store).then((result) => {
-          if (result.status === $Status.SUCCESS) {
+        this.$utils.proxyOne(sendData, $api.UserApi().updateBgUrl, this.$store).then((result) => {
+          if (result.status === $status.SUCCESS) {
             this.$notify({
               title: '修改成功',
               message: '背景图片修改成功！',
@@ -406,7 +406,7 @@
         } else if (mode === 'email') {
           sendData = {'email': this.newEmail}
         }
-        let call = $Api.UserApi().userExist
+        let call = $api.UserApi().userExist
         //判断是否已经注册过了
         this.$utils.proxyOne(sendData, call, this.$store).then((res) => {
           if (res.data.exist) {
@@ -414,7 +414,7 @@
             this.$message.warning(msg)
             return false
           } else {
-            call = $Api.UserApi().sendCode
+            call = $api.UserApi().sendCode
             return this.$utils.proxyOne(sendData, call, this.$store)
           }
         }).then((res) => {
@@ -467,7 +467,7 @@
           //邮箱
           sendData = {verify_type: 'email'}
         }
-        this.$utils.proxyOne(sendData, $Api.UserApi().verifySendCode, this.$store).then((result) => {
+        this.$utils.proxyOne(sendData, $api.UserApi().verifySendCode, this.$store).then((result) => {
           if (result.status === this.$status.SUCCESS) {
             let times = 60
             this.$message.success('验证码发送成功！')
@@ -492,7 +492,7 @@
         if (this.which === 'email') {
           if (this.$refs.email.validate()) {//验证
             sendData = {email: this.newEmail, user_id: this.user.user_id}
-            this.$utils.proxyOne(sendData, $Api.UserApi().updateEmail, this.$store).then((result) => {
+            this.$utils.proxyOne(sendData, $api.UserApi().updateEmail, this.$store).then((result) => {
               if (result.status === this.$status.SUCCESS) {
                 this.user.email = result.data.email
                 this.$store.commit('userCenter/updateEmail', result.data.email)
@@ -530,7 +530,7 @@
         } else {
           if (this.$refs.phone.validate()) {
             sendData = {phone: this.newPhone, user_id: this.user.user_id}
-            this.$utils.proxyOne(sendData, $Api.UserApi().updatePhone, this.$store).then((result) => {
+            this.$utils.proxyOne(sendData, $api.UserApi().updatePhone, this.$store).then((result) => {
               if (result.status === this.$status.SUCCESS) {
                 this.user.phone = result.data.phone
                 this.$store.commit('userCenter/updatePhone', result.data.phone)
@@ -638,8 +638,8 @@
               this.$message.warning('昵称太短啦！')
             } else {
               sendData = {nickname: this.user.nickname}
-              this.$utils.proxyOne(sendData, $Api.UserApi().updateNickname, this.$store).then((result) => {
-                if (result.status === $Status.SUCCESS) {
+              this.$utils.proxyOne(sendData, $api.UserApi().updateNickname, this.$store).then((result) => {
+                if (result.status === $status.SUCCESS) {
                   this.$store.commit('userCenter/updateNickname', this.user.nickname)
                   this.$store.commit('setNickname', this.user.nickname)
                   this.$notify({
@@ -649,7 +649,7 @@
                   })
                   this.show(0, false)
                   this.editNickname = false
-                } else if (result.status === $Status.NICKNAME_EXIST) {
+                } else if (result.status === $status.NICKNAME_EXIST) {
                   this.$notify({
                     title: '修改失败！',
                     message: '该昵称已经存在了，换个吧！',
@@ -670,8 +670,8 @@
             break
           case 'gender':
             sendData = {gender: value}
-            this.$utils.proxyOne(sendData, $Api.UserApi().updateGender, this.$store).then((result) => {
-              if (result.status === $Status.SUCCESS) {
+            this.$utils.proxyOne(sendData, $api.UserApi().updateGender, this.$store).then((result) => {
+              if (result.status === $status.SUCCESS) {
                 this.user.gender = value
                 this.$store.commit('userCenter/updateGender', value)
                 this.$store.commit('setGender', value)
@@ -698,8 +698,8 @@
             } else {
               this.newPassword = $md5(this.newPassword.split('').reverse().join(''))//逆序并计算MD5值
               sendData = {password: this.newPassword, user_id: this.user.user_id}
-              this.$utils.proxyOne(sendData, $Api.UserApi().updatePassword).then((result) => {
-                if (result.status === $Status.SUCCESS) {
+              this.$utils.proxyOne(sendData, $api.UserApi().updatePassword).then((result) => {
+                if (result.status === $status.SUCCESS) {
                   this.$notify({
                     title: '修改成功！',
                     message: '您的密码修改成功！',
@@ -731,8 +731,8 @@
               this.user.introduce = '这个人很懒，连介绍都没有(￢︿̫̿￢☆)'
             }
             sendData = {introduce: this.user.introduce}
-            this.$utils.proxyOne(sendData, $Api.UserApi().updateIntroduce, this.$store).then((result) => {
-              if (result.status === $Status.SUCCESS) {
+            this.$utils.proxyOne(sendData, $api.UserApi().updateIntroduce, this.$store).then((result) => {
+              if (result.status === $status.SUCCESS) {
                 this.$store.commit('userCenter/updateIntroduce', result.data.introduce)
                 this.$store.commit('setIntroduce', result.data.introduce)
                 this.$notify({
@@ -754,8 +754,8 @@
             break
           case 'color':
             let sendData = {theme_color: this.user.theme_color}
-            this.$utils.proxyOne(sendData, $Api.UserApi().updateThemeColor, this.$store).then((result) => {
-              if (result.status === $Status.SUCCESS) {
+            this.$utils.proxyOne(sendData, $api.UserApi().updateThemeColor, this.$store).then((result) => {
+              if (result.status === $status.SUCCESS) {
                 this.$store.commit('userCenter/updateThemeColor', this.user.theme_color)
                 this.$notify({
                   title: '修改成功！',
@@ -774,7 +774,7 @@
         }
       },
       passwordStrength: function () {
-        let score = $Strength(this.newPassword).score
+        let score = $strength(this.newPassword).score
         let process
         if (score === 0) {
           process = 0
@@ -791,7 +791,7 @@
       },
       changeProcess (score, process) {
         let timer = setInterval(() => {
-          if (this.strength === process || $Strength(this.newPassword).score !== score) {
+          if (this.strength === process || $strength(this.newPassword).score !== score) {
             clearInterval(timer)
           } else {
             if (this.strength > process) {
@@ -818,8 +818,8 @@
           v => !!v || '验证码不可为空'
         ],
         emailCode: '',
-        email_msg: '',
-        phone_msg: '',
+        emailMsg: '',
+        phoneMsg: '',
         phoneCode: '',
         editEmailPhone: false,
         disabled: false,
@@ -883,22 +883,22 @@
           return 'phone'
         }
       },
-      email_error: function () {
+      emailError: function () {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         if (typeof (this.newEmail) === 'undefined' || pattern.test(this.newEmail) || this.newEmail.length === 0) {
-          this.email_msg = ''
+          this.emailMsg = ''
           return false
         }
-        this.email_msg = '请输入正确的邮箱'
+        this.emailMsg = '请输入正确的邮箱'
         return true
       },
-      phone_error: function () {
+      phoneError: function () {
         const pattern = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/
         if (typeof (this.newPhone) === 'undefined' || pattern.test(this.newPhone) || this.newPhone.length === 0) {
-          this.phone_msg = ''
+          this.phoneMsg = ''
           return false
         }
-        this.phone_msg = '请输入正确的手机号'
+        this.phoneMsg = '请输入正确的手机号'
         return true
       },
       sendDisabled: function () {
@@ -935,7 +935,7 @@
         color: #17202A;
     }
 
-    .backPicture {
+    .back-picture {
         width: 100%;
     }
 

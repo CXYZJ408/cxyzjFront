@@ -1,11 +1,11 @@
 <template>
-    <v-container grid-list-md wrap class="clearPadding mb-3">
+    <v-container grid-list-md wrap class="clearPadding mb-5">
         <v-layout row wrap style="height:65px ">
             <toolbar :font_size=28 :icon_size=28 :none=true></toolbar>
         </v-layout>
         <v-layout align-center justify-center>
             <v-flex md12 xl9>
-                <v-card class="mt-4 myCard">
+                <v-card class="mt-4 my-card">
                     <v-layout class="pt-2">
                         <v-flex md12 class="text-md-center">
                             <span class="title2">标签管理</span>
@@ -182,7 +182,7 @@
         color: grey
     }
 
-    .myCard {
+    .my-card {
         box-shadow: none;
         border-radius: 15px;
     }

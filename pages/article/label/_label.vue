@@ -1,5 +1,5 @@
 <template>
-    <v-container grid-list-md wrap class="clearPadding mb-3" v-scroll="onScroll">
+    <v-container grid-list-md wrap class="clearPadding mb-5" v-scroll="onScroll">
         <v-layout row wrap style="height:65px ">
             <toolbar :font_size=28 :icon_size=28 :none=true></toolbar>
         </v-layout>

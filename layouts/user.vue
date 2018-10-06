@@ -2,7 +2,6 @@
     <v-app class="background" :style="{'background-image':'url('+ $store.state.userCenter.user.bg_url+')'}">
         <updateCookie></updateCookie>
         <nuxt/>
-        <Footer></Footer>
     </v-app>
 </template>
 

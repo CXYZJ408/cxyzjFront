@@ -3,19 +3,16 @@ import UtilApi from './UtilsApi'
 
 export default class Api {
   constructor (store) {
-    this.$UserApi = new UserApi(store)
-    this.$UtilApi = new UtilApi(store)
+    this.$userApi = new UserApi(store)
+    this.$utilApi = new UtilApi(store)
     this.$store = store
   }
 
   UserApi () {
-    return this.$UserApi
+    return this.$userApi
   }
 
   UtilApi () {
-    return this.$UtilApi
-  }
-  getStore(){
-    return this.$store
+    return this.$utilApi
   }
 }

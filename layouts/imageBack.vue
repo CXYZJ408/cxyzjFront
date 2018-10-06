@@ -2,9 +2,6 @@
     <v-app class="background" :style="background">
         <updateCookie></updateCookie>
         <nuxt/>
-        <no-ssr class="mt-5">
-            <Footer></Footer>
-        </no-ssr>
     </v-app>
 </template>
 

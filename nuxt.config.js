@@ -18,11 +18,10 @@ module.exports = {
   plugins: [
     {src: '~/plugins/vuetify.js'},
     {src: '~/plugins/element.js'},
-    {src: '~/plugins/menu.js'},
     {src: '~/plugins/component.js'},
     {src: '~/plugins/markdown.js', ssr: false},
-    {src: '~/plugins/Utils.js', ssr: false},
-    {src: '~/plugins/vue-croppa.js', ssr: false},
+    {src: '~/plugins/utils.js', ssr: false},
+    {src: '~/plugins/vueCroppa.js', ssr: false},
     {src:'./static/js/iconfont.js', ssr: false}
 
   ],

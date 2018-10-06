@@ -1,10 +1,7 @@
 <template>
-    <v-app class="background">
+    <v-app class="background ">
         <updateCookie></updateCookie>
         <nuxt/>
-        <no-ssr>
-            <Footer color='#BDC3C7'></Footer>
-        </no-ssr>
     </v-app>
 </template>
 <script>

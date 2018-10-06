@@ -1,10 +1,10 @@
-import axios from '../utils/axios'
-import Status from '../utils/status'
+import $axios from '../utils/axios'
+import $status from '../utils/status'
 
 //user的Api实现层
 let Auth = '/v1/user/auth'
 let User = '/v1/user'
-let $axios = axios
+
 export default class UserApi {
   constructor (store) {
     console.log('UserApi setStore')
@@ -59,7 +59,7 @@ export default class UserApi {
     return await new Promise((resolve, reject) => {
       resolve($axios.get(url))
     }).then((result) => {
-      if (result.data.status === Status.SUCCESS) {
+      if (result.data.status === $status.SUCCESS) {
         console.log('refreshSuccess')
         //刷新成功
         that.$store.commit('setToken', result.data.data.token)
@@ -117,14 +117,14 @@ export default class UserApi {
 
   async getAttentions (params) {
     console.log('getAttentions')
-    let url = User + `/${params.user_id}/attention_list/${params.pageNum}`
+    let url = User + `/${params.user_id}/attention_list/${params.page_num}`
     return new Promise(resolve => {
       resolve($axios.get(url))
     })
   }
   async getFans (params) {
     console.log('getFans')
-    let url = User + `/${params.user_id}/fans_list/${params.pageNum}`
+    let url = User + `/${params.user_id}/fans_list/${params.page_num}`
     return new Promise(resolve => {
       resolve($axios.get(url))
     })

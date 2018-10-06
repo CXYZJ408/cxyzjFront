@@ -3,11 +3,11 @@
 </template>
 
 <script>
-  let Cookie
+  let $cookie
 
   export default {
     mounted () {
-      Cookie = require('js-cookie')
+      $cookie = require('js-cookie')
     },
     name: 'updateCookie',
     watch: {
@@ -21,17 +21,17 @@
     methods: {
       handleTokenExpired () {
         this.$message('用户认证已过期，需要重新登录')
-        Cookie.remove('token')//移除token
-        Cookie.remove('refreshToken')
+        $cookie.remove('token')//移除token
+        $cookie.remove('refreshToken')
         this.$router.push({path: `/signIn`})
         this.$store.commit('tokenIsExpired', false)
         this.$store.commit('clearAll')
       },
       handleTokenHasUpdate () {
         console.log(new Date(), '更新cookie')
-        console.log('更新前的cookie：', Cookie.get('token'))
-        Cookie.set('token', this.$store.state.token)
-        console.log('更新后的cookie：', Cookie.get('token'))
+        console.log('更新前的cookie：', $cookie.get('token'))
+        $cookie.set('token', this.$store.state.token)
+        console.log('更新后的cookie：', $cookie.get('token'))
         this.$store.commit('shouldUpdateToken', false)
       }
     }

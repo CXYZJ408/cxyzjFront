@@ -56,9 +56,9 @@
 
 <script>
   import Api from '~/api/Api'
-  import $Status from '~/utils/status'
+  import $status from '~/utils/status'
 
-  let $Api
+  let $api
   export default {
     name: 'myhead',
     data: function () {
@@ -83,13 +83,13 @@
       Attention () {
         if (this.$store.state.userCenter.user.is_followed) {
           //已关注则取消关注
-          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $Api.UserApi().disFollowUser, this.$store).then((result) => {
-            if (result.status === $Status.SUCCESS) {
+          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $api.UserApi().disFollowUser, this.$store).then((result) => {
+            if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功取消关注${this.$store.state.userCenter.user.nickname}`)
               this.$store.commit('userCenter/updateFollow', false)
               this.$store.commit('userCenter/updateFans', result.data.fans)
               this.isAttention(true)
-            } else if (result.status === $Status.USER_NOT_FOLLOWED) {
+            } else if (result.status === $status.USER_NOT_FOLLOWED) {
               this.$message.warning('您还未关注该用户')
               this.$store.commit('userCenter/updateFollow', false)
               this.isAttention(true)
@@ -99,13 +99,13 @@
           })
         } else {
           //未关注则进行关注
-          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $Api.UserApi().followUser, this.$store).then((result) => {
-            if (result.status === $Status.SUCCESS) {
+          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $api.UserApi().followUser, this.$store).then((result) => {
+            if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功关注了${this.$store.state.userCenter.user.nickname}`)
               this.$store.commit('userCenter/updateFollow', true)
               this.$store.commit('userCenter/updateFans', result.data.fans)
               this.isAttention(true)
-            } else if (result.status === $Status.USER_HAS_FOLLOWED) {
+            } else if (result.status === $status.USER_HAS_FOLLOWED) {
               this.$message.warning('您已经关注过该用户了')
               this.$store.commit('userCenter/updateFollow', true)
               this.isAttention(true)
@@ -144,7 +144,7 @@
     },
     mounted () {
       this.isAttention(false)
-      $Api = new Api(this.$store)
+      $api = new Api(this.$store)
       let res = this.widthOrHeight()
       if (res === 'width') {
         this.widthHeight = 'avatar-img-width'

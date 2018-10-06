@@ -13,7 +13,7 @@
                 <nuxt/>
             </v-layout>
         </v-container>
-        <Footer></Footer>
+
     </v-app>
 </template>
 

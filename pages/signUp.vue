@@ -54,7 +54,7 @@
                         <v-layout algin-center justify-start row xs12 sm8 wrap>
                             <v-flex md11 xs12>
                                 <v-text-field prepend-icon="phone" v-model="user.phone" :rules="phoneRules"
-                                              :error="phone_error" label="手机号" :error-messages="phone_msg"
+                                              :error="phoneError" label="手机号" :error-messages="phoneMsg"
                                               required @keyup.enter="next('3')"></v-text-field>
                                 <v-layout algin-center justify-start row xs12 sm8 wrap>
                                     <v-flex md8 xs12>
@@ -93,7 +93,7 @@
                             <v-flex md11 xs12>
                                 <v-text-field prepend-icon="email" v-model="user.email"
                                               :rules="emailRules"
-                                              :error="email_error" :error-messages="email_msg"
+                                              :error="emailError" :error-messages="emailMsg"
                                               label="邮箱" required @keyup.enter="next('4')"></v-text-field>
                                 <v-layout algin-center justify-start row xs12 sm8 wrap>
                                     <v-flex md8 xs12>
@@ -136,8 +136,8 @@
                                               v-model="password1"
                                               :rules="passwordRules"
                                               label="输入密码"
-                                              :error="password_error"
-                                              :error-messages="error_msg"
+                                              :error="passwordError"
+                                              :error-messages="errorMsg"
                                               @click:append="show1=!show1"
                                               @input="passwordStrength"
                                               required
@@ -150,8 +150,8 @@
                                               v-model="password2"
                                               :rules="passwordRules"
                                               label="再次输入密码"
-                                              :error="password_error"
-                                              :error-messages="error_msg"
+                                              :error="passwordError"
+                                              :error-messages="errorMsg"
                                               @click:append="show2=!show2"
                                               @keyup.enter="register"
                                               required></v-text-field>
@@ -181,19 +181,19 @@
   import Api from '~/api/Api'
 
   let $md5
-  let $Api
-  let $Strength
-  let Cookie
+  let $api
+  let $strength
+  let $cookie
   export default {
     head: {
       title: '程序员之家 - 注册'
     },
     layout: 'signIn',
     mounted () {
-      $Api = new Api(this.$store)
-      $Strength = require('zxcvbn')
+      $api = new Api(this.$store)
+      $strength = require('zxcvbn')
       $md5 = require('js-md5')
-      Cookie = require('js-cookie')
+      $cookie = require('js-cookie')
     },
     methods: {
       reset () {
@@ -213,7 +213,7 @@
         }
       },
       passwordStrength: function () {
-        let score = $Strength(this.password1).score
+        let score = $strength(this.password1).score
         let process
         if (score === 0) {
           process = 0
@@ -231,7 +231,7 @@
       },
       changeProcess (score, process) {
         let timer = setInterval(() => {
-          if (this.strength === process || $Strength(this.password1).score !== score) {
+          if (this.strength === process || $strength(this.password1).score !== score) {
             clearInterval(timer)
           } else {
             if (this.strength > process) {
@@ -249,7 +249,7 @@
         } else if (mode === 'email') {
           sendData = {'email': this.user.email}
         }
-        let call = $Api.UserApi().userExist
+        let call = $api.UserApi().userExist
         //判断是否已经注册过了
         this.$utils.proxyOne(sendData, call).then((res) => {
           if (res.data.exist) {
@@ -257,7 +257,7 @@
             this.$message.warning(msg)
             return false
           } else {
-            call = $Api.UserApi().sendCode
+            call = $api.UserApi().sendCode
             this.$utils.proxyOne(sendData, call)
             this.$message.success('验证码发送成功')
             if (mode === 'phone') {
@@ -299,7 +299,7 @@
         switch (step - 1) {
           case 1:
             if (this.$refs.form0.validate()) {
-              await this.$utils.proxyOne({nickname: this.user.nickname}, $Api.UserApi().userExist).then((result) => {
+              await this.$utils.proxyOne({nickname: this.user.nickname}, $api.UserApi().userExist).then((result) => {
                 if (result.data.exist) {
                   //用户名已存在.
                   this.$message.warning('昵称已经被注册啦，换个吧！')
@@ -314,7 +314,7 @@
               await this.$utils.proxyOne({
                 phone: this.user.phone,
                 code: this.phoneCode
-              }, $Api.UserApi().verifyCode).then((result) => {
+              }, $api.UserApi().verifyCode).then((result) => {
                 if (result.status === this.$status.CODE_ERROR) {
                   this.$message.error('验证码错误')
                 } else {
@@ -328,7 +328,7 @@
               await this.$utils.proxyOne({
                 email: this.user.email,
                 code: this.emailCode
-              }, $Api.UserApi().verifyCode).then((result) => {
+              }, $api.UserApi().verifyCode).then((result) => {
                 if (result.status === this.$status.CODE_ERROR) {
                   this.$message.error('验证码错误')
                 } else {
@@ -355,7 +355,7 @@
             this.$message.warning('密码太简单啦，加强一下吧！')
           } else {
             this.user.password = $md5(this.password1.split('').reverse().join(''))//逆序并计算MD5值
-            this.$utils.proxyOne(this.user, $Api.UserApi().registerUser).then((res) => {
+            this.$utils.proxyOne(this.user, $api.UserApi().registerUser).then((res) => {
               //再次检测
               if (res.status === this.$status.NICKNAME_EXIST) {
                 this.step = '1'
@@ -369,8 +369,8 @@
               } else if (res.status === this.$status.SUCCESS) {
                 //注册成功
                 this.$store.commit('login', res.data)
-                Cookie.set('token', res.data.token)
-                Cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
+                $cookie.set('token', res.data.token)
+                $cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
                 this.$router.push({path: `/`})
               }
             })
@@ -380,12 +380,12 @@
       }
     },
     computed: {
-      password_error: function () {
+      passwordError: function () {
         if (this.password1.length > 0 && this.password2.length > 0 && this.password1 !== this.password2) {
-          this.error_msg = '两次密码不一致'
+          this.errorMsg = '两次密码不一致'
           return true
         }
-        this.error_msg = ''
+        this.errorMsg = ''
         this.user.password = this.password1
         return false
       },
@@ -406,22 +406,22 @@
           return !(this.user.email.length !== 0 && email.test(this.user.email))
         }
       },
-      phone_error: function () {
+      phoneError: function () {
         const pattern = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/
         if (typeof (this.user.phone) === 'undefined' || pattern.test(this.user.phone) || this.user.phone.length === 0) {
-          this.phone_msg = ''
+          this.phoneMsg = ''
           return false
         }
-        this.phone_msg = '请输入正确的手机号'
+        this.phoneMsg = '请输入正确的手机号'
         return true
       },
-      email_error: function () {
+      emailError: function () {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         if (typeof (this.user.email) === 'undefined' || pattern.test(this.user.email) || this.user.email.length === 0) {
-          this.email_msg = ''
+          this.emailMsg = ''
           return false
         }
-        this.email_msg = '请输入正确的邮箱'
+        this.emailMsg = '请输入正确的邮箱'
         return true
       },
       strengthColor: function () {
@@ -464,9 +464,9 @@
         password1: '',
         password2: '',
         max: 1,
-        error_msg: '',
-        phone_msg: '',
-        email_msg: '',
+        errorMsg: '',
+        phoneMsg: '',
+        emailMsg: '',
         passwordRules: [
           v => !!v || '密码不为空',
           v => {

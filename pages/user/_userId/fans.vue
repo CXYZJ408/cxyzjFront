@@ -28,23 +28,23 @@
   import userCard from '~/components/user/userCard.vue'
   import Api from '~/api/Api'
   import * as $utils from '~/utils'
-  import $Status from '~/utils/status'
+  import $status from '~/utils/status'
 
-  let $API
+  let $api
   export default {
     name: 'fans',
     components: {
       userCard
     },
     async asyncData ({store}) {
-      $API = new Api(store)
+      $api = new Api(store)
       let params = {
         user_id: store.state.userCenter.user.user_id,
-        pageNum: 0 //页码从0开始
+        page_num: 0 //页码从0开始
       }
-      return await $utils.proxyOne(params, $API.UserApi().getFans, store).then(res => {
+      return await $utils.proxyOne(params, $api.UserApi().getFans, store).then(res => {
         let fans = []
-        if (res.status === $Status.SUCCESS) {
+        if (res.status === $status.SUCCESS) {
           fans = res.data.fans
         }
         let size = fans.length

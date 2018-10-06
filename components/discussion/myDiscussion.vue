@@ -14,7 +14,7 @@
                     <v-flex md12>
                         <div @mouseleave="show=false" class="d-inline-block">
                             <transition name="fade">
-                                <div v-show="show" class="userCard" @mouseleave="show=false">
+                                <div v-show="show" class="user-card" @mouseleave="show=false">
                                     <card :user="discussion.user" class=" elevation-3"></card>
                                 </div>
                             </transition>
@@ -162,7 +162,7 @@
         color: #18ADED
     }
 
-    .userCard {
+    .user-card {
         position: absolute;
         z-index: 999;
         width: 300px;

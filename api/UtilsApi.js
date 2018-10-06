@@ -1,9 +1,8 @@
 import $axios from '../utils/axios'
-import Status from '../utils/status'
+import $status from '../utils/status'
 
 //Util的API
-let util = '/v1/utils'
-let Auth = '/v1/user/auth'
+let Util = '/v1/utils'
 
 export default class UtilsApi {
   constructor (store) {
@@ -12,7 +11,7 @@ export default class UtilsApi {
   }
 
   async uploadFile (data) {
-    let url = util + `/upload/${data.type}`
+    let url = Util + `/upload/${data.type}`
     let formData = new FormData()
     formData.append('file', data.file)
     let header = {

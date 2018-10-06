@@ -78,23 +78,17 @@
             <v-layout align-center justify-center>
                 <v-flex md2>
                     <v-btn icon flat color="blue">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-QQ"></use>
-                        </svg>
+                        <v-icon color="blue">iconfont icon-QQ</v-icon>
                     </v-btn>
                 </v-flex>
                 <v-flex md2>
                     <v-btn icon flat color="red">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-weibo"></use>
-                        </svg>
+                        <v-icon color="red">iconfont icon-weibo</v-icon>
                     </v-btn>
                 </v-flex>
                 <v-flex md2>
                     <v-btn icon flat color="black">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-github"></use>
-                        </svg>
+                       <v-icon>iconfont icon-github</v-icon>
                     </v-btn>
                 </v-flex>
             </v-layout>
@@ -104,8 +98,8 @@
 <script>
   import Api from '~/api/Api'
 
-  let Cookie
-  let $Api
+  let $cookie
+  let $api
   export default {
     head: {
       title: '程序员之家 - 登录'
@@ -169,7 +163,7 @@
         return phone.test(phoneEmail)
       },
       sendCode () {
-        let call = $Api.UserApi().sendCode
+        let call = $api.UserApi().sendCode
         let sendData = {'phone': this.phoneEmail}
         //获取验证码
         this.$utils.proxyOne(sendData, call).then((res) => {
@@ -209,7 +203,7 @@
             //邮箱
             sendData = {'email': this.phoneEmail, 'password': password}
           }
-          call = $Api.UserApi().loginPassword
+          call = $api.UserApi().loginPassword
           this.$utils.proxyOne(sendData, call).then((res) => {
             let status = res.status
             if (status === this.$status.WRONG_PASSWORD) {
@@ -218,15 +212,15 @@
               this.$message.error('当前用户不存在，请先注册！！')
             } else if (status === this.$status.SUCCESS) {
               that.$store.commit('login', res.data)
-              Cookie.set('token', res.data.token)
-              Cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
+              $cookie.set('token', res.data.token)
+              $cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
               this.$router.push({path: `/`})
             }
           })
         } else if (!this.loginWithPassword && this.$refs.form2.validate()) {
           //使用验证码登录，同时通过表单验证
           sendData = {'phone': this.phoneEmail, 'code': this.code}
-          call = $Api.UserApi().loginCode
+          call = $api.UserApi().loginCode
           this.$utils.proxyOne(sendData, call).then((res) => {
             let status = res.status
             if (status === this.$status.CODE_ERROR) {
@@ -235,8 +229,8 @@
               this.$message.error('当前用户不存在，请先注册！！')
             } else if (status === this.$status.SUCCESS) {
               that.$store.commit('login', res.data)
-              Cookie.set('token', res.data.token)
-              Cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
+              $cookie.set('token', res.data.token)
+              $cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
               this.$router.push({path: `/`})
             }
           })
@@ -245,8 +239,8 @@
     },
     mounted () {
       //初始化
-      Cookie = require('js-cookie')
-      $Api = new Api(this.$store)
+      $cookie = require('js-cookie')
+      $api = new Api(this.$store)
     }
   }
 </script>

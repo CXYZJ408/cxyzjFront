@@ -1,6 +1,6 @@
 import Api from '../api/Api'
 import * as $utils from '../utils/index'
-import Status from '../utils/status'
+import $status from '../utils/status'
 //主模块
 let defaultToken = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0ODcwMDUzODM3OTgyOTI0ODIiLCJyb2xlIjoiUk9MRV9BTk9OWU1JVFkiLCJleHAiOjE1NDUxNjAzMjMsImlhdCI6MTUzNjQwMDMyMywiaXNzIjoiY3h5emoiLCJzdWIiOiJUb2tlbiIsImF1ZCI6IlVzZXIiLCJqdGkiOiJhMmFhODc4Yi03MjgzLTQ5NjgtOWJjOS00ZjFhZDEzNmViOWQifQ.y5H4oXx05V33Bo9ZQRvVf8IqyNMxYDzHZW27_D9QD_MzTbhNHsQ9FsHmcXF9OkdZ_gCRIOdPhT7tElMaCk7iig'
 //默认的匿名用户的token是不会过期的(或者说是在2118年过期,如果这个项目还在的话。。。)
@@ -11,7 +11,7 @@ export const state = () => ({
   user: {},//user information
   tokenHasUpdate: false,//should client need to flush the cookie
   tokenExpired: false,//whether token is expired
-  Welcome: false,
+  welcome: false,
   background: ''
 })
 
@@ -28,10 +28,10 @@ export const mutations = {
     state.user = data.user
     state.token = data.token
     state.refreshToken = data.refreshToken
-    state.Welcome = true
+    state.welcome = true
   },
   cancelWelcome (state) {
-    state.Welcome = false
+    state.welcome = false
   },
   logout (state) {
     state.isLogin = false
@@ -115,12 +115,12 @@ export const actions = {
         console.log('the status without login')
       } else {
         //存在refreshToken
-        let $Api = new Api(store)
-        let call = $Api.UserApi().getUserSimple
+        let $api = new Api(store)
+        let call = $api.UserApi().getUserSimple
         if (!!token) {
           //存在有token，使用token进行刷新
           await $utils.proxyOne(null, call, store).then((res) => {
-            if (res.status === Status.SUCCESS) {
+            if (res.status === $status.SUCCESS) {
               //成功刷新用户信息
               store.commit('loginAgain', res.data)
             } else {
@@ -133,12 +133,12 @@ export const actions = {
           })
         } else {
           //没有token，使用refreshToken重新获取token，同时获取用户信息
-          await $Api.UserApi().refreshToken().then(async (res) => {
+          await $api.UserApi().refreshToken().then(async (res) => {
             //成功重新获取了token
             if (res) {
               //重新获取用户信息
               await $utils.proxyOne(null, call, store).then((res) => {
-                if (res.status === Status.SUCCESS) {
+                if (res.status === $status.SUCCESS) {
                   //成功刷新用户信息
                   store.commit('loginAgain', res.data)
                 } else {

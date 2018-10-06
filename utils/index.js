@@ -1,20 +1,19 @@
-import Status from './status'
-import UserApi from '../api/UserApi'
-
+import $status from './status'
+import Api from '../api/Api'
 export async function proxy (data, calls, store) {//做一个代理层，保证在refreshToken不过期的情况下返回所需要的数据
   console.log(calls)
   let invokes = pack(data, calls)//将请求打包
   return Promise.all(invokes).then(async function (results) {//将所有的请求并行执行，然后返回结果
     let needRefresh = false
     for (let i = 0; i < results.length; i++) {
-      if (results[i].data.status === Status.TOKEN_EXPIRED) {
+      if (results[i].data.status === $status.TOKEN_EXPIRED) {
         console.log('token过期')
         needRefresh = true
         break //有请求没有获取到数据，需要全部重发
       }
     }
     if (needRefresh) {
-      let $userApi = new UserApi(store)
+      let $userApi = new Api(store).UserApi()
       //使用refreshToken刷新
       return await $userApi.refreshToken().then(async function (refreshOk) {
         if (refreshOk) {
@@ -53,13 +52,13 @@ export async function proxyOne (data, call, store) {
   let invoke = call(data)//将请求打包
   return Promise.resolve(invoke).then(async function (result) {//将所有的请求并行执行，然后返回结果
     let needRefresh = false
-    if (result.data.status === Status.TOKEN_EXPIRED) {
+    if (result.data.status === $status.TOKEN_EXPIRED) {
       console.log('token过期')
       needRefresh = true
       //有请求没有获取到数据，需要全部重发
     }
     if (needRefresh) {
-      let $userApi = new UserApi(store)
+      let $userApi = new Api(store).UserApi()
       //使用refreshToken刷新
       return await $userApi.refreshToken().then(async function (refreshOk) {
         if (refreshOk) {

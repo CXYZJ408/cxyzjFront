@@ -100,10 +100,10 @@
       },
       handleCommand (command) {
         if (command === 'logout') {
-          let Cookie = require('js-cookie')
+          let $cookie = require('js-cookie')
           this.$store.commit('logout')
-          Cookie.remove('token')//移除token
-          Cookie.remove('refreshToken')
+          $cookie.remove('token')//移除token
+          $cookie.remove('refreshToken')
           this.$router.push({path: `/`})
         } else if (command === 'userCenter') {
           this.$router.push({path: `/user/${this.$store.state.user.user_id}/articles`})

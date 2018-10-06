@@ -7,9 +7,9 @@
                               prepend-icon="phone"
                               v-model="phone"
                               :rules="phoneRules"
-                              :error="phone_error"
+                              :error="phoneError"
                               label="手机号"
-                              :error-messages="phone_msg"
+                              :error-messages="phoneMsg"
                               required
                               v-if="which==='phone'">
                 </v-text-field>
@@ -17,8 +17,8 @@
                               prepend-icon="email"
                               v-model="email"
                               :rules="emailRules"
-                              :error="email_error"
-                              :error-messages="email_msg"
+                              :error="emailError"
+                              :error-messages="emailMsg"
                               label="邮箱"
                               required
                               v-else>
@@ -49,7 +49,7 @@
                         :rules="passwordRules"
                         label="输入新密码"
                         :error="error"
-                        :error-messages="error_msg"
+                        :error-messages="errorMsg"
                         @click:append="show1=!show1"
                         @input="passwordStrength"
                         required
@@ -63,7 +63,7 @@
                         :rules="passwordRules"
                         label="再次输入密码"
                         :error="error"
-                        :error-messages="error_msg"
+                        :error-messages="errorMsg"
                         @click:append="show2=!show2"
                         required
                 ></v-text-field>
@@ -101,8 +101,8 @@
 <script>
   import Api from '~/api/Api'
 
-  let $Strength
-  let $Api
+  let $strength
+  let $api
   export default {
     name: 'forget',
     head: {
@@ -112,7 +112,7 @@
     methods: {
       passwordStrength: function () {
         if (typeof this.password1 !== 'undefined') {
-          let score = $Strength(this.password1).score
+          let score = $strength(this.password1).score
           let process
           if (score === 0) {
             process = 0
@@ -131,7 +131,7 @@
       },
       changeProcess (score, process) {
         let timer = setInterval(() => {
-          if (this.strength === process || $Strength(this.password1).score !== score) {
+          if (this.strength === process || $strength(this.password1).score !== score) {
             clearInterval(timer)
           } else {
             if (this.strength > process) {
@@ -149,7 +149,7 @@
         } else if (this.which === 'email') {
           sendData = {'email': this.email}
         }
-        let call = $Api.UserApi().userExist
+        let call = $api.UserApi().userExist
         //判断是否已经注册过了
         this.$utils.proxyOne(sendData, call).then((res) => {
           if (!res.data.exist) {
@@ -157,7 +157,7 @@
             this.$message.warning(msg)
             return false
           } else {
-            call = $Api.UserApi().sendCode
+            call = $api.UserApi().sendCode
             return this.$utils.proxyOne(sendData, call)
           }
         }).then((res) => {
@@ -202,7 +202,7 @@
           } else {
             sendData = {email: this.email, password: password, code: this.code}
           }
-          this.$utils.proxyOne(sendData, $Api.UserApi().forgetPassword).then((res) => {
+          this.$utils.proxyOne(sendData, $api.UserApi().forgetPassword).then((res) => {
             if (res.status === this.$status.SUCCESS) {
               this.$notify({
                 title: '密码重置成功！',
@@ -237,10 +237,10 @@
           return false
         }
         if (this.password1.length > 0 && this.password2.length > 0 && this.password1 !== this.password2) {
-          this.error_msg = '两次密码不一致'
+          this.errorMsg = '两次密码不一致'
           return true
         }
-        this.error_msg = ''
+        this.errorMsg = ''
         return false
       },
       disabled: function () {
@@ -260,22 +260,22 @@
           return !(this.email.length !== 0 && email.test(this.email))
         }
       },
-      phone_error: function () {
+      phoneError: function () {
         const pattern = /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/
         if (typeof (this.phone) === 'undefined' || pattern.test(this.phone) || this.phone.length === 0) {
-          this.phone_msg = ''
+          this.phoneMsg = ''
           return false
         }
-        this.phone_msg = '请输入正确的手机号'
+        this.phoneMsg = '请输入正确的手机号'
         return true
       },
-      email_error: function () {
+      emailError: function () {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         if (typeof (this.email) === 'undefined' || pattern.test(this.email) || this.email.length === 0) {
-          this.email_msg = ''
+          this.emailMsg = ''
           return false
         }
-        this.email_msg = '请输入正确的邮箱'
+        this.emailMsg = '请输入正确的邮箱'
         return true
       }
     },
@@ -294,9 +294,9 @@
         code: '',
         password1: '',
         password2: '',
-        error_msg: '',
-        phone_msg: '',
-        email_msg: '',
+        errorMsg: '',
+        phoneMsg: '',
+        emailMsg: '',
         passwordRules: [
           v => !!v || '密码不为空',
           v => {
@@ -324,8 +324,8 @@
       }
     },
     mounted () {
-      $Api = new Api(this.$store)
-      $Strength = require('zxcvbn')
+      $api = new Api(this.$store)
+      $strength = require('zxcvbn')
     }
   }
 </script>

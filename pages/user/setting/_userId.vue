@@ -11,7 +11,7 @@
   import toolbar from '~/components/user/userToolBar.vue'
   import Api from '~/api/Api'
   import * as $utils from '~/utils'
-  import $Status from '~/utils/status'
+  import $status from '~/utils/status'
 
   export default {
     name: 'setting',
@@ -24,14 +24,14 @@
       if (store.state.userCenter.user.user_id !== params.userId) {
         //用户中心的数据还没有
         return await $utils.proxyOne(null, $Api.UserApi().getUserDetails, store).then((res) => {
-            if (res.status === $Status.SUCCESS) {
+            if (res.status === $status.SUCCESS) {
               store.commit('userCenter/setUser', res.data.user)//提交数据
               return {user: res.data.user}
             } else {
               if (store.state.tokenExpired) {
-                let Cookie = require('js-cookie')
-                Cookie.remove('token')//移除token
-                Cookie.remove('refreshToken')
+                let $cookie = require('js-cookie')
+                $cookie.remove('token')//移除token
+                $cookie.remove('refreshToken')
                 store.commit('tokenIsExpired', false)// todo 修改为重定向
               } else {
                 error({statusCode: 500, message: '未知错误！'})

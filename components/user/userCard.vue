@@ -1,5 +1,5 @@
 <template>
-    <v-card class="userCard mt-3 pa-3  py-4 md12">
+    <v-card class="user-card mt-3 pa-3  py-4 md12">
         <v-layout row wrap justify-center>
             <v-flex md3 class="text-md-center">
                 <v-avatar size="55">
@@ -60,10 +60,9 @@
 
 <script>
   import Api from '~/api/Api'
-  import * as $utils from '~/utils'
-  import $Status from '~/utils/status'
+  import $status from '~/utils/status'
 
-  let $Api
+  let $api
   export default {
     name: 'userCard',
     props: {
@@ -86,11 +85,11 @@
       Attention () {
         if (this.user.is_followed) {
           //已关注则取消关注
-          this.$utils.proxyOne(this.user.user_id, $Api.UserApi().disFollowUser, this.$store).then((result) => {
-            if (result.status === $Status.SUCCESS) {
+          this.$utils.proxyOne(this.user.user_id, $api.UserApi().disFollowUser, this.$store).then((result) => {
+            if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功取消关注${this.user.nickname}`)
               this.$store.commit('userCenter/updateFans', result.data.fans)
-            } else if (result.status === $Status.USER_NOT_FOLLOWED) {
+            } else if (result.status === $status.USER_NOT_FOLLOWED) {
               this.$message.warning('您还未关注该用户')
             }
             this.$emit('del',this.index)
@@ -101,12 +100,12 @@
           })
         } else {
           //未关注则进行关注
-          this.$utils.proxyOne(this.user.user_id, $Api.UserApi().followUser, this.$store).then((result) => {
+          this.$utils.proxyOne(this.user.user_id, $api.UserApi().followUser, this.$store).then((result) => {
             console.log(result)
-            if (result.status === $Status.SUCCESS) {
+            if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功关注了${this.user.nickname}`)
               this.$store.commit('userCenter/updateFans', result.data.fans)
-            } else if (result.status === $Status.USER_HAS_FOLLOWED) {
+            } else if (result.status === $status.USER_HAS_FOLLOWED) {
               this.$message.warning('您已经关注过该用户了')
             }
             this.$set(this.user, 'is_followed', true)
@@ -141,7 +140,7 @@
       }
     },
     mounted () {
-      $Api = new Api(this.$store)
+      $api = new Api(this.$store)
       this.isAttention(false)
     }
   }
@@ -152,7 +151,7 @@
         margin: 0;
     }
 
-    .userCard {
+    .user-card {
         box-shadow: none;
         background-color: rgb(255, 255, 255);
         max-width: 310px;
