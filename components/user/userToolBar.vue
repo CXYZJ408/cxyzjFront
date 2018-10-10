@@ -1,5 +1,5 @@
 <template>
-    <v-card class="elevation-3 toolbar">
+    <v-card class=" toolbar"  tile flat>
         <v-container grid-list-md class="clearPadding  mt-2">
             <v-layout align-center justify-center>
                 <v-flex xl9 md12>
@@ -137,6 +137,7 @@
         top: 0;
         left: 0;
         height: 63px;
+        border-bottom: 1px #f0f0f0 solid;
     }
 
     .menu {

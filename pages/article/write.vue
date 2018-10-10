@@ -3,7 +3,7 @@
         <v-layout row wrap style="height:65px ">
             <toolbar :font_size=28 :icon_size=28 :write=true></toolbar>
         </v-layout>
-        <v-layout mt-4 row align-center justify-center style="height:90vh">
+        <v-layout mt-4 row align-center justify-center style="height:80%">
             <v-flex md12 xl9 style="height: 100%;z-index:99">
                 <v-layout class="clearAll">
                     <v-flex md10 class="clearAll">
@@ -28,8 +28,8 @@
                         </div>
                     </v-flex>
                 </v-layout>
-                <no-ssr style="height: 78vh">
-                    <mavon-editor codeStyle="atom-one-dark" v-model="value"></mavon-editor>
+                <no-ssr style="height: 100%">
+                    <mavon-editor v-model="value"></mavon-editor>
                 </no-ssr>
             </v-flex>
         </v-layout>
@@ -60,6 +60,10 @@
     }
   }
 </script>
+
+<style>
+    @import "~/assets/style/markdown.css";
+</style>
 <style scoped>
 
     .draft:hover {

@@ -24,7 +24,7 @@ export async function proxy (data, calls, store) {//做一个代理层，保证�
           return await Promise.all(invokesAgain).then(function (results) {
             if (results) {
               console.log('开始返回数据')
-              return PushData(results)
+              return pushData(results)
             } else {
               return false
             }
@@ -39,7 +39,7 @@ export async function proxy (data, calls, store) {//做一个代理层，保证�
       if (results) {
         //成功请求到了数据
         console.log('开始返回数据')
-        return PushData(results)
+        return pushData(results)
       } else {
         //请求数据失败
         return false
@@ -123,7 +123,7 @@ function pack (data, calls) {//打包
   return invokes
 }
 
-function PushData (results) {
+function pushData (results) {
   let responseData = []//提取数据
   for (let i = 0; i < results.length; i++) {
     responseData.push(results[i].data)

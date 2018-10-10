@@ -12,7 +12,8 @@ module.exports = {
     link: [
       {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'},
       {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'},
-      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_319haek6rql.css'}
+      {rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css'},
+      {rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_y29oy8xqul.css'},
     ]
   },
   plugins: [
@@ -22,7 +23,9 @@ module.exports = {
     {src: '~/plugins/markdown.js', ssr: false},
     {src: '~/plugins/utils.js', ssr: false},
     {src: '~/plugins/vueCroppa.js', ssr: false},
-    {src:'./static/js/iconfont.js', ssr: false}
+    {src: '~/plugins/viewer.js', ssr: false},
+    {src: './static/js/iconfont.js', ssr: false},
+    {src: '~/plugins/vueScroll.js'}
 
   ],
   css: [

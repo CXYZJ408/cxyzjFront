@@ -11,10 +11,6 @@ body::-webkit-scrollbar {
     display: none;
 }
 
-.content-input-wrapper {
-    height: 100%;
-}
-
 .slide-fade-enter-active {
     transition: all .4s ease-in-out;
 }
@@ -119,11 +115,31 @@ body {
     -webkit-line-clamp: 2 !important;
 }
 
+.limit-3line {
+    line-height: 22px !important;
+    max-height: 66px !important;
+    margin: 0 0 3px !important;
+    overflow: hidden !important;
+    font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 3 !important;
+}
 .hr {
     width: 98%;
     margin-left: 1%;
     border: none;
     border-top: 1.5px solid #BBBBBB;
+}
+
+.hr-dotted {
+    border: none;
+    border-top: 1.5px dotted #BBBBBB;
+}
+
+.hr-dash {
+    border: none;
+    border-top: 1.5px dashed #BBBBBB;
 }
 
 .v-tabs__div {

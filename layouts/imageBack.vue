@@ -21,8 +21,8 @@
 
 <style scoped>
     .background {
-        background-size: cover;
+       /* background-size: cover;
         width: 100%;
-        overflow: hidden;
+        overflow: hidden;*/
     }
 </style>
