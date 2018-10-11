@@ -113,7 +113,7 @@
       toolbar, dynamic
     },
     methods: {
-      PerLoad () {
+      perLoad () {
         if (this.loadTimes % 3 === 0) {
           this.scrollDisabled = true// 如果加载的次数可以被3整除则暂停加载，同时显示加载更多的按钮
           this.showLoadMore = true
@@ -143,7 +143,7 @@
         let offsetTop = window.pageYOffset
         if (offsetTop + window.screen.availHeight > document.body.scrollHeight - 200) {
           // 如果当前浏览部分的上端距离页面顶端的距离加上屏幕的高度大于页面高度-200 提前加载
-          this.PerLoad()
+          this.perLoad()
         }
       }
     },

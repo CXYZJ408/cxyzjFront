@@ -20,9 +20,9 @@
             </v-flex>
             <v-flex md3 class="ml-4">
                 <catalog :currentIndex="currentIndex" :max="catalogs.length">
-                        <v-list-tile
-                                v-for="(catalog,index) in catalogs" :key="index"
-                                v-scroll-to="{
+                    <v-list-tile
+                            v-for="(catalog,index) in catalogs" :key="index"
+                            v-scroll-to="{
                                   el:'#'+catalog.id,
                                   container: 'body',
                                   duration: 500,
@@ -32,11 +32,11 @@
                                  cancelable: true,
                                  x: false,
                                  y: true}" :color="currentIndex >= index?'blue':'#85929D'" :ripple="true"
-                                class="list-tile title" :class="{'current':currentIndex===index}"
-                                @click="" >
-                            <v-icon :color="currentIndex >= index?'blue':'#85929D'" size="10">iconfont icon-dot</v-icon>
-                            <span class="ml-3">{{catalog.title}}</span>
-                        </v-list-tile>
+                            class="list-tile title" :class="{'current':currentIndex===index}"
+                            @click="">
+                        <v-icon :color="currentIndex >= index?'blue':'#85929D'" size="10">iconfont icon-dot</v-icon>
+                        <span class="ml-3">{{catalog.title}}</span>
+                    </v-list-tile>
                 </catalog>
             </v-flex>
         </v-layout>
