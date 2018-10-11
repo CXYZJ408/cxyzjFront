@@ -67,7 +67,7 @@
 
 <script>
   import card from '~/components/user/userCard.vue'
-
+    //todo:组件的数据需要重写
   export default {
     name: 'dynamic',
     props: {

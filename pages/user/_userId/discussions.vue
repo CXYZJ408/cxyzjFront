@@ -50,7 +50,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,

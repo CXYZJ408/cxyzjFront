@@ -11,14 +11,21 @@
                 class="progress"
         ></v-progress-linear>
         <v-layout mt-4 justify-center pt-2 ref="articleContent">
-            <v-flex md8 xl6>
-                <articleContent :article="article" :user="user" :label="label">
-                    <span slot="words" class="grey--text subheading">字数：{{words}}&nbsp;&nbsp;&nbsp;&nbsp;阅读大约需要：{{Math.floor(words/400)}}分钟</span>
-                    <div class="markdown-body mt-1" v-viewer slot="articleRender"
-                         v-html="articleRender" id="articleContent"></div>
-                </articleContent>
+            <v-flex md7 xl6>
+                <v-layout row wrap>
+                    <v-flex md12>
+                        <articleContent :article="article" :user="user" :label="label">
+                            <span slot="words" class="grey--text subheading">字数：{{words}}&nbsp;&nbsp;&nbsp;&nbsp;阅读大约需要：{{Math.floor(words/400)}}分钟</span>
+                            <div class="markdown-body mt-1" v-viewer slot="articleRender"
+                                 v-html="articleRender" id="articleContent"></div>
+                        </articleContent>
+                    </v-flex>
+                    <v-flex md12>
+                        <div style="height: 700px">TODO:评论区</div>
+                    </v-flex>
+                </v-layout>
             </v-flex>
-            <v-flex md3 class="ml-4">
+            <v-flex md3 xl2 class="ml-4">
                 <catalog :currentIndex="currentIndex" :max="catalogs.length">
                     <v-list-tile
                             v-for="(catalog,index) in catalogs" :key="index"
@@ -67,13 +74,12 @@
       toolbar, articleContent, catalog, HappyScroll
 
     },
-    created () {
-      this.$store.commit('setBackground', 'white')
-    },
+
     mounted () {
       this.generateArticle(this)
       this.generateCatalog(this)
       this.rendered()
+      this.$store.commit('setBackground', 'white')
     },
     computed: {},
     data: function () {

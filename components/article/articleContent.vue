@@ -33,9 +33,11 @@
                 </v-flex>
             </v-layout>
         </v-flex>
+
         <v-flex md12 class="text-md-right">
             <slot name="words"></slot>
         </v-flex>
+
         <v-flex md12>
             <slot name="articleRender"></slot>
         </v-flex>

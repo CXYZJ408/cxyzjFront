@@ -57,7 +57,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: '野望',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -95,7 +95,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -128,7 +128,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -161,7 +161,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -194,7 +194,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,

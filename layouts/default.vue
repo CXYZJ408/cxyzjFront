@@ -6,8 +6,8 @@
 </template>
 <script>
   export default {
-    mounted () {
-      if (this.$store.state.background.length !== 0) {
+    watch: {
+      '$store.state.background': function () {
         this.background = `background: ${this.$store.state.background } no-repeat fixed;`
       }
     },

@@ -129,7 +129,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -162,7 +162,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -195,7 +195,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -228,7 +228,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -261,7 +261,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -293,7 +293,7 @@
             user: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               is_followed: false,
@@ -324,7 +324,7 @@
             discusser: {
               user_id: 'xxxxx',
               nickname: 'Yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -335,7 +335,7 @@
             replier: {
               user_id: 'xxxxx',
               nickname: 'yaser2',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -364,7 +364,7 @@
             discusser: {
               user_id: 'xxxxx',
               nickname: 'Yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -375,7 +375,7 @@
             replier: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -404,7 +404,7 @@
             discusser: {
               user_id: 'xxxxx',
               nickname: 'Yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -415,7 +415,7 @@
             replier: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -444,7 +444,7 @@
             discusser: {
               user_id: 'xxxxx',
               nickname: 'Yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -455,7 +455,7 @@
             replier: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -484,7 +484,7 @@
             discusser: {
               user_id: 'xxxxx',
               nickname: 'Yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',
@@ -495,7 +495,7 @@
             replier: {
               user_id: 'xxxxx',
               nickname: 'yaser',
-              head_url: '/img/test/head.jpg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               role: 'user',
               gender: 1,
               introduce: 'xx',

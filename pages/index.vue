@@ -154,7 +154,7 @@
   import board from '~/components/index/board.vue'
   import myLabel from '~/components/article/labelSimple.vue'
   import Api from '~/api/Api'
-
+  //todo dynamic组件的数据需要重写
   let _ = require('lodash')
   let $api
   export default {
@@ -227,6 +227,7 @@
         })
         this.$store.commit('cancelWelcome')
       }
+      this.$store.commit('setBackground', '#F3F3F3')
     },
     asyncData ({store}) {
       $api = new Api(store)
@@ -375,13 +376,13 @@
             views: 12,
             comments: 5,
             collections: 4,
-            type: 'articles',
+            type: 'article',
             dynamic_id: '8979651',
             is_collected: false,
             user: {
               user_id: '490538974364827648',
               nickname: '野望',
-              head_url: '/img/Avatar/9f966f29-c496-4347-aa12-7384a789d0e2.jpeg',
+              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -406,7 +407,7 @@
             views: 2,
             comments: 5,
             collections: 4,
-            type: 'articles',
+            type: 'article',
             dynamic_id: '8979651',
             is_collected: false,
             user: {
@@ -437,13 +438,13 @@
             views: 12,
             comments: 5,
             collections: 4,
-            type: 'articles',
+            type: 'article',
             dynamic_id: '8979651',
             is_collected: true,
             user: {
               user_id: 'xxxxx',
               nickname: '野望',
-              head_url: '/img/Avatar/87ea13f3-e1f0-4ee8-bfa1-063647765620.jpeg',
+              head_url: '/img/Avatar/cxyzj.png',
               bg_url: 'xxx',
               theme_color: 'xxxx',
               role: 'user',
@@ -468,7 +469,7 @@
             views: 12,
             comments: 5,
             collections: 4,
-            type: 'articles',
+            type: 'article',
             dynamic_id: '8979651',
             is_collected: false,
             user: {
@@ -502,7 +503,7 @@
             views: 12,
             comments: 5,
             collections: 4,
-            type: 'articles',
+            type: 'article',
             dynamic_id: '8979651',
             is_collected: true,
             user: {
