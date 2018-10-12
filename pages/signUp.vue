@@ -354,7 +354,7 @@
           if (this.strength < 1) {
             this.$message.warning('密码太简单啦，加强一下吧！')
           } else {
-            this.user.password = $md5(this.password1.split('').reverse().join(''))//逆序并计算MD5值
+            this.user.password = $md5(this.password1.split('').reverse().join(''))//将密码逆序同时进行md5处理
             this.$utils.proxyOne(this.user, $api.UserApi().registerUser).then((res) => {
               //再次检测
               if (res.status === this.$status.NICKNAME_EXIST) {

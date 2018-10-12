@@ -9,14 +9,10 @@
 </template>
 
 <script>
-  import toolbar from '~/components/user/userToolBar.vue'
-
   export default {
     name: 'index',
     layout: 'user',
-    components: {
-      toolbar
-    }
+
   }
 </script>
 

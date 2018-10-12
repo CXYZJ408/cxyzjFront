@@ -15,7 +15,7 @@
 </template>
 <script>
   import myHead from '~/components/user/myHead.vue'
-  import toolbar from '~/components/user/userToolBar.vue'
+  import leftMenu from '~/components/user/leftMenu.vue'
   import Api from '~/api/Api'
   import * as $utils from '~/utils'
   import $status from '~/utils/status'
@@ -23,7 +23,7 @@
   export default {
     name: 'default',
     components: {
-      myHead, toolbar
+      myHead, leftMenu
     },
     asyncData ({params, redirect, store, error}) {
       let $api = new Api(store)

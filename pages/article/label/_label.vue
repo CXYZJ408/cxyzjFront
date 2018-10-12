@@ -104,13 +104,12 @@
 </template>
 
 <script>
-  import toolbar from '~/components/user/userToolBar.vue'
   import dynamic from '~/components/index/dynamic.vue'
 
   export default {
     name: 'myLabel',
     components: {
-      toolbar, dynamic
+      dynamic
     },
     mounted () {
       this.$store.commit('setBackground', '#F3F3F3')

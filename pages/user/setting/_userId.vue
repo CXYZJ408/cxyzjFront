@@ -8,7 +8,6 @@
 
 <script>
   import set from '~/components/user/userSetting.vue'
-  import toolbar from '~/components/user/userToolBar.vue'
   import Api from '~/api/Api'
   import * as $utils from '~/utils'
   import $status from '~/utils/status'
@@ -16,7 +15,7 @@
   export default {
     name: 'setting',
     components: {
-      toolbar, set
+       set
     },
     async asyncData ({params, redirect, store, error, route}) {
       let $Api = new Api(store)

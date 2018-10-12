@@ -1,4 +1,5 @@
 <template>
+    <!--自定义报错界面-->
     <!--todo 放置一个扫雷的小游戏-->
     <div class="container err">
         <updateCookie></updateCookie>

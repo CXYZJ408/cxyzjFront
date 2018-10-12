@@ -2,16 +2,17 @@
     <v-layout row wrap>
         <v-flex md12>
             <h1>{{article.title}}</h1>
+            <hr>
         </v-flex>
         <v-flex md12 class="pt-3">
-            <v-layout>
+            <v-layout class="user pa-2">
                 <v-flex md1>
                     <v-avatar size="65">
                         <img :src="user.head_url" alt="">
                     </v-avatar>
                 </v-flex>
                 <v-flex md3 xl2>
-                    <v-layout wrap row class="d-inline-block" pt-2 pl-1>
+                    <v-layout wrap row class="d-inline-block " pt-2 pl-1>
                         <v-flex md12>
                             <nuxt-link :to="'/user/'+user.user_id+'/articles'">
                                 <span class="title black--text"
@@ -128,7 +129,7 @@
 <style scoped>
     h1 {
         font-family: -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif;
-        font-size: 2.3em;
+        font-size: 2.8em;
         font-weight: 600;
     }
 
@@ -136,5 +137,18 @@
         height: 35px;
         line-height: 35px;
         display: inline-block
+    }
+
+    .user {
+        border-left:4px solid #009DFF;
+    }
+    hr{
+        height: 0;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid #dfe2e5;
     }
 </style>

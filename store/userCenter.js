@@ -4,6 +4,7 @@ export const state = () => ({
 })
 
 export const mutations = {
+  //用户信息设置
   setUser (state, user) {
     state.user = user
   },
