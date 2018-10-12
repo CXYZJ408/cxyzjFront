@@ -36,7 +36,6 @@
     </v-container>
 </template>
 <script>
-  import toolbar from '~/components/user/userToolBar.vue'
 
   export default {
     name: 'App',
@@ -51,9 +50,6 @@
       click () {
         console.log('click')
       }
-    },
-    components: {
-      toolbar
     },
     created () {
       this.$store.commit('setBackground', '/img/Article/writeBack.jpg')

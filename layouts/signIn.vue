@@ -22,7 +22,7 @@
     methods: {
       changeBackground () {
         let index = Math.floor(Math.random() * 24 + 1)
-        this.background = `/img/login/${index}.jpg`
+        this.background = `/img/Login/${index}.jpg`
       }
     },
     data: function () {

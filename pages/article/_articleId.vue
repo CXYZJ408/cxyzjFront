@@ -11,7 +11,7 @@
                 class="progress"
         ></v-progress-linear>
         <v-layout mt-4 justify-center pt-2 ref="articleContent">
-            <v-flex md7 xl6>
+            <v-flex md7 xl6 >
                 <v-layout row wrap>
                     <v-flex md12>
                         <articleContent :article="article" :user="user" :label="label">
@@ -56,7 +56,6 @@
 </template>
 
 <script>
-  import toolbar from '~/components/user/userToolBar.vue'
   import articleContent from '~/components/article/articleContent.vue'
   import catalog from '~/components/article/catalog.vue'
   import {mavonEditor} from 'mavon-editor'
@@ -71,7 +70,7 @@
   export default {
     name: 'index',
     components: {
-      toolbar, articleContent, catalog, HappyScroll
+      articleContent, catalog, HappyScroll
 
     },
 
@@ -198,5 +197,9 @@
 
     .current {
         background-color: rgba(191, 215, 230, .7);
+    }
+
+    .main {
+        background-color: white;
     }
 </style>

@@ -8,10 +8,10 @@
                             <nuxt-link to="/"><img style="width: 60px;float: left" src="/img/login/logo-small.png"
                                                    alt="">
                             </nuxt-link>
-                            <mymenu :icon_size="icon_size" :font_size=font_size :about=about
+                            <icons :icon_size="icon_size" :font_size=font_size :about=about
                                     :index=index :userCenter=userCenter :discussion="discussion"
                                     :education="education" :none="none"
-                                    :distance="distance" :write="write"></mymenu>
+                                    :distance="distance" :write="write"></icons>
                         </v-flex>
                         <v-spacer></v-spacer>
                         <v-flex v-if="$store.state.isLogin" wrap md7 xl6 class="text-md-right">
@@ -45,8 +45,12 @@
 </template>
 
 <script>
+    import icons from '~/components/user/icons.vue'
   export default {
     name: 'userToolBar',
+    components:{
+      icons
+    },
     props: {
       index: {
         type: Boolean,

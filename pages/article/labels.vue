@@ -48,13 +48,12 @@
 </template>
 
 <script>
-  import toolbar from '~/components/user/userToolBar.vue'
   import my_label from '~/components/article/label.vue'
 
   export default {
     name: 'labels',
     components: {
-      toolbar, my_label
+      my_label
     },
 
     data: () => {

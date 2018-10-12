@@ -195,7 +195,7 @@
         if (this.loginWithPassword && this.$refs.form.validate()) {
           let $md5 = require('js-md5')
           //使用密码登录，同时通过表单验证
-          let password = $md5(this.password.split('').reverse().join(''))
+          let password = $md5(this.password.split('').reverse().join(''))//将密码逆序同时进行md5处理
           if (this.isPhone(this.phoneEmail)) {
             //手机
             sendData = {'phone': this.phoneEmail, 'password': password}

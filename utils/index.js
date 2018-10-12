@@ -32,7 +32,7 @@ export async function proxy (data, calls, store) {//做一个代理层，保证�
         } else {
           //刷新失败
           console.log('再次请求失败')
-          return false
+          return Promise.reject()
         }
       })
     } else {
@@ -45,6 +45,8 @@ export async function proxy (data, calls, store) {//做一个代理层，保证�
         return false
       }
     }
+  }).catch((e) => {
+    return {statusCode: 404, message: 'Post not found'}
   })
 }
 
@@ -123,7 +125,7 @@ function pack (data, calls) {//打包
   return invokes
 }
 
-function pushData (results) {
+function pushData (results) {//打包数据
   let responseData = []//提取数据
   for (let i = 0; i < results.length; i++) {
     responseData.push(results[i].data)
@@ -131,7 +133,7 @@ function pushData (results) {
   return responseData
 }
 
-export function dataURLtoFile (dataUrl, filename) {
+export function dataURLtoFile (dataUrl, filename) {//base64转file
   let arr = dataUrl.split(',')
   console.log(arr)
   let mime = arr[0].match(/:(.*?);/)[1]

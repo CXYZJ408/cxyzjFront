@@ -149,7 +149,6 @@
 </template>
 
 <script>
-  import toolbar from '~/components/user/userToolBar.vue'
   import dynamic from '~/components/index/dynamic.vue'
   import board from '~/components/index/board.vue'
   import myLabel from '~/components/article/labelSimple.vue'
@@ -160,7 +159,7 @@
   export default {
     name: 'index',
     components: {
-      toolbar, dynamic, board, myLabel
+       dynamic, board, myLabel
     },
     methods: {
       addItem (item) {

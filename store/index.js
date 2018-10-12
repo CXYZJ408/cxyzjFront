@@ -5,18 +5,18 @@ import $status from '../utils/status'
 let defaultToken = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0ODcwMDUzODM3OTgyOTI0ODIiLCJyb2xlIjoiUk9MRV9BTk9OWU1JVFkiLCJleHAiOjE1NDUxNjAzMjMsImlhdCI6MTUzNjQwMDMyMywiaXNzIjoiY3h5emoiLCJzdWIiOiJUb2tlbiIsImF1ZCI6IlVzZXIiLCJqdGkiOiJhMmFhODc4Yi03MjgzLTQ5NjgtOWJjOS00ZjFhZDEzNmViOWQifQ.y5H4oXx05V33Bo9ZQRvVf8IqyNMxYDzHZW27_D9QD_MzTbhNHsQ9FsHmcXF9OkdZ_gCRIOdPhT7tElMaCk7iig'
 //默认的匿名用户的token是不会过期的(或者说是在2118年过期,如果这个项目还在的话。。。)
 export const state = () => ({
-  isLogin: false,
+  isLogin: false,//登录状态
   token: '',
   refreshToken: '',
-  user: {},//user information
-  tokenHasUpdate: false,//should client need to flush the cookie
-  tokenExpired: false,//whether token is expired
-  welcome: false,
+  user: {},//user信息
+  tokenHasUpdate: false,//客户端是否需要对cookie进行刷新操作
+  tokenExpired: false,//token是否已过期
+  welcome: false,//在登录和注册之后，主页会显示相应的欢迎信息
   background: ''
 })
 
 export const mutations = {
-  //the login or logout operation
+  //登录或退出操作
   loginAgain (state, data) {
     console.log('LoginAgain')
     state.isLogin = true
@@ -40,7 +40,7 @@ export const mutations = {
     state.tokenHasUpdate = false
     state.user = {}
   },
-  //the setting operation
+  //设置用户信息
   setToken (state, token) {
     state.token = token
     console.log('setTokenOK')
@@ -86,7 +86,7 @@ export const mutations = {
   setBackground (state, background) {
     state.background = background
   },
-  //clear the cache of token
+  //清除token缓存
   clearToken (state) {
     state.token = ''
   },

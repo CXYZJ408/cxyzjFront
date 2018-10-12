@@ -1,5 +1,5 @@
 <template>
-    <v-app class="background " :style="background">
+    <v-app class="background" :style="background">
         <updateCookie></updateCookie>
         <nuxt/>
     </v-app>
@@ -8,12 +8,12 @@
   export default {
     watch: {
       '$store.state.background': function () {
-        this.background = `background: ${this.$store.state.background } no-repeat fixed;`
+        this.background = `background: ${this.$store.state.background };`
       }
     },
     data: () => {
       return {
-        background: 'background: #F3F3F3 no-repeat fixed;'
+        background: 'background: #F3F3F3;'
       }
     }
   }
