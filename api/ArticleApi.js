@@ -13,4 +13,12 @@ export default class ArticleApi {
       resolve($axios.get(url))
     })
   }
+
+  async getArticleList (params) {
+    let url = Article
+    return new Promise(resolve => {
+      resolve($axios.get(url, params))
+    })
+
+  }
 }

@@ -25,13 +25,17 @@ module.exports = {
     {src: '~/plugins/vueCroppa.js', ssr: false},
     {src: '~/plugins/viewer.js', ssr: false},
     {src: '~/assets/js/iconfont.js', ssr: false},//article 标签svg渲染文件
-    {src: '~/plugins/vueScroll.js'}
+    {src: '~/plugins/vueScroll.js'},
+    {src: '~/plugins/swiper.js', ssr: false},
+    {src: '~/plugins/vue-virtual-scroller.js', ssr: false}
 
   ],
+
   css: [
     '~/assets/style/app.styl',
     '~/assets/style/common.css',//全局css配置文件
-    'element-ui/lib/theme-chalk/index.css'],//element的css配置文件
+    'element-ui/lib/theme-chalk/index.css',
+    'swiper/dist/css/swiper.css'],
   router: {
     middleware: ['Auth'],
     scrollBehavior: function (to, from, savedPosition) {//每次打开新的链接，跳转至顶部

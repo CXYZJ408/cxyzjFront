@@ -1,19 +1,26 @@
-<template>
+<template xmlns:v-swiper="http://www.w3.org/1999/xhtml">
     <div id="myIndex">
         <v-container v-scroll="onScroll" grid-list-md class="clearPadding mb-5">
             <v-layout row wrap>
                 <toolbar :font_size=28 :icon_size=28 :index=true></toolbar>
             </v-layout>
-            <v-layout align-center justify-center wrap style="margin-top: 90px!important;height: 500px">
+            <v-layout align-center justify-center wrap ref="swiper"
+                      style="margin-top: 90px!important;height:65vh;min-height: 500px">
                 <v-flex md12 xl9 wrap>
                     <no-ssr>
-                        <v-carousel id="slide">
-                            <v-carousel-item
-                                    v-for="(item,i) in items"
-                                    :key="i"
-                                    :src="item"
-                            ></v-carousel-item>
-                        </v-carousel>
+                        <div>
+                            <div v-swiper:mySwiper="swiperOption"
+                                 style=" height: 65vh;border-radius: 15px;min-height: 500px">
+                                <div class="swiper-wrapper">
+                                    <div class="swiper-slide" v-for="item in items">
+                                        <img :src="item" style="width: 100%">
+                                    </div>
+                                </div>
+                                <div class="swiper-button-prev"></div><!--左箭头-->
+                                <div class="swiper-button-next"></div><!--右箭头-->
+                                <div class="swiper-pagination swiper-pagination-bullets"></div>
+                            </div>
+                        </div>
                     </no-ssr>
                 </v-flex>
             </v-layout>
@@ -85,24 +92,7 @@
                                             :key="index"
                                             :id="'tab-'+label.label_id"
                                     >
-                                        <dynamic v-for="(item,index) in dynamics" :dynamic="item"
-                                                 :key="index"></dynamic>
-                                        <!--TODO api完成后完善瀑布加载-->
-                                        <v-layout row wrap justify-center>
-                                            <v-flex md8 v-show="showLoadMore">
-                                                <v-btn flat round block dark class="title black--text"
-                                                       @click="loadMore">
-                                                    加载更多
-                                                </v-btn>
-                                            </v-flex>
-                                            <v-flex md12 v-show="showLoad" class="text-md-center ma-3">
-                                                <v-progress-circular
-                                                        :size="40"
-                                                        color="grey"
-                                                        indeterminate
-                                                ></v-progress-circular>
-                                            </v-flex>
-                                        </v-layout>
+
                                     </v-tab-item>
                                 </v-tabs-items>
                             </v-flex>
@@ -149,17 +139,16 @@
 </template>
 
 <script>
-  import dynamic from '~/components/index/dynamic.vue'
   import board from '~/components/index/board.vue'
   import myLabel from '~/components/article/labelSimple.vue'
+  import $status from '~/utils/status'
   import Api from '~/api/Api'
-  //todo dynamic组件的数据需要重写
   let _ = require('lodash')
   let $api
   export default {
     name: 'index',
     components: {
-       dynamic, board, myLabel
+       board, myLabel
     },
     methods: {
       addItem (item) {
@@ -200,21 +189,24 @@
       },
       onScroll () {
         let offsetTop = window.pageYOffset
-        if (offsetTop + window.screen.availHeight > document.body.scrollHeight - 200) {
-          // 如果当前浏览部分的上端距离页面顶端的距离加上屏幕的高度大于页面高度-200 提前加载
-          this.perLoad()
-        }
-        if (offsetTop >= 530) {
-          // 如果当前浏览部分的上端距离大于510，则固定board和hotTopic
-          this.isFixed = true
-          let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
-          let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
-          this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
-          this.topicStyle = 'width:' + width + 'px'
+        let element = this.$refs.swiper
+        let top = element.offsetHeight
+        if (offsetTop >= top + 35) {
+          // 如果当前浏览部分的上端距离大于轮播图下边，则固定board和hotTopic
+          if (!this.isFixed) {
+            this.isFixed = true
+            let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
+            let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
+            this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
+            this.topicStyle = 'width:' + width + 'px'
+          }
         } else {
           this.isFixed = false
           this.style = ''
         }
+      },
+     async getArticleList() {
+
       }
     },
     mounted () {
@@ -230,10 +222,17 @@
     },
     asyncData ({store}) {
       $api = new Api(store)
-
     },
     data: function () {
       return {
+        renderScroller: true,
+        showScroller: true,
+        scopedSlots: false,
+        buffer: 200,
+        poolSize: 2000,
+        enableLetters: false,
+        pageMode: false,
+        pageModeFullPage: true,
         isFixed: false,
         boardStyle: '',
         topicStyle: '',
@@ -242,6 +241,24 @@
         loadTimes: 1,
         showLoad: false,
         currentItem: '',
+        swiperOption: {
+          loop: true,
+          slidesPerView: 'auto',
+          spaceBetween: 30,
+          autoplay: true,
+          effect: 'fade',
+          fadeEffect: {
+            crossFade: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+          pagination: {
+            el: '.swiper-pagination',
+            dynamicBullets: true
+          }
+        },
         items: [
           '/img/Temp/1.jpg', '/img/Temp/2.jpg', '/img/Temp/3.jpg', '/img/Temp/4.jpg'
         ],
@@ -356,7 +373,7 @@
             href: '/about'
           }
         ],
-        dynamics: [
+        temp: [
           {
             title: 'Python使用Requests抓取包图网小视频',
             text: '涉及到的知识点\n' +
@@ -376,7 +393,7 @@
             comments: 5,
             collections: 4,
             type: 'article',
-            dynamic_id: '8979651',
+            dynamic_id: 12,
             is_collected: false,
             user: {
               user_id: '490538974364827648',
@@ -407,7 +424,7 @@
             comments: 5,
             collections: 4,
             type: 'article',
-            dynamic_id: '8979651',
+            dynamic_id: 4,
             is_collected: false,
             user: {
               user_id: 'xxxxx',
@@ -438,7 +455,7 @@
             comments: 5,
             collections: 4,
             type: 'article',
-            dynamic_id: '8979651',
+            dynamic_id: 123,
             is_collected: true,
             user: {
               user_id: 'xxxxx',
@@ -469,7 +486,7 @@
             comments: 5,
             collections: 4,
             type: 'article',
-            dynamic_id: '8979651',
+            dynamic_id: 53,
             is_collected: false,
             user: {
               user_id: 'xxxxx',
@@ -503,7 +520,7 @@
             comments: 5,
             collections: 4,
             type: 'article',
-            dynamic_id: '8979651',
+            dynamic_id: 66,
             is_collected: true,
             user: {
               user_id: 'xxxxx',
@@ -527,19 +544,14 @@
             update_time: '两天前'
           }
         ],
+        dynamics: [],
       }
     }
   }
 </script>
 
 <style>
-    #myIndex #slide .v-carousel__controls {
-        background: none !important;
-    }
 
-    #myIndex #slide {
-        border-radius: 15px
-    }
 
     #myIndex #main {
         border-radius: 15px;
@@ -611,5 +623,9 @@
     #myIndex .title3:hover {
         color: #299BE7;
     }
+
+
+</style>
+<style lang="stylus">
 
 </style>
