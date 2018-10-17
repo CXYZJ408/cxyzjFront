@@ -1,5 +1,6 @@
 import $status from './status'
 import Api from '../api/Api'
+
 export async function proxy (data, calls, store) {//做一个代理层，保证在refreshToken不过期的情况下返回所需要的数据
   console.log(calls)
   let invokes = pack(data, calls)//将请求打包
@@ -144,4 +145,15 @@ export function dataURLtoFile (dataUrl, filename) {//base64转file
     u8arr[n] = bstr.charCodeAt(n)
   }
   return new File([u8arr], filename, {type: mime})
+}
+
+export function transformTime (time) {
+  let date = new Date(time)
+  let Y = date.getFullYear() + '.'
+  let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '.'
+  let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+  let h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+  let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+  let s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+  return Y + M + D + h + m + s
 }

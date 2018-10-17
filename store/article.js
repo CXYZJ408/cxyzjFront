@@ -1,11 +1,15 @@
 //文章模块
 
 export const state = () => ({
-  articleContent: ''
+  //列表信息
+  articleList: [],
+  page: {}
 })
 
 export const mutations = {
-  setArticleContent (state, articleContent) {
-    state.articleContent = articleContent
+  setArticleList (state, data) {
+    state.articleList = data.list
+    state.page = data.page
+
   }
 }

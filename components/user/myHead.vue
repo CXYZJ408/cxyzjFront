@@ -30,7 +30,7 @@
                     <v-btn v-else large block dark :color="color" depressed @mouseover="isAttention(true)"
                            @mouseleave="isAttention(false)" @click="Attention" class="title">
                         <v-icon :size="24">{{icon}}</v-icon>
-                        {{attention}}
+                        {{attentionMsg}}
                     </v-btn>
                 </v-flex>
             </v-layout>
@@ -63,7 +63,7 @@
     name: 'myhead',
     data: function () {
       return {
-        attention: '',
+        attentionMsg: '',
         color: '',
         icon: '',
         widthHeight: 'avatar-img-width',
@@ -121,21 +121,21 @@
           if (hover) {
             if (this.$store.state.userCenter.user.is_followed) {
               this.icon = 'clear'
-              this.attention = '取消关注'
+              this.attentionMsg = '取消关注'
               this.color = 'grey'
             } else {
               this.icon = 'add'
-              this.attention = '关注'
+              this.attentionMsg = '关注'
               this.color = 'blue'
             }
           } else {
             if (this.$store.state.userCenter.user.is_followed) {
               this.icon = 'done'
-              this.attention = '已关注'
+              this.attentionMsg = '已关注'
               this.color = 'red'
             } else {
               this.icon = 'add'
-              this.attention = '关注'
+              this.attentionMsg = '关注'
               this.color = 'blue'
             }
           }

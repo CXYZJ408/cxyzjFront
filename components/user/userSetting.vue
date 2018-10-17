@@ -290,7 +290,6 @@
 </template>
 <script>
   import Api from '~/api/Api'
-  import $status from '~/utils/status'
   //todo 待添加功能：个人介绍使用markdown格式
   let $md5
   let $strength
@@ -333,7 +332,7 @@
           type: 'background'
         }
         return this.$utils.proxyOne(data, $api.UtilApi().uploadFile, this.$store).then((res) => {
-          if (res.status === $status.SUCCESS) {
+          if (res.status === this.$status.SUCCESS) {
             return Promise.resolve(res)
           } else {
             return Promise.reject()
@@ -343,7 +342,7 @@
       handleAvatarSuccess (res) {
         let sendData = {head_url: res.data.url}
         this.$utils.proxyOne(sendData, $api.UserApi().updateHead, this.$store).then((result) => {
-          if (result.status === $status.SUCCESS) {
+          if (result.status === this.$status.SUCCESS) {
             this.$notify({
               title: '修改成功',
               message: '用户头像修改成功！',
@@ -361,7 +360,7 @@
         this.progress = false//隐藏进度条
         let sendData = {bg_url: res.data.url}
         this.$utils.proxyOne(sendData, $api.UserApi().updateBgUrl, this.$store).then((result) => {
-          if (result.status === $status.SUCCESS) {
+          if (result.status === this.$status.SUCCESS) {
             this.$notify({
               title: '修改成功',
               message: '背景图片修改成功！',
@@ -639,7 +638,7 @@
             } else {
               sendData = {nickname: this.user.nickname}
               this.$utils.proxyOne(sendData, $api.UserApi().updateNickname, this.$store).then((result) => {
-                if (result.status === $status.SUCCESS) {
+                if (result.status ===this.$status.SUCCESS) {
                   this.$store.commit('userCenter/updateNickname', this.user.nickname)
                   this.$store.commit('setNickname', this.user.nickname)
                   this.$notify({
@@ -649,7 +648,7 @@
                   })
                   this.show(0, false)
                   this.editNickname = false
-                } else if (result.status === $status.NICKNAME_EXIST) {
+                } else if (result.status === this.$status.NICKNAME_EXIST) {
                   this.$notify({
                     title: '修改失败！',
                     message: '该昵称已经存在了，换个吧！',
@@ -671,7 +670,7 @@
           case 'gender':
             sendData = {gender: value}
             this.$utils.proxyOne(sendData, $api.UserApi().updateGender, this.$store).then((result) => {
-              if (result.status === $status.SUCCESS) {
+              if (result.status === this.$status.SUCCESS) {
                 this.user.gender = value
                 this.$store.commit('userCenter/updateGender', value)
                 this.$store.commit('setGender', value)
@@ -699,7 +698,7 @@
               this.newPassword = $md5(this.newPassword.split('').reverse().join(''))//逆序并计算MD5值
               sendData = {password: this.newPassword, user_id: this.user.user_id}
               this.$utils.proxyOne(sendData, $api.UserApi().updatePassword).then((result) => {
-                if (result.status === $status.SUCCESS) {
+                if (result.status === this.$status.SUCCESS) {
                   this.$notify({
                     title: '修改成功！',
                     message: '您的密码修改成功！',
@@ -732,7 +731,7 @@
             }
             sendData = {introduce: this.user.introduce}
             this.$utils.proxyOne(sendData, $api.UserApi().updateIntroduce, this.$store).then((result) => {
-              if (result.status === $status.SUCCESS) {
+              if (result.status === this.$status.SUCCESS) {
                 this.$store.commit('userCenter/updateIntroduce', result.data.introduce)
                 this.$store.commit('setIntroduce', result.data.introduce)
                 this.$notify({
@@ -755,7 +754,7 @@
           case 'color':
             let sendData = {theme_color: this.user.theme_color}
             this.$utils.proxyOne(sendData, $api.UserApi().updateThemeColor, this.$store).then((result) => {
-              if (result.status === $status.SUCCESS) {
+              if (result.status === this.$status.SUCCESS) {
                 this.$store.commit('userCenter/updateThemeColor', this.user.theme_color)
                 this.$notify({
                   title: '修改成功！',
