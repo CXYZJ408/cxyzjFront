@@ -1,4 +1,4 @@
 import Vue from 'vue'
 import Croppa from 'vue-croppa'
 
-Vue.use(Croppa, { componentName: 'image-cropper' })
+Vue.use(Croppa, {componentName: 'image-cropper'})

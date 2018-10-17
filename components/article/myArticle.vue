@@ -18,7 +18,7 @@
                             <span class="subheading ml-3"
                                   style="text-transform: capitalize">{{article.user.nickname}}</span>
                         </nuxt-link>
-                        <card :user="article.user" class=" elevation-3"></card>
+
                     </v-menu>
                 </div>
                 <span class="subheading ml-3 grey--text">{{article.articleInfo.update_time}}</span>
@@ -108,7 +108,7 @@
 
 <script>
   import card from '~/components/user/userCard.vue'
-
+  //todo 修改user卡片加载的方式
   export default {
     name: 'myArticle',
     components: {

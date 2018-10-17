@@ -11,7 +11,7 @@
                         <img :src="user.head_url" alt="">
                     </v-avatar>
                 </v-flex>
-                <v-flex md3 xl2>
+                <v-flex md3 xl3 class="pl-3">
                     <v-layout wrap row class="d-inline-block " pt-2 pl-1>
                         <v-flex md12>
                             <nuxt-link :to="'/user/'+user.user_id+'/articles'">
@@ -29,7 +29,7 @@
                         </v-flex>
                     </v-layout>
                 </v-flex>
-                <v-flex md9 xl9>
+                <v-flex md7 xl8>
                     <p class="grey--text subheading limit-3line">{{user.introduce}}</p>
                 </v-flex>
             </v-layout>
@@ -89,7 +89,7 @@
       articleLabel
     },
     mounted () {
-      this.createTime = this.transformTime(this.article.update_time)
+      this.createTime = this.$utils.transformTime(this.article.update_time)
     },
     props: {
       article: {
@@ -110,19 +110,7 @@
         createTime: ''
       }
     },
-    methods: {
-      transformTime (time) {
-        let date = new Date(time)
-        let Y = date.getFullYear() + '.'
-        let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '.'
-        let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
-        let h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
-        let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
-        let s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
-        return Y + M + D + h + m + s
 
-      }
-    }
   }
 </script>
 

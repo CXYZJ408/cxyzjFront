@@ -12,7 +12,7 @@
                             <div v-swiper:mySwiper="swiperOption"
                                  style=" height: 65vh;border-radius: 15px;min-height: 500px">
                                 <div class="swiper-wrapper">
-                                    <div class="swiper-slide" v-for="item in items">
+                                    <div class="swiper-slide" v-for="item in swiperItems">
                                         <img :src="item" style="width: 100%">
                                     </div>
                                 </div>
@@ -40,12 +40,16 @@
                                         class="mr-2"
                                         grow
                                 >
+                                    <v-tab ripple active-class="active" @click="changeTabs(-1)">
+                                        <span class="label">推荐</span>
+                                    </v-tab>
                                     <v-tab
                                             v-for="(label,index) in userLabels"
                                             :key="index"
                                             :href="'#tab-'+label.label_id"
                                             ripple
-                                            active-class="active">
+                                            active-class="active"
+                                            @click="changeTabs(index)">
                                         <span class="label">{{label.label_name}}</span>
                                     </v-tab>
                                     <v-tabs-slider color="#18ADED"></v-tabs-slider>
@@ -87,12 +91,32 @@
                             </v-flex>
                             <v-flex md12>
                                 <v-tabs-items v-model="currentItem">
+                                    <v-tab-item :lazy="true">
+                                        <articleList :articleList="articleList" :page="page" :userLabel="undefined"
+                                                     @getArticleList="getArticleList"
+                                                     :state="state[0]" v-if="articleList.length!==0"></articleList>
+                                        <div v-else class="animation">
+                                            <div class="spinner">
+                                                <div class="dot1"></div>
+                                                <div class="dot2"></div>
+                                            </div>
+                                        </div>
+                                    </v-tab-item>
                                     <v-tab-item
                                             v-for="(label,index) in userLabels"
-                                            :key="index"
-                                            :id="'tab-'+label.label_id"
+                                            :key="index" :id="'tab-'+label.label_id"
+                                            :lazy="true"
                                     >
-
+                                        <articleList :articleList="articleList" :page="page"
+                                                     :userLabel="label" @getArticleList="getArticleList"
+                                                     :state="state[index+1]"
+                                                     v-if="articleList.length!==0"></articleList>
+                                        <div v-else class="animation">
+                                            <div class="spinner">
+                                                <div class="dot1"></div>
+                                                <div class="dot2"></div>
+                                            </div>
+                                        </div>
                                     </v-tab-item>
                                 </v-tabs-items>
                             </v-flex>
@@ -141,51 +165,62 @@
 <script>
   import board from '~/components/index/board.vue'
   import myLabel from '~/components/article/labelSimple.vue'
+  import articleList from '~/components/article/articleList.vue'
+  import * as $utils from '~/utils'
   import $status from '~/utils/status'
   import Api from '~/api/Api'
+
   let _ = require('lodash')
   let $api
   export default {
     name: 'index',
     components: {
-       board, myLabel
+      board, myLabel, articleList
     },
     methods: {
+      changeTabs (index) {//tab变更
+        console.log(index)
+        this.page.is_end = false
+        let labelId = undefined
+        this.handleTimer(true)//关闭所有计时器
+        if (index !== -1) {
+          labelId = this.userLabels[index].label_id
+        }
+        setTimeout(() => {
+          this.articleList = []//如果是获取第一页，则数据清空
+          this.getArticleList(0, labelId, () => {
+            this.handleTimer(false, index + 1)//启动计时器
+          })
+        }, 310)
+
+      },
+      handleTimer (stop, index) {
+        console.log(index)
+        if (stop) {
+          //关闭所有计时器
+          for (let i = 0; i < this.state.length; i++) {
+            //关闭所有的计时器
+            if (this.state[i] !== 0) {
+              this.state[i] = 0
+            }
+          }
+        } else {
+          //开启指定计时器
+          this.state[index] = 1
+        }
+
+      },
       addItem (item) {
         const removed = _.head(this.userLabels) //删除头元素,为新的元素腾出位置
         this.userLabels = _.drop(this.userLabels)
         this.userLabels.push(item)//将新元素加入userlabel
         _.pull(this.more, item)//在more中删除新加入的元素
         this.more.push(removed)//在more中加入从userlabel中删除的元素
+        this.changeTabs(3)
         this.$nextTick(() => {
           this.currentItem = 'tab-' + item.label_id//更新当前item
         })
-      },
-      perLoad () {
-        if (this.loadTimes % 3 === 0) {
-          this.scrollDisabled = true// 如果加载的次数可以被3整除则暂停加载，同时显示加载更多的按钮
-          this.showLoadMore = true
-          this.showLoad = false // 禁用加载动画
-        }
-        if (!this.scrollDisabled) {
-          this.scrollDisabled = true
-          this.showLoad = true // 显示加载动画
-          this.loadMore()// 加载操作
-        }
-      },
-      loadMore () {
-        let temp = this.dynamics[0] // todo 需要修改
-        setTimeout(() => {
-          for (let i = 0; i < 5; i++) {
-            this.dynamics.push(temp)
-          }
-          this.scrollDisabled = false
-          this.showLoad = false
-          if (this.showLoadMore) {
-            this.showLoadMore = false
-          }
-          this.loadTimes++ // 加载次数计数
-        }, 800)
+
       },
       onScroll () {
         let offsetTop = window.pageYOffset
@@ -205,11 +240,41 @@
           this.style = ''
         }
       },
-     async getArticleList() {
-
+      getArticleList (pageNum, labelId, callback) {//获取文章列表
+        console.log('开始读取', labelId)
+        if (!this.page.is_end) {
+          let params = {
+            page_num: pageNum
+          }
+          if (!_.isUndefined(labelId)) {
+            params.label_id = labelId
+          }
+          setTimeout(() => {
+          this.$utils.proxyOne(params, $api.ArticleApi().getArticleList, this.$store).then(result => {
+              if (result.status === this.$status.SUCCESS) {
+                for (let i = 0; i < result.data.list.length; i++) {
+                  this.articleList.push(result.data.list[i])
+                }
+                this.page = result.data.page
+              }
+              if (_.isFunction(callback)) {
+                console.log('回调')
+                callback()
+              }
+          })
+          }, 500)
+        } else {
+          this.handleTimer(true)
+          console.log('没有了')
+          if (_.isFunction(callback)) {
+            console.log('回调')
+            callback()
+          }
+        }
       }
     },
     mounted () {
+      $api = new Api(this.$store)
       if (this.$store.state.welcome) {
         this.$notify({
           title: '登录成功！',
@@ -222,17 +287,18 @@
     },
     asyncData ({store}) {
       $api = new Api(store)
+      let params = {
+        page_num: 0
+      }
+      return $utils.proxyOne(params, $api.ArticleApi().getArticleList, store).then(result => {
+        if (result.status === $status.SUCCESS) {
+          return {articleList: result.data.list, page: result.data.page}
+        }
+      })
     },
     data: function () {
       return {
-        renderScroller: true,
-        showScroller: true,
-        scopedSlots: false,
-        buffer: 200,
-        poolSize: 2000,
-        enableLetters: false,
-        pageMode: false,
-        pageModeFullPage: true,
+        state: [1, 0, 0, 0, 0],
         isFixed: false,
         boardStyle: '',
         topicStyle: '',
@@ -241,6 +307,7 @@
         loadTimes: 1,
         showLoad: false,
         currentItem: '',
+        //轮播图配置
         swiperOption: {
           loop: true,
           slidesPerView: 'auto',
@@ -259,51 +326,36 @@
             dynamicBullets: true
           }
         },
-        items: [
+        swiperItems: [
           '/img/Temp/1.jpg', '/img/Temp/2.jpg', '/img/Temp/3.jpg', '/img/Temp/4.jpg'
         ],
         userLabels: [
           {
-            label_id: 'e',
+            label_id: '2',
             label_name: '操作系统',
             link: '#icon-os'
           },
           {
-            label_id: 'f',
+            label_id: '1',
             label_name: '前端',
             link: '#icon-front'
           },
           {
-            label_id: 'g',
+            label_id: '4',
             label_name: '人工智能',
             link: '#icon-AI'
           },
           {
-            label_id: 'h',
+            label_id: '3',
             label_name: 'Android',
             link: '#icon-android'
           }
         ],
         more: [
           {
-            label_id: 'a',
+            label_id: '5',
             label_name: '算法',
             link: '#icon-os'
-          },
-          {
-            label_id: 'b',
-            label_name: '设计模式',
-            link: '#icon-front'
-          },
-          {
-            label_id: 'v',
-            label_name: '架构',
-            link: '#icon-AI'
-          },
-          {
-            label_id: 'd',
-            label_name: 'IOS',
-            link: '#icon-android'
           }
         ],
         labels: [
@@ -372,187 +424,13 @@
             text: '关于',
             href: '/about'
           }
-        ],
-        temp: [
-          {
-            title: 'Python使用Requests抓取包图网小视频',
-            text: '涉及到的知识点\n' +
-              'input 标签的 onchange 事件是在上传完文件之后触发\n' +
-              '当 input 标签 type="file" 时，使用 files 属性获取到上传的文件对象\n' +
-              'readAsDataURL 用于将读取内容转换成 base64 编码\n' + ~
-                '区分 canvas 的 画布 和 绘画环境：\n' +
-              '画布：对应代码中的 cvs，可以设置画布 width，height；\n' +
-              '绘画环境：对应代码中的 ctx，由 cvs 得来。ctx = cvs.getContext(\'2d\')，可以设置 fillStyle，fillRect 等；\n' +
-              '\n' +
-              '作者：_我亦飘零\n' +
-              '链接：https://www.jianshu.com/p/4ba393be278b\n' +
-              '來源：简书\n' +
-              '简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。',
-            thumbnail: '/img/Temp/2.jpg',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: 12,
-            is_collected: false,
-            user: {
-              user_id: '490538974364827648',
-              nickname: '野望',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '前端'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '学习Python的建议',
-            text: 'Python是最容易入门的编程语言，没有之一。如果初学者接触的第一门语言是C或者C++，对他们来说最难的不是语法，而是容易出现内存泄漏、指针等问题。有时候排查这些问题对初学者的打击很大，尤其是没掌握排查BUG技巧时。',
-            thumbnail: '/img/Temp/1.jpg',
-            views: 2,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: 4,
-            is_collected: false,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/Avatar/cxyzj.png',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '编程语言'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '使用PHP扩展Xhprof分析项目性能实践',
-            text: '项目即将上线，想通过一些工具来分析代码的稳定性和效率，想起在上个团队时使用过的xhprof扩展；因为换了新电脑，所以需要重新编译此扩展，现将安装与实际排查过程完整记录下来，方便自己回顾和帮助更多的读者。',
-            thumbnail: '',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: 123,
-            is_collected: true,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/Avatar/cxyzj.png',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '架构'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '「Android」SocialSdk-快速接入社会化登录分享',
-            text: '使用 微博、QQ、微信、钉钉 原生 SDK 接入，提供这些平台的登录、分享功能支持。针对业务逻辑对各个平台的接口进行封装，对外提供一致的表现，在减轻接入压力的同时，又能获得原生 SDK 最大的灵活性',
-            thumbnail: '/img/Temp/4.jpg',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: 53,
-            is_collected: false,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: 'Android'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '从爬虫到机器学习预测，我是如何一步一步做到的？',
-            text: '前一段时间与大家分享了北京二手房房价分析的实战项目，分为分析和建模两篇。文章发出后，得到了大家的肯定和支持，在此表示感谢。\n' +
-              '数据分析实战—北京二手房房价分析\n' +
-              '数据分析实战—北京二手房房价分析（建模篇）\n' +
-              '除了数据',
-            thumbnail: '/img/login/4.jpg',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: 66,
-            is_collected: true,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/login/9.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '人工智能'
-            },
-            update_time: '两天前'
-          }
-        ],
-        dynamics: [],
+        ]
       }
-    }
+    },
   }
 </script>
 
 <style>
-
-
     #myIndex #main {
         border-radius: 15px;
     }
@@ -574,10 +452,6 @@
         border-radius: 50px;
     }
 
-    #myIndex .top35 {
-        margin-top: 35px;
-    }
-
     #main .title2 {
         font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
         font-size: 18px;
@@ -589,6 +463,22 @@
 
     #myIndex .label:hover {
         color: #007FFF;
+    }
+
+    #myIndex .title3 {
+        font-size: 16px;
+        color: #85C1E9;
+        transition: all .3s ease-in;
+    }
+
+    #myIndex .title3:hover {
+        color: #299BE7;
+    }
+</style>
+<style scoped>
+
+    #myIndex .top35 {
+        margin-top: 35px;
     }
 
     #myIndex .label {
@@ -614,18 +504,70 @@
         border-radius: 5px;
     }
 
-    #myIndex .title3 {
-        font-size: 16px;
-        color: #85C1E9;
-        transition: all .3s ease-in;
+    .spinner {
+        margin: 100px auto;
+        width: 150px;
+        height: 150px;
+        position: relative;
+        text-align: center;
+        -webkit-animation: rotate 2.0s infinite linear;
+        animation: rotate 2.0s infinite linear;
     }
 
-    #myIndex .title3:hover {
-        color: #299BE7;
+    .dot1, .dot2 {
+        width: 60%;
+        height: 60%;
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        background-color: #57B4F3;
+        border-radius: 100%;
+
+        -webkit-animation: bounce 2.0s infinite ease-in-out;
+        animation: bounce 2.0s infinite ease-in-out;
     }
 
+    .dot2 {
+        top: auto;
+        bottom: 0;
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+    }
 
-</style>
-<style lang="stylus">
+    @-webkit-keyframes rotate {
+        100% {
+            -webkit-transform: rotate(360deg)
+        }
+    }
 
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+            -webkit-transform: rotate(360deg)
+        }
+    }
+
+    @-webkit-keyframes bounce {
+        0%, 100% {
+            -webkit-transform: scale(0.0)
+        }
+        50% {
+            -webkit-transform: scale(1.0)
+        }
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: scale(0.0);
+            -webkit-transform: scale(0.0);
+        }
+        50% {
+            transform: scale(1.0);
+            -webkit-transform: scale(1.0);
+        }
+    }
+
+    .animation {
+        height: 400px;
+    }
 </style>
