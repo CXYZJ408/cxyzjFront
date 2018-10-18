@@ -13,14 +13,14 @@
                         <div style="background: white;height: 100%">
                             <el-tooltip effect="dark" content="草稿箱" class="mt-2" placement="bottom">
                                 <v-avatar>
-                                    <v-icon class='draft' @click="click">
+                                    <v-icon class='draft' >
                                         iconfont icon-draft
                                     </v-icon>
                                 </v-avatar>
                             </el-tooltip>
                             <el-tooltip effect="dark" content="发布" class="mt-2 ml-1" placement="bottom">
                                 <v-avatar>
-                                    <v-icon class='send' @click="click">
+                                    <v-icon class='send' @click="send">
                                         iconfont icon-send
                                     </v-icon>
                                 </v-avatar>
@@ -30,13 +30,16 @@
                 </v-layout>
                 <no-ssr style="height: 100%">
                     <mavon-editor v-model="value"></mavon-editor>
+
                 </no-ssr>
             </v-flex>
         </v-layout>
     </v-container>
 </template>
 <script>
+  import Api from '~/api/Api'
 
+  let $api
   export default {
     name: 'App',
     layout: 'imageBack',
@@ -46,9 +49,23 @@
         down: false,
       }
     },
+    mounted () {
+      $api = new Api(this.$store)
+    },
     methods: {
-      click () {
-        console.log('click')
+      send () {
+        let params = {
+          title: '111',
+          text: 'asdasdas',
+          status_id: 101,
+          user_id: this.$store.state.user.user_id,
+          thumbnail: '',
+          label_id: 1,
+          article_sum: '12121212'
+        }
+        this.$utils.proxyOne(params, $api.ArticleApi().writeArticle, this.$store).then((result) => {
+          console.log(result)
+        })
       }
     },
     created () {

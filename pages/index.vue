@@ -7,6 +7,7 @@
             <v-layout align-center justify-center wrap ref="swiper"
                       style="margin-top: 90px!important;height:65vh;min-height: 500px">
                 <v-flex md12 xl9 wrap>
+                    <div>123    </div>
                     <no-ssr>
                         <div>
                             <div v-swiper:mySwiper="swiperOption"

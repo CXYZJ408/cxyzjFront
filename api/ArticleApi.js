@@ -19,6 +19,12 @@ export default class ArticleApi {
     return new Promise(resolve => {
       resolve($axios.get(url, params))
     })
+  }
 
+  async writeArticle (params) {
+    let url = Article+'/write'
+    return new Promise(resolve => {
+      resolve($axios.post(url, params))
+    })
   }
 }

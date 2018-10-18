@@ -108,6 +108,7 @@
           this.$store.commit('logout')
           $cookie.remove('token')//移除token
           $cookie.remove('refreshToken')
+
           this.$router.push({path: `/`})
         } else if (command === 'userCenter') {
           this.$router.push({path: `/user/${this.$store.state.user.user_id}/articles`})
