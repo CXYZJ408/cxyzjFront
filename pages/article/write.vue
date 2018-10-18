@@ -7,20 +7,20 @@
             <v-flex md12 xl9 style="height: 100%;z-index:99">
                 <v-layout class="clearAll">
                     <v-flex md10 class="clearAll">
-                        <input class="pa-2" type="text" placeholder="请输入标题（最多30个字）">
+                        <input v-model="title" class="pa-2" type="text" placeholder="请输入标题（最多30个字）">
                     </v-flex>
                     <v-flex md2 class="clearAll text-md-right">
                         <div style="background: white;height: 100%">
                             <el-tooltip effect="dark" content="草稿箱" class="mt-2" placement="bottom">
                                 <v-avatar>
-                                    <v-icon class='draft' @click="click">
+                                    <v-icon class='draft' @click="draft">
                                         iconfont icon-draft
                                     </v-icon>
                                 </v-avatar>
                             </el-tooltip>
                             <el-tooltip effect="dark" content="发布" class="mt-2 ml-1" placement="bottom">
                                 <v-avatar>
-                                    <v-icon class='send' @click="click">
+                                    <v-icon class='send' @click="send">
                                         iconfont icon-send
                                     </v-icon>
                                 </v-avatar>
@@ -29,7 +29,7 @@
                     </v-flex>
                 </v-layout>
                 <no-ssr style="height: 100%">
-                    <mavon-editor v-model="value"></mavon-editor>
+                    <mavon-editor v-model="content"></mavon-editor>
                 </no-ssr>
             </v-flex>
         </v-layout>
@@ -37,18 +37,48 @@
 </template>
 <script>
 
+  import Api from '../../api/Api'
+  let $api
+
   export default {
     name: 'App',
     layout: 'imageBack',
     data () {
       return {
-        value: '',
         down: false,
+        title: '',
+        content: '',
       }
     },
     methods: {
-      click () {
-        console.log('click')
+      draft() {
+        // todo: draft article
+
+      },
+      send () {
+        // send article
+        $api = new Api(this.$store)
+
+        // todo, 参数值需要修改
+        let params = {
+          title: this.title,
+          text: this.content,
+          label_id: "1",
+          article_sum: "1",
+          thumbnail: "",
+          status_id: "101",
+          user_id: this.$store.state.user.user_id,
+        }
+
+        console.log(params)
+        this.$utils.proxyOne(params, $api.ArticleApi().writeArticle, this.$store).then(result => {
+          if (result.status === this.$status.SUCCESS) {
+            this.$message.success("发布成功！")
+            this.$router.push({path: '/article/' + result.data.article_id})
+          } else {
+            this.$message.error("发布失败！")
+          }
+        })
       }
     },
     created () {

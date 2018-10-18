@@ -21,4 +21,11 @@ export default class ArticleApi {
     })
 
   }
+
+  async writeArticle(params) {
+    let url = Article + '/write'
+    return new Promise(resolve => {
+      resolve($axios.post(url, params))
+    })
+  }
 }
