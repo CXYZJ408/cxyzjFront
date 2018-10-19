@@ -12,6 +12,7 @@
 </template>
 
 <script>
+    //todo 重写
   import {HappyScroll} from 'vue-happy-scroll'
   import 'vue-happy-scroll/docs/happy-scroll.css'
 
@@ -21,8 +22,7 @@
       HappyScroll
     },
     data: function () {
-      return {
-      }
+      return {}
     }
   }
 </script>

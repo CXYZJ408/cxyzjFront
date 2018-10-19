@@ -1,237 +1,317 @@
-import $axios from '../utils/axios'
-import $status from '../utils/status'
-
+import {Api} from './API'
+import {Request, requestMethods} from './Request'
 //user的Api实现层
-let Auth = '/v1/user/auth'
-let User = '/v1/user'
+const Auth = '/v1/user/auth'
+const User = '/v1/user'
 
-export default class UserApi {
+export class UserApi extends Api {
   constructor (store) {
-    console.log('UserApi setStore')
-    this.$store = store
-    $axios.setStore(store)
+    super(store)
   }
 
   //用户登录等操作
-  async loginPassword (data) {
-    console.log('loginPassword')
+  loginPasswordUseEmail (email, password, send = true) {
+    console.log('loginPasswordUseEmail')
     let url = Auth + '/login_password'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, data))
-    })
+    let params = {
+      email: email,
+      password: password
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.loginPasswordUseEmail, params)
+    return super.judgeSend(send)
   }
 
-  async loginCode (data) {
-    console.log('loginCode')
+  loginPasswordUsePhone (phone, password, send = true) {
+    console.log('loginPasswordUsePhone')
+    let url = Auth + '/login_password'
+    let params = {
+      phone: phone,
+      password: password
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.loginPasswordUsePhone, params)
+    return super.judgeSend(send)
+  }
+
+  loginCode (phone, code, send = true) {
+    console.log('loginPasswordUsePhone')
     let url = Auth + '/login_code'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, data))
-    })
+    let params = {
+      phone: phone,
+      code: code
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.loginCode, params)
+    return super.judgeSend(send)
   }
 
-  async registerUser (data) {
+  registerUser (nickname, email, password, gender, phone, headUrl, send = true) {
+    console.log('registerUser')
     let url = Auth + '/register'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, data))
-    })
+    let params = {
+      phone: phone,
+      nickname: nickname,
+      email: email,
+      gender: gender,
+      head_url: headUrl,
+      password: password
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.registerUser, params)
+    return super.judgeSend(send)
   }
 
-  async forgetPassword (data) {
+  forgetPasswordUsePhone (password, code, phone, send = true) {
     let url = Auth + '/forget_password'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, data))
-    })
+    let params = {
+      password: password,
+      code: code,
+      phone: phone
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.forgetPasswordUsePhone, params)
+    return super.judgeSend(send)
   }
 
-  async verifyCode (data) {
+  forgetPasswordUseEmail (password, code, email, send = true) {
+    let url = Auth + '/forget_password'
+    let params = {
+      password: password,
+      code: code,
+      email: email
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.forgetPasswordUseEmail, params)
+    return super.judgeSend(send)
+  }
+
+  verifyCodeUsePhone (phone, code, send = true) {
     let url = Auth + '/verify_code'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, data))
-    })
+    let params = {
+      phone: phone,
+      code: code
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.verifyCodeUsePhone, params)
+    return super.judgeSend(send)
   }
 
-  async refreshToken () {
-    console.log('refreshToken')
-    let url = User + '/refresh_token'
-    //刷新token
-    let that = this//绑定this
-    $axios.needRefresh()
-    return await new Promise((resolve, reject) => {
-      resolve($axios.get(url))
-    }).then((result) => {
-      if (result.data.status === $status.SUCCESS) {
-        console.log('refreshSuccess')
-        //刷新成功
-        that.$store.commit('setToken', result.data.data.token)
-        that.$store.commit('shouldUpdateToken', true)//提醒客户端需要更新cookie中的token
-        return true
-      } else {
-        //刷新失败
-        that.$store.commit('tokenIsExpired', true)
-        that.$store.commit('clearAll')
-        return false
-      }
-    })
+  verifyCodeUseEmail (email, code, send = true) {
+    let url = Auth + '/verify_code'
+    let params = {
+      email: email,
+      code: code
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.verifyCodeUseEmail, params)
+    return super.judgeSend(send)
   }
 
-  async sendCode (phoneEmail) {//用于登录或注册
+  sendCodeUsePhone (phone, send = true) {//用于登录或注册
     console.log('sendCode')
     let url = Auth + '/send_code'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, phoneEmail))
-    })
+    let params = {
+      phone: phone
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.sendCodeUsePhone, params)
+    return super.judgeSend(send)
   }
 
-  async userExist (data) {
+  sendCodeUseEmail (email, send = true) {//用于登录或注册
+    console.log('sendCode')
+    let url = Auth + '/send_code'
+    let params = {
+      email: email
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.sendCodeUseEmail, params)
+    return super.judgeSend(send)
+  }
+
+  userExistWithNickname (nickname, send = true) {
     console.log('userExist')
     let url = Auth + '/exist'
-    return new Promise((resolve) => {
-      resolve($axios.get(url, data))
-    })
+    let params = {
+      nickname: nickname
+    }
+    super.pushRequest = new Request(requestMethods.GET, url, this.userExistWithNickname, params)
+    return super.judgeSend(send)
+  }
+
+  userExistWithPhone (phone, send = true) {
+    console.log('userExist')
+    let url = Auth + '/exist'
+    let params = {
+      phone: phone
+    }
+    super.pushRequest = new Request(requestMethods.GET, url, this.userExistWithPhone, params)
+    return super.judgeSend(send)
+  }
+
+  userExistWithEmail (email, send = true) {
+    console.log('userExist')
+    let url = Auth + '/exist'
+    let params = {
+      email: email
+    }
+    super.pushRequest = new Request(requestMethods.GET, url, this.userExistWithEmail, params)
+    return super.judgeSend(send)
   }
 
   //用户信息获取
-  async getUserSimple () {
+  getUserSimple (send = true) {
     console.log('getUserSimple')
     let url = User + '/simple/own'
-    return new Promise((resolve, reject) => {
-      resolve($axios.get(url))
-    })
+    super.pushRequest = new Request(requestMethods.GET, url, this.getUserSimple)
+    return super.judgeSend(send)
   }
 
-  async getUserDetails () {
+  getUserDetails (send = true) {
     console.log('getUserDetails')
     let url = User + '/details/own'
-    return new Promise((resolve) => {
-      resolve($axios.get(url))
-    })
+    super.pushRequest = new Request(requestMethods.GET, url, this.getUserDetails)
+    return super.judgeSend(send)
   }
 
-  async getOtherUserDetails (userID) {
+  getOtherUserDetails (userID, send = true) {
     console.log('getOtherUserDetails')
     let url = User + `/details/other/${userID}`
-    return new Promise((resolve) => {
-      resolve($axios.get(url))
-    })
+    super.pushRequest = new Request(requestMethods.GET, url, this.getOtherUserDetails)
+    return super.judgeSend(send)
   }
 
-  async getAttentions (params) {
+  getAttentions (userId, pageNum, send = true) {
     console.log('getAttentions')
-    let url = User + `/${params.user_id}/attention_list/${params.page_num}`
-    return new Promise(resolve => {
-      resolve($axios.get(url))
-    })
-  }
-  async getFans (params) {
-    console.log('getFans')
-    let url = User + `/${params.user_id}/fans_list/${params.page_num}`
-    return new Promise(resolve => {
-      resolve($axios.get(url))
-    })
-  }
-  //用户操作
-  async disFollowUser (user) {
-    console.log('disFollowUser------')
-    let url = User + `/follow/${user}`
-    return new Promise((resolve) => {
-      resolve($axios.delete(url))
-    })
+    let url = User + `/${userId}/attention_list/${pageNum}`
+    super.pushRequest = new Request(requestMethods.GET, url, this.getAttentions)
+    return super.judgeSend(send)
   }
 
-  async followUser (user) {
+  getFans (userId, pageNum, send = true) {
+    console.log('getFans')
+    let url = User + `/${userId}/fans_list/${pageNum}`
+    super.pushRequest = new Request(requestMethods.GET, url, this.getFans)
+    return super.judgeSend(send)
+  }
+
+  //用户操作
+  disFollowUser (userId, send = true) {
+    console.log('disFollowUser')
+    let url = User + `/follow/${userId}`
+    super.pushRequest = new Request(requestMethods.DELETE, url, this.disFollowUser)
+    return super.judgeSend(send)
+  }
+
+  followUser (userId, send = true) {
     console.log('followUser')
-    let url = User + `/follow/${user}`
-    return new Promise((resolve) => {
-      resolve($axios.put(url))
-    })
+    let url = User + `/follow/${userId}`
+    super.pushRequest = new Request(requestMethods.PUT, url, this.followUser)
+    return super.judgeSend(send)
   }
 
   //用户信息更新
-  async updateNickname (nickname) {
+  updateNickname (nickname, send = true) {
     console.log('updateNickname')
     let url = User + '/update_nickname'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, nickname))
-    })
+    let params = {
+      nickname: nickname
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updateNickname, params)
+    return super.judgeSend(send)
   }
 
-  async updateHead (headUrl) {
+  updateHead (headUrl, send = true) {
     console.log('updateHead')
     let url = User + '/update_head'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, headUrl))
-    })
+    let params = {
+      head_url: headUrl
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updateHead, params)
+    return super.judgeSend(send)
   }
 
-  async updateGender (gender) {
+  updateGender (gender, send = true) {
     console.log('updateGender')
     let url = User + '/update_gender'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, gender))
-    })
+    let params = {
+      gender: gender
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updateGender, params)
+    return super.judgeSend(send)
   }
 
-  async updateIntroduce (Introduce) {
+  updateIntroduce (introduce, send = true) {
     console.log('updateIntroduce')
     let url = User + '/update_introduce'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, Introduce))
-    })
+    let params = {
+      introduce: introduce
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updateIntroduce, params)
+    return super.judgeSend(send)
   }
 
-  async updateThemeColor (themeColor) {
+  updateThemeColor (themeColor, send = true) {
     console.log('updateThemeColor')
     let url = User + '/update_theme_color'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, themeColor))
-    })
+    let params = {
+      theme_color: themeColor
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updateThemeColor, params)
+    return super.judgeSend(send)
   }
 
-  async updateBgUrl (BgUrl) {
+  updateBgUrl (bgUrl, send = true) {
     console.log('updateBgUrl')
     let url = User + '/update_bg'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, BgUrl))
-    })
+    let params = {
+      bg_url: bgUrl
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updateBgUrl, params)
+    return super.judgeSend(send)
   }
 
-  async verifySendCode (params) {
+  verifySendCode (verifyType, send = true) {
     console.log('verifySendCode')
     let url = User + '/verify_user/send_code'
-    return new Promise((resolve) => {
-      resolve($axios.get(url, params))
-    })
+    let params = {
+      verify_type: verifyType
+    }
+    super.pushRequest = new Request(requestMethods.GET, url, this.verifySendCode, params)
+    return super.judgeSend(send)
   }
 
-  async verifyUser (params) {
+  verifyUser (code, send = true) {
     console.log('verifyUser')
     let url = User + '/verify_user'
-    return new Promise((resolve) => {
-      resolve($axios.get(url, params))
-    })
+    let params = {
+      code: code
+    }
+    super.pushRequest = new Request(requestMethods.GET, url, this.verifyUser, params)
+    return super.judgeSend(send)
   }
 
-  async updatePassword (password) {
+  updatePassword (password, userId, send = true) {
     console.log('updatePassword')
     let url = User + '/update_password'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, password))
-    })
+    let params = {
+      password: password,
+      user_id: userId
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updatePassword, params)
+    return super.judgeSend(send)
   }
 
-  async updatePhone (phone) {
+  updatePhone (phone, userId, send = true) {
     console.log('updatePhone')
     let url = User + '/update_phone'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, phone))
-    })
+    let params = {
+      phone: phone,
+      user_id: userId
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updatePhone, params)
+    return super.judgeSend(send)
   }
 
-  async updateEmail (email) {
+  updateEmail (email, userId, send = true) {
     console.log('updateEmail')
     let url = User + '/update_email'
-    return new Promise((resolve) => {
-      resolve($axios.post(url, email))
-    })
+    let params = {
+      email: email,
+      user_id: userId
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.updateEmail, params)
+    return super.judgeSend(send)
   }
 }

@@ -11,7 +11,7 @@
                 class="progress"
         ></v-progress-linear>
         <v-layout mt-4 justify-center pt-2 ref="articleContent">
-            <v-flex md7 xl6 >
+            <v-flex md7 xl6>
                 <v-layout row wrap>
                     <v-flex md12>
                         <articleContent :article="article" :user="user" :label="label">
@@ -59,8 +59,7 @@
   import articleContent from '~/components/article/articleContent.vue'
   import catalog from '~/components/article/catalog.vue'
   import {mavonEditor} from 'mavon-editor'
-  import Api from '~/api/Api'
-  import * as $utils from '~/utils'
+  import {ArticleApi} from '../../api/ArticleApi'
   import $status from '~/utils/status'
   import {HappyScroll} from 'vue-happy-scroll'
   import 'vue-happy-scroll/docs/happy-scroll.css'
@@ -71,7 +70,6 @@
     name: 'index',
     components: {
       articleContent, catalog, HappyScroll
-
     },
 
     mounted () {
@@ -92,9 +90,9 @@
       }
     },
     asyncData ({params, store}) {
-      let $api = new Api(store)
-      let url = '495628181437415424'
-      return $utils.proxyOne(url, $api.ArticleApi().getArticle, store).then(res => {
+      let $articleApi = new ArticleApi(store)
+      let id = '495628181437415424'//todo 去掉写死的id
+      return $articleApi.getArticle(id).then(res => {
         if (res.status === $status.SUCCESS) {
           res.data.article.words = 16
           return {article: res.data.article, user: res.data.user, label: res.data.label}

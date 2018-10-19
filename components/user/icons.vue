@@ -26,7 +26,7 @@
 </template>
 <script>
   export default {
-    name: 'mymenu',
+    name: 'icons',
     props: {
       font_size: {
         type: Number,

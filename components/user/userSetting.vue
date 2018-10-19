@@ -243,7 +243,7 @@
                                 </v-flex>
                                 <v-flex md4 xs12>
                                     <v-btn block large round class="white--text" color="grey"
-                                           @click="sendPhoneEmail('email')"
+                                           @click="handlePhoneEmail('email')"
                                            :disabled="sendDisabled">
                                         {{emailCodeMsg}}
                                     </v-btn>
@@ -270,7 +270,7 @@
                                 </v-flex>
                                 <v-flex md4 xs12>
                                     <v-btn block large round class="white--text" color="grey"
-                                           @click="sendPhoneEmail('phone')"
+                                           @click="handlePhoneEmail('phone')"
                                            :disabled="sendDisabled">
                                         {{phoneCodeMsg}}
                                     </v-btn>
@@ -289,15 +289,16 @@
     </v-card>
 </template>
 <script>
-  import Api from '~/api/Api'
+  import {UserApi} from '../../api/UserApi'
+  import Constant from '../../utils/constant'
   //todo 待添加功能：个人介绍使用markdown格式
   let $md5
   let $strength
-  let $api
+  let $userApi
   export default {
     name: 'userSetting',
     mounted () {
-      $api = new Api(this.$store)
+      $userApi = new UserApi(this.$store)
       $strength = require('zxcvbn')
       $md5 = require('js-md5')
     },
@@ -308,8 +309,7 @@
     },
     methods: {
       verify () {
-        let sendData = {code: this.code}
-        this.$utils.proxyOne(sendData, $api.UserApi().verifyUser, this.$store).then((result) => {
+        $userApi.verifyUser(this.code).then((result) => {
           if (result.status === this.$status.SUCCESS) {
             this.$notify({
               title: '验证成功',
@@ -327,11 +327,7 @@
       },
       upload: function (options) {
         console.log('upload')
-        let data = {
-          file: options.file,
-          type: 'background'
-        }
-        return this.$utils.proxyOne(data, $api.UtilApi().uploadFile, this.$store).then((res) => {
+        $userApi.uploadImage(Constant.IMAGE_BACKGROUND, options.file).then((res) => {
           if (res.status === this.$status.SUCCESS) {
             return Promise.resolve(res)
           } else {
@@ -340,8 +336,7 @@
         })
       },
       handleAvatarSuccess (res) {
-        let sendData = {head_url: res.data.url}
-        this.$utils.proxyOne(sendData, $api.UserApi().updateHead, this.$store).then((result) => {
+        $userApi.updateHead(res.data.url).then((result) => {
           if (result.status === this.$status.SUCCESS) {
             this.$notify({
               title: '修改成功',
@@ -358,8 +353,7 @@
       },
       handleBackgroundSuccess (res, file) {
         this.progress = false//隐藏进度条
-        let sendData = {bg_url: res.data.url}
-        this.$utils.proxyOne(sendData, $api.UserApi().updateBgUrl, this.$store).then((result) => {
+        $userApi.updateBgUrl(res.data.url).then((result) => {
           if (result.status === this.$status.SUCCESS) {
             this.$notify({
               title: '修改成功',
@@ -383,7 +377,6 @@
         this.$message.error('图片上传失败')
       },
       beforeBackgroundUpload (file) {
-
         const isAccess = this.accessType.includes(file.type)
         const isLt2M = file.size / 1024 / 1024 < 2
         if (!isAccess) {
@@ -398,75 +391,84 @@
       show (index, state) {
         this.$set(this.shows, index, state)
       },
-      sendPhoneEmail: function (mode) {
-        let sendData
+      handlePhoneEmail (mode) {
         if (mode === 'phone') {
-          sendData = {'phone': this.newPhone}
+          $userApi.userExistWithPhone(this.newPhone).then((res) => {
+            return this.phoneEmailExist(mode, res.data.exist)
+          }).then((res) => {
+            this.sendPhoneEmailCode(mode, res)
+          })
         } else if (mode === 'email') {
-          sendData = {'email': this.newEmail}
+          $userApi.userExistWithEmail(this.newEmail).then((res) => {
+            return this.phoneEmailExist(mode, res.data.exist)
+          }).then((res) => {
+            this.sendPhoneEmailCode(mode, res)
+          })
         }
-        let call = $api.UserApi().userExist
-        //判断是否已经注册过了
-        this.$utils.proxyOne(sendData, call, this.$store).then((res) => {
-          if (res.data.exist) {
-            let msg = `该${mode === 'phone' ? '手机' : '邮箱'}已经被注册过啦，换个吧！`
-            this.$message.warning(msg)
-            return false
+      },
+      phoneEmailExist (mode, exist) {
+        if (exist) {
+          let msg = `该${mode === 'phone' ? '手机' : '邮箱'}已经被注册过啦，换个吧！`
+          this.$message.warning(msg)
+          return false
+        } else {
+          if (mode === 'phone') {
+            return $userApi.sendCodeUsePhone(this.newPhone)
           } else {
-            call = $api.UserApi().sendCode
-            return this.$utils.proxyOne(sendData, call, this.$store)
+            return $userApi.sendCodeUseEmail(this.newEmail)
           }
-        }).then((res) => {
-          if (!res) return false
-          if (res.status === this.$status.SUCCESS) {
-            //成功发送验证码
-            this.$message.success('验证码发送成功')
+        }
+      },
+      sendPhoneEmailCode (mode, res) {
+        if (!res) return false
+        if (res.status === this.$status.SUCCESS) {
+          //成功发送验证码
+          this.$message.success('验证码发送成功')
+          if (mode === 'phone') {
+            this.phoneHasSend = true
+            this.phoneRest = false
+          } else {
+            this.emailHasSend = true
+            this.emailRest = false
+          }
+          let times = 60
+          let timer = setInterval(() => {
             if (mode === 'phone') {
-              this.phoneHasSend = true
-              this.phoneRest = false
-            } else {
-              this.emailHasSend = true
-              this.emailRest = false
-            }
-            let times = 60
-            let timer = setInterval(() => {
-              if (mode === 'phone') {
-                if ((this.phoneRest) || times === 0) {
-                  clearInterval(timer)
-                  this.phoneHasSend = false
-                  this.phoneCodeMsg = '发送手机验证码'
-                  this.phoneRest = false
-                } else {
-                  this.phoneCodeMsg = `重新获取(${times}秒)`
-                  times--
-                }
+              if ((this.phoneRest) || times === 0) {
+                clearInterval(timer)
+                this.phoneHasSend = false
+                this.phoneCodeMsg = '发送手机验证码'
+                this.phoneRest = false
               } else {
-                if ((this.emailRest) || times === 0) {
-                  clearInterval(timer)
-                  this.emailHasSend = false
-                  this.emailCodeMsg = '发送邮箱验证码'
-                  this.emailRest = false
-                } else {
-                  this.emailCodeMsg = `重新获取(${times}秒)`
-                  times--
-                }
+                this.phoneCodeMsg = `重新获取(${times}秒)`
+                times--
               }
-            }, 1000)
-          } else if (res.status === this.$status.CODE_SEND_FAILURE) {
-            this.$message.error('验证码发送失败，请尝试重新发送')
-          }
-        })
+            } else {
+              if ((this.emailRest) || times === 0) {
+                clearInterval(timer)
+                this.emailHasSend = false
+                this.emailCodeMsg = '发送邮箱验证码'
+                this.emailRest = false
+              } else {
+                this.emailCodeMsg = `重新获取(${times}秒)`
+                times--
+              }
+            }
+          }, 1000)
+        } else if (res.status === this.$status.CODE_SEND_FAILURE) {
+          this.$message.error('验证码发送失败，请尝试重新发送')
+        }
       },
       send () {
-        let sendData
+        let verifyType
         if (this.sel === this.items[0]) {
           //手机号
-          sendData = {verify_type: 'phone'}
+          verifyType = 'phone'
         } else {
           //邮箱
-          sendData = {verify_type: 'email'}
+          verifyType = 'email'
         }
-        this.$utils.proxyOne(sendData, $api.UserApi().verifySendCode, this.$store).then((result) => {
+        $userApi.verifySendCode(verifyType).then((result) => {
           if (result.status === this.$status.SUCCESS) {
             let times = 60
             this.$message.success('验证码发送成功！')
@@ -487,11 +489,9 @@
         })
       },
       modify () {
-        let sendData
         if (this.which === 'email') {
           if (this.$refs.email.validate()) {//验证
-            sendData = {email: this.newEmail, user_id: this.user.user_id}
-            this.$utils.proxyOne(sendData, $api.UserApi().updateEmail, this.$store).then((result) => {
+            $userApi.updateEmail(this.newEmail, this.user.user_id).then((result) => {
               if (result.status === this.$status.SUCCESS) {
                 this.user.email = result.data.email
                 this.$store.commit('userCenter/updateEmail', result.data.email)
@@ -528,8 +528,7 @@
           }
         } else {
           if (this.$refs.phone.validate()) {
-            sendData = {phone: this.newPhone, user_id: this.user.user_id}
-            this.$utils.proxyOne(sendData, $api.UserApi().updatePhone, this.$store).then((result) => {
+            $userApi.updatePhone(this.newPhone, this.user.user_id).then((result) => {
               if (result.status === this.$status.SUCCESS) {
                 this.user.phone = result.data.phone
                 this.$store.commit('userCenter/updatePhone', result.data.phone)
@@ -630,15 +629,13 @@
         }
       },
       finish (which, value) {
-        let sendData
         switch (which) {
           case 'nickname':
             if (this.user.nickname.length < 3) {
               this.$message.warning('昵称太短啦！')
             } else {
-              sendData = {nickname: this.user.nickname}
-              this.$utils.proxyOne(sendData, $api.UserApi().updateNickname, this.$store).then((result) => {
-                if (result.status ===this.$status.SUCCESS) {
+              $userApi.updateNickname(this.user.nickname).then((result) => {
+                if (result.status === this.$status.SUCCESS) {
                   this.$store.commit('userCenter/updateNickname', this.user.nickname)
                   this.$store.commit('setNickname', this.user.nickname)
                   this.$notify({
@@ -668,8 +665,7 @@
             }
             break
           case 'gender':
-            sendData = {gender: value}
-            this.$utils.proxyOne(sendData, $api.UserApi().updateGender, this.$store).then((result) => {
+            $userApi.updateGender(value).then((result) => {
               if (result.status === this.$status.SUCCESS) {
                 this.user.gender = value
                 this.$store.commit('userCenter/updateGender', value)
@@ -696,8 +692,7 @@
               this.$message.warning('密码太简单啦！')
             } else {
               this.newPassword = $md5(this.newPassword.split('').reverse().join(''))//逆序并计算MD5值
-              sendData = {password: this.newPassword, user_id: this.user.user_id}
-              this.$utils.proxyOne(sendData, $api.UserApi().updatePassword).then((result) => {
+              $userApi.updatePassword(this.newPassword,this.user.user_id).then((result) => {
                 if (result.status === this.$status.SUCCESS) {
                   this.$notify({
                     title: '修改成功！',
@@ -723,14 +718,12 @@
                 this.show(4, false)
               })
             }
-
             break
           case 'introduce':
             if (this.user.introduce.length === 0) {
               this.user.introduce = '这个人很懒，连介绍都没有(￢︿̫̿￢☆)'
             }
-            sendData = {introduce: this.user.introduce}
-            this.$utils.proxyOne(sendData, $api.UserApi().updateIntroduce, this.$store).then((result) => {
+            $userApi.updateIntroduce(this.user.introduce).then((result) => {
               if (result.status === this.$status.SUCCESS) {
                 this.$store.commit('userCenter/updateIntroduce', result.data.introduce)
                 this.$store.commit('setIntroduce', result.data.introduce)
@@ -752,8 +745,7 @@
             })
             break
           case 'color':
-            let sendData = {theme_color: this.user.theme_color}
-            this.$utils.proxyOne(sendData, $api.UserApi().updateThemeColor, this.$store).then((result) => {
+            $userApi.updateThemeColor(this.user.theme_color).then((result) => {
               if (result.status === this.$status.SUCCESS) {
                 this.$store.commit('userCenter/updateThemeColor', this.user.theme_color)
                 this.$notify({

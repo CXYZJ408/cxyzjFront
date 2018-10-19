@@ -4,23 +4,23 @@
 
 <script>
   let $cookie
+  import {setInterval, clearInterval} from '../../../utils'
 
   export default {
     mounted () {
       $cookie = require('js-cookie')
+      this.startToWatchToken()
     },
     name: 'updateCookie',
-    watch: {
-      '$store.state.tokenHasUpdate': function () {
-        this.handleTokenHasUpdate()
-      },
-      '$store.state.tokenExpired': function () {
-        this.handleTokenExpired()
-      }
-    },
     methods: {
+      startToWatchToken () {
+        setInterval(() => {
+          this.handleTokenExpired()
+          this.handleTokenHasUpdate()
+        }, 1000)
+      },
       handleTokenExpired () {
-        if (this.$store.state.tokenHasUpdate){
+        if (this.$store.state.tokenExpired) {
           this.$message('用户认证已过期，需要重新登录')
           $cookie.remove('token')//移除token
           $cookie.remove('refreshToken')
@@ -30,7 +30,7 @@
         }
       },
       handleTokenHasUpdate () {
-        if (this.$store.state.tokenExpired) {
+        if (this.$store.state.tokenHasUpdate) {
           console.log(new Date(), '更新cookie')
           console.log('更新前的cookie：', $cookie.get('token'))
           $cookie.set('token', this.$store.state.token)

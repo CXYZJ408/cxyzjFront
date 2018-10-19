@@ -1,5 +1,5 @@
 <template>
-    <div ref="list">
+    <div ref="list" class="article-list">
         <no-ssr>
             <div style="position: relative">
                 <RecycleScroller
@@ -148,5 +148,7 @@
         left: 40px;
     }
 
-
+    .article-list {
+        min-height: 700px;
+    }
 </style>

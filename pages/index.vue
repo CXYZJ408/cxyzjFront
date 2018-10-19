@@ -90,7 +90,7 @@
                                 <hr style="border: 1.5px solid #BBBBBB;">
                             </v-flex>
                             <v-flex md12>
-                                <v-tabs-items v-model="currentItem">
+                                <v-tabs-items v-model="currentItem" class="article-list">
                                     <v-tab-item :lazy="true">
                                         <articleList :articleList="articleList" :page="page" :userLabel="undefined"
                                                      @getArticleList="getArticleList"
@@ -104,7 +104,7 @@
                                     </v-tab-item>
                                     <v-tab-item
                                             v-for="(label,index) in userLabels"
-                                            :key="index" :id="'tab-'+label.label_id"
+                                            :key="index" :value="'tab-'+label.label_id"
                                             :lazy="true"
                                     >
                                         <articleList :articleList="articleList" :page="page"
@@ -166,16 +166,27 @@
   import board from '~/components/index/board.vue'
   import myLabel from '~/components/article/labelSimple.vue'
   import articleList from '~/components/article/articleList.vue'
-  import * as $utils from '~/utils'
   import $status from '~/utils/status'
-  import Api from '~/api/Api'
+  import {ArticleApi} from '../api/ArticleApi'
 
   let _ = require('lodash')
-  let $api
+  let $articleApi
   export default {
     name: 'index',
     components: {
       board, myLabel, articleList
+    },
+    mounted () {
+      $articleApi = new ArticleApi(this.$store)
+      if (this.$store.state.welcome) {
+        this.$notify({
+          title: '登录成功！',
+          message: `你好${this.$store.state.user.nickname}，欢迎登录程序员之家！`,
+          type: 'success'
+        })
+        this.$store.commit('cancelWelcome')
+      }
+      this.$store.commit('setBackground', '#F3F3F3')
     },
     methods: {
       changeTabs (index) {//tab变更
@@ -243,14 +254,8 @@
       getArticleList (pageNum, labelId, callback) {//获取文章列表
         console.log('开始读取', labelId)
         if (!this.page.is_end) {
-          let params = {
-            page_num: pageNum
-          }
-          if (!_.isUndefined(labelId)) {
-            params.label_id = labelId
-          }
           setTimeout(() => {
-          this.$utils.proxyOne(params, $api.ArticleApi().getArticleList, this.$store).then(result => {
+            $articleApi.getArticleList(pageNum, labelId).then(result => {
               if (result.status === this.$status.SUCCESS) {
                 for (let i = 0; i < result.data.list.length; i++) {
                   this.articleList.push(result.data.list[i])
@@ -261,7 +266,7 @@
                 console.log('回调')
                 callback()
               }
-          })
+            })
           }, 500)
         } else {
           this.handleTimer(true)
@@ -273,24 +278,10 @@
         }
       }
     },
-    mounted () {
-      $api = new Api(this.$store)
-      if (this.$store.state.welcome) {
-        this.$notify({
-          title: '登录成功！',
-          message: `你好${this.$store.state.user.nickname}，欢迎登录程序员之家！`,
-          type: 'success'
-        })
-        this.$store.commit('cancelWelcome')
-      }
-      this.$store.commit('setBackground', '#F3F3F3')
-    },
+
     asyncData ({store}) {
-      $api = new Api(store)
-      let params = {
-        page_num: 0
-      }
-      return $utils.proxyOne(params, $api.ArticleApi().getArticleList, store).then(result => {
+      $articleApi = new ArticleApi(store)
+      return $articleApi.getArticleList(0).then(result => {
         if (result.status === $status.SUCCESS) {
           return {articleList: result.data.list, page: result.data.page}
         }
@@ -476,6 +467,9 @@
     }
 </style>
 <style scoped>
+    .article-list {
+        min-height: 700px;
+    }
 
     #myIndex .top35 {
         margin-top: 35px;
@@ -568,6 +562,6 @@
     }
 
     .animation {
-        height: 400px;
+        height: 700px;
     }
 </style>
