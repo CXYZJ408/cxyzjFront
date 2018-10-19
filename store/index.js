@@ -50,6 +50,7 @@ export const mutations = {
     console.log('setRefreshTokenOK')
   },
   shouldUpdateToken (state, need) {
+    console.log('------------------shouldUpdateToken----##############')
     state.tokenHasUpdate = need
   },
   setTokenRefreshToken (state, tokens) {
@@ -110,15 +111,15 @@ export const actions = {
       }
       store.commit('clearAll')//清空token，防止缓存
       store.commit('setTokenRefreshToken', tokens)//将token全部重置
-      console.log(store.token)
+      console.log('setTokenRefreshToken----------', store.state.token.split('.')[2])
       if (store.state.refreshToken.length === 0) {//如果重置token之后，refreshToken仍然为空，则表示还没有登陆
         console.log('the status without login')
       } else {
         //存在refreshToken
         let $api = new Api(store)
         let call = $api.UserApi().getUserSimple
-        if (!!token) {
-          //存在有token，使用token进行刷新
+        if (!!token && token !== defaultToken) {
+          //存在有token,同时token与默认token不一样，使用token进行刷新
           await $utils.proxyOne(null, call, store).then((res) => {
             if (res.status === $status.SUCCESS) {
               //成功刷新用户信息

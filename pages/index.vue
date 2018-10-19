@@ -7,7 +7,6 @@
             <v-layout align-center justify-center wrap ref="swiper"
                       style="margin-top: 90px!important;height:65vh;min-height: 500px">
                 <v-flex md12 xl9 wrap>
-                    <div>123    </div>
                     <no-ssr>
                         <div>
                             <div v-swiper:mySwiper="swiperOption"
@@ -251,7 +250,7 @@
             params.label_id = labelId
           }
           setTimeout(() => {
-          this.$utils.proxyOne(params, $api.ArticleApi().getArticleList, this.$store).then(result => {
+            this.$utils.proxyOne(params, $api.ArticleApi().getArticleList, this.$store).then(result => {
               if (result.status === this.$status.SUCCESS) {
                 for (let i = 0; i < result.data.list.length; i++) {
                   this.articleList.push(result.data.list[i])
@@ -262,7 +261,7 @@
                 console.log('回调')
                 callback()
               }
-          })
+            })
           }, 500)
         } else {
           this.handleTimer(true)

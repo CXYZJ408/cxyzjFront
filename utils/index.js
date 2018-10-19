@@ -118,7 +118,7 @@ function pack (data, calls) {//打包
         resolve(calls[i](data[dataIndex++]))
       }))
     } else {
-      invokes.push(new Promise((resolve, reject) => {
+      invokes.push(new Promise((resolve) => {
         resolve(calls[i]())
       }))
     }
@@ -156,4 +156,25 @@ export function transformTime (time) {
   let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
   let s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
   return Y + M + D + h + m + s
+}
+
+export function setInterval (callback, interval) {
+  const now = Date.now
+  let startTime = now()
+  let endTime = startTime
+  let intervalTimer
+  const loop = () => {
+    intervalTimer = window.requestAnimationFrame(loop)
+    endTime = now()
+    if (endTime - startTime >= interval) {
+      startTime = endTime = now()
+      callback()
+    }
+  }
+  intervalTimer = window.requestAnimationFrame(loop)
+  return intervalTimer
+}
+
+export function clearInterval (intervalTimerId) {
+  window.cancelAnimationFrame(intervalTimerId)
 }

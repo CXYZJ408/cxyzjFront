@@ -3,7 +3,6 @@ import $axios from '../utils/axios'
 let Article = '/v1/article'
 export default class ArticleApi {
   constructor (store) {
-    this.$store = store
     $axios.setStore(store)
   }
 
@@ -22,7 +21,7 @@ export default class ArticleApi {
   }
 
   async writeArticle (params) {
-    let url = Article+'/write'
+    let url = Article + '/write'
     return new Promise(resolve => {
       resolve($axios.post(url, params))
     })

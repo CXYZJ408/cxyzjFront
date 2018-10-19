@@ -95,6 +95,7 @@ export default class UserApi {
     console.log('getUserSimple')
     let url = User + '/simple/own'
     return new Promise((resolve, reject) => {
+      console.log('请求')
       resolve($axios.get(url))
     })
   }

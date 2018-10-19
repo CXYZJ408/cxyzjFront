@@ -29,7 +29,7 @@
                         </v-flex>
                     </v-layout>
                 </v-flex>
-                <v-flex md7 xl8>
+                <v-flex md8 xl8>
                     <p class="grey--text subheading limit-3line">{{user.introduce}}</p>
                 </v-flex>
             </v-layout>

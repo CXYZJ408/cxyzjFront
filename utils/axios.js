@@ -38,7 +38,7 @@ axios.interceptors.response.use(response => {
 
 export default {//导出方法
   get (url, params = {}, header = {}) {
-    console.log('get', url)
+    console.log('get-------', url)
     return axios.get(url, {params}, header)
   },
   post (url, params, header = {'Content-Type': 'application/x-www-form-urlencoded'}, needQS = true) {
@@ -68,6 +68,9 @@ export default {//导出方法
   },
   needRefresh () {
     $needRefresh = true
+  },
+  getStore () {
+    return $store.state
   }
 }
 
