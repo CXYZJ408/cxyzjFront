@@ -105,7 +105,7 @@
 
 <script>
   import dynamic from '~/components/index/dynamic.vue'
-
+  //todo 要将list改成和主页一样的
   export default {
     name: 'myLabel',
     components: {

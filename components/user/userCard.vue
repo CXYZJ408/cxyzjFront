@@ -80,10 +80,10 @@
 </template>
 
 <script>
-  import Api from '~/api/Api'
   import $status from '~/utils/status'
+  import {UserApi} from '../../api/UserApi'
 
-  let $api
+  let $userApi
   export default {
     name: 'userCard',
     props: {
@@ -107,7 +107,7 @@
       Attention () {
         if (this.$store.state.userCard.user.is_followed) {
           //已关注则取消关注
-          this.$utils.proxyOne(this.$store.state.userCard.user.user_id, $api.UserApi().disFollowUser, this.$store).then((result) => {
+          $userApi.disFollowUser(this.$store.state.userCard.user.user_id).then((result) => {
             if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功取消关注${this.$store.state.userCard.user.nickname}`)
               this.$store.commit('userCard/setAttention', true)
@@ -120,7 +120,7 @@
           })
         } else {
           //未关注则进行关注
-          this.$utils.proxyOne(this.$store.state.userCard.user.user_id, $api.UserApi().followUser, this.$store).then((result) => {
+          $userApi.followUser(this.$store.state.userCard.user.user_id).then((result) => {
             if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功关注了${this.$store.state.userCard.user.nickname}`)
             } else if (result.status === $status.USER_HAS_FOLLOWED) {
@@ -157,20 +157,19 @@
       },
       getUser () {
         if (this.$store.state.userCard.needFlush) {
-          this.$utils.proxyOne(this.$store.state.userCard.userId, $api.UserApi().getOtherUserDetails, this.$store).then(result => {
+          $userApi.getOtherUserDetails(this.$store.state.userCard.userId).then(result => {
             if (result.status === $status.SUCCESS) {
               setTimeout(() => {
                 this.$store.commit('userCard/setUserCard', result.data.user)
                 this.isAttention(false)
               }, 500)
-
             }
           })
         }
       }
     },
     mounted () {
-      $api = new Api(this.$store)
+      $userApi = new UserApi(this.$store)
     }
   }
 </script>

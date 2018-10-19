@@ -1,28 +1,27 @@
 <template>
     <v-layout wrap justify-center row mb-5>
         <v-flex md9 xl6>
-            <set :user="user"></set>
+            <Setting :user="user"></Setting>
         </v-flex>
     </v-layout>
 </template>
 
 <script>
-  import set from '~/components/user/userSetting.vue'
-  import Api from '~/api/Api'
-  import * as $utils from '~/utils'
+  import Setting from '~/components/user/userSetting.vue'
+  import {UserApi} from '../../../api/UserApi'
   import $status from '~/utils/status'
 
   export default {
     name: 'setting',
     components: {
-       set
+      Setting
     },
     async asyncData ({params, redirect, store, error, route}) {
-      let $Api = new Api(store)
+      let $userApi = new UserApi(store)
       console.log('params--------', params.userId)
       if (store.state.userCenter.user.user_id !== params.userId) {
         //用户中心的数据还没有
-        return await $utils.proxyOne(null, $Api.UserApi().getUserDetails, store).then((res) => {
+        return await $userApi.getUserDetails().then((res) => {
             if (res.status === $status.SUCCESS) {
               store.commit('userCenter/setUser', res.data.user)//提交数据
               return {user: res.data.user}

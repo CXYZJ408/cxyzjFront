@@ -78,11 +78,11 @@
                         </v-flex>
                         <v-flex md12 class="pl-3 py-2 title2"><span>旋转：</span></v-flex>
                         <v-flex md12 class="pl-5">
-                            <v-btn flat round color="blue" @click="rotateLeftight('Left')" icon
+                            <v-btn flat round color="blue" @click="rotateLeftRight('Left')" icon
                                    style="margin: 0!important;">
                                 <v-icon :size="33" color="blue">rotate_left</v-icon>
                             </v-btn>
-                            <v-btn flat round color="blue" class="ml-2" @click="rotateLeftight('Right')" icon
+                            <v-btn flat round color="blue" class="ml-2" @click="rotateLeftRight('Right')" icon
                                    style="margin: 0!important;">
                                 <v-icon :size="33" color="blue">
                                     rotate_right
@@ -151,7 +151,8 @@
 </template>
 
 <script>
-  import Api from '~/api/Api'
+  import {UtilsApi} from '../../../api/UtilsApi'
+  import Constant from '../../../utils/constant'
 
   let $api
 
@@ -181,19 +182,15 @@
       }
     },
     mounted () {
-      $api = new Api(this.$store)
+      $api = new UtilsApi(this.$store)
       this.image = this.initImage
       this.nowImage = this.initImage
     },
     methods: {
       uploadCroppedImage () {
         let file = this.$utils.dataURLtoFile(this.image, 'image.jpeg')
-        let data = {
-          file: file,
-          type: 'avatar'
-        }
         this.beforeUpload(file).then(() => {
-          this.$utils.proxyOne(data, $api.UtilApi().uploadFile, this.$store).then((res) => {
+          $api.uploadImage(Constant.IMAGE_AVATAR, file).then((res) => {
             if (res.status === this.$status.SUCCESS) {
               this.handleSuccess(res)
             } else {
@@ -267,7 +264,7 @@
           this.myCroppa.zoomOut()
         }
       },
-      rotateLeftight (mode) {
+      rotateLeftRight (mode) {
         if (mode === 'Left') {
           //正数表示顺时针，负数表示逆时针
           this.myCroppa.rotate(-1)

@@ -1,29 +1,57 @@
-import $axios from '../utils/axios'
+import {Api} from './API'
+import {Request, requestMethods} from './Request'
 
-let Article = '/v1/article'
-export default class ArticleApi {
+const Article = '/v1/article'
+
+export class ArticleApi extends Api {
   constructor (store) {
-    $axios.setStore(store)
+    super(store)
   }
 
-  async getArticle (articleId) {
+  getArticle (articleId, send = true) {
     let url = Article + `/${articleId}`
-    return new Promise(resolve => {
-      resolve($axios.get(url))
-    })
+    super.pushRequest = new Request(requestMethods.GET, url, this.getArticle)
+    return super.judgeSend(send)
   }
 
-  async getArticleList (params) {
+  getArticleList (pageNum, labelId = undefined, send = true) {
     let url = Article
-    return new Promise(resolve => {
-      resolve($axios.get(url, params))
-    })
+    let params
+    if (labelId !== undefined) {
+      params = {
+        label_id: labelId,
+        page_num: pageNum
+      }
+    } else {
+      params = {
+        page_num: pageNum
+      }
+    }
+    super.pushRequest = new Request(requestMethods.GET, url, this.getArticleList, params)
+    return super.judgeSend(send)
   }
 
-  async writeArticle (params) {
+  writeArticle (title, text, labelId, articleSum, thumbnail, statusId, userId, send = true) {
     let url = Article + '/write'
-    return new Promise(resolve => {
-      resolve($axios.post(url, params))
-    })
+    let params = {
+      title: title,
+      text: text,
+      label_id: labelId,
+      article_sum: articleSum,
+      thumbnail: thumbnail,
+      status_id: statusId,
+      user_id: userId
+    }
+    super.pushRequest = new Request(requestMethods.POST, url, this.writeArticle, params)
+    return super.judgeSend(send)
+  }
+
+  deleteArticle (articleId, userId, send = true) {
+    let url = Article + `${articleId}`
+    let params = {
+      user_id: userId
+    }
+    super.pushRequest = new Request(requestMethods.DELETE, url, this.deleteArticle, params)
+    return super.judgeSend(send)
   }
 }

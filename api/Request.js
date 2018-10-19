@@ -1,9 +1,17 @@
 export class Request {
-  constructor (requestMethod, url, func, params = {}) {
+  get header () {
+    return this._header
+  }
+
+  set header (value) {
+    this._header = value
+  }
+  constructor (requestMethod, url, func, params = {}, header = {}) {
     this._requestMethod = requestMethod
     this._url = url
     this._params = params
     this._name = getFuncName(func)
+    this._header = header
   }
 
   set requestMethod (value) {

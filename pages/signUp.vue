@@ -63,7 +63,8 @@
                                                       @keyup.enter="next('3')"></v-text-field>
                                     </v-flex>
                                     <v-flex md4 xs12>
-                                        <v-btn block large round class="white--text" color="grey" @click="send('phone')"
+                                        <v-btn block large round class="white--text" color="grey"
+                                               @click="startToSendCode('phone')"
                                                :disabled="disabled">{{phoneCodeMsg}}
                                         </v-btn>
                                     </v-flex>
@@ -102,7 +103,8 @@
                                                       @keyup.enter="next('4')"></v-text-field>
                                     </v-flex>
                                     <v-flex md4 xs12>
-                                        <v-btn block large round class="white--text" color="grey" @click="send('email')"
+                                        <v-btn block large round class="white--text" color="grey"
+                                               @click="startToSendCode('email')"
                                                :disabled="disabled">
                                             {{emailCodeMsg}}
                                         </v-btn>
@@ -178,10 +180,10 @@
 </template>
 
 <script>
-  import Api from '~/api/Api'
+  import {UserApi} from '../api/UserApi'
 
   let $md5
-  let $api
+  let $userApi
   let $strength
   let $cookie
   export default {
@@ -190,7 +192,7 @@
     },
     layout: 'signIn',
     mounted () {
-      $api = new Api(this.$store)
+      $userApi = new UserApi(this.$store)
       $strength = require('zxcvbn')
       $md5 = require('js-md5')
       $cookie = require('js-cookie')
@@ -242,64 +244,72 @@
           }
         }, 5)
       },
-      send: function (mode) {
-        let sendData
-        if (mode === 'phone') {
-          sendData = {'phone': this.user.phone}
-        } else if (mode === 'email') {
-          sendData = {'email': this.user.email}
-        }
-        let call = $api.UserApi().userExist
-        //判断是否已经注册过了
-        this.$utils.proxyOne(sendData, call).then((res) => {
-          if (res.data.exist) {
-            let msg = `该${mode === 'phone' ? '手机' : '邮箱'}已经被注册过啦，换个吧！`
-            this.$message.warning(msg)
-            return false
+      handleUserExistResult (mode, res) {
+        if (res.data.exist) {
+          let msg = `该${mode === 'phone' ? '手机' : '邮箱'}已经被注册过啦，换个吧！`
+          this.$message.warning(msg)
+          return false
+        } else {
+          if (mode === 'phone') {
+            $userApi.sendCodeUsePhone(this.user.phone)
           } else {
-            call = $api.UserApi().sendCode
-            this.$utils.proxyOne(sendData, call)
-            this.$message.success('验证码发送成功')
-            if (mode === 'phone') {
-              this.phoneHasSend = true
+            $userApi.sendCodeUseEmail(this.user.email)
+          }
+          //直接发送，不管是否成功收到，因为如果等待成功收到，这会导致用户等待反馈的时间太长了
+          this.$message.success('验证码发送成功')
+          if (mode === 'phone') {
+            this.phoneHasSend = true
+            this.phoneRest = false
+          } else {
+            this.emailHasSend = true
+            this.emailRest = false
+          }
+          this.waitNextSend(mode)
+        }
+      },
+      waitNextSend (mode) {
+        let times = 60
+        let timer = setInterval(() => {
+          if (mode === 'phone') {
+            if ((this.phoneRest) || times === 0) {
+              clearInterval(timer)
+              this.phoneHasSend = false
+              this.phoneCodeMsg = '发送手机验证码'
               this.phoneRest = false
             } else {
-              this.emailHasSend = true
-              this.emailRest = false
+              this.phoneCodeMsg = `重新获取(${times}秒)`
+              times--
             }
-            let times = 60
-            let timer = setInterval(() => {
-              if (mode === 'phone') {
-                if ((this.phoneRest) || times === 0) {
-                  clearInterval(timer)
-                  this.phoneHasSend = false
-                  this.phoneCodeMsg = '发送手机验证码'
-                  this.phoneRest = false
-                } else {
-                  this.phoneCodeMsg = `重新获取(${times}秒)`
-                  times--
-                }
-              } else {
-                if ((this.emailRest) || times === 0) {
-                  clearInterval(timer)
-                  this.emailHasSend = false
-                  this.emailCodeMsg = '发送邮箱验证码'
-                  this.emailRest = false
-                } else {
-                  this.emailCodeMsg = `重新获取(${times}秒)`
-                  times--
-                }
-              }
-            }, 1000)
+          } else {
+            if ((this.emailRest) || times === 0) {
+              clearInterval(timer)
+              this.emailHasSend = false
+              this.emailCodeMsg = '发送邮箱验证码'
+              this.emailRest = false
+            } else {
+              this.emailCodeMsg = `重新获取(${times}秒)`
+              times--
+            }
           }
-        })
+        }, 1000)
+      },
+      startToSendCode: function (mode) {
+        if (mode === 'phone') {
+          $userApi.userExistWithPhone(this.user.phone).then((res) => {
+            this.handleUserExistResult(mode, res)
+          })
+        } else if (mode === 'email') {
+          $userApi.userExistWithEmail(this.user.email).then((res) => {
+            this.handleUserExistResult(mode, res)
+          })
+        }
       },
       async next (step) {
         let able = false
         switch (step - 1) {
           case 1:
             if (this.$refs.form0.validate()) {
-              await this.$utils.proxyOne({nickname: this.user.nickname}, $api.UserApi().userExist).then((result) => {
+              await $userApi.userExistWithNickname(this.user.nickname).then((result) => {
                 if (result.data.exist) {
                   //用户名已存在.
                   this.$message.warning('昵称已经被注册啦，换个吧！')
@@ -311,10 +321,7 @@
             break
           case 2:
             if (this.$refs.form1.validate()) {
-              await this.$utils.proxyOne({
-                phone: this.user.phone,
-                code: this.phoneCode
-              }, $api.UserApi().verifyCode).then((result) => {
+              await $userApi.verifyCodeUsePhone(this.user.phone, this.phoneCode).then((result) => {
                 if (result.status === this.$status.CODE_ERROR) {
                   this.$message.error('验证码错误')
                 } else {
@@ -325,10 +332,7 @@
             break
           case 3:
             if (this.$refs.form2.validate()) {
-              await this.$utils.proxyOne({
-                email: this.user.email,
-                code: this.emailCode
-              }, $api.UserApi().verifyCode).then((result) => {
+              await $userApi.verifyCodeUseEmail(this.user.email, this.emailCode).then((result) => {
                 if (result.status === this.$status.CODE_ERROR) {
                   this.$message.error('验证码错误')
                 } else {
@@ -355,7 +359,7 @@
             this.$message.warning('密码太简单啦，加强一下吧！')
           } else {
             this.user.password = $md5(this.password1.split('').reverse().join(''))//将密码逆序同时进行md5处理
-            this.$utils.proxyOne(this.user, $api.UserApi().registerUser).then((res) => {
+            $userApi.registerUser(this.us.ni, this.user.email, this.user.password, this.user.gender, this.user.phone, this.user.head_url).then((res) => {
               //再次检测
               if (res.status === this.$status.NICKNAME_EXIST) {
                 this.step = '1'
@@ -375,7 +379,6 @@
               }
             })
           }
-
         }
       }
     },

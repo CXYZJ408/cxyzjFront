@@ -4,7 +4,7 @@
         <v-flex md2 ml-3>
             <div class="card">
                 <v-avatar class="avatar" :tile="true">
-                    <img :src="$store.state.userCenter.user.head_url"  alt="">
+                    <img :src="$store.state.userCenter.user.head_url" alt="">
                 </v-avatar>
                 <span class="d-block title text-md-center mt-2 px-2" style="text-transform: capitalize">
                         {{$store.state.userCenter.user.nickname}}
@@ -55,10 +55,10 @@
 </template>
 
 <script>
-  import Api from '~/api/Api'
   import $status from '~/utils/status'
+  import {UserApi} from '../../api/UserApi'
 
-  let $api
+  let $userApi
   export default {
     name: 'myhead',
     data: function () {
@@ -83,7 +83,7 @@
       Attention () {
         if (this.$store.state.userCenter.user.is_followed) {
           //已关注则取消关注
-          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $api.UserApi().disFollowUser, this.$store).then((result) => {
+          $userApi.disFollowUser(this.$store.state.userCenter.user.user_id).then((result) => {
             if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功取消关注${this.$store.state.userCenter.user.nickname}`)
               this.$store.commit('userCenter/updateFollow', false)
@@ -99,7 +99,7 @@
           })
         } else {
           //未关注则进行关注
-          this.$utils.proxyOne(this.$store.state.userCenter.user.user_id, $api.UserApi().followUser, this.$store).then((result) => {
+          $userApi.followUser(this.$store.state.userCenter.user.user_id).then((result) => {
             if (result.status === $status.SUCCESS) {
               this.$message.success(`您成功关注了${this.$store.state.userCenter.user.nickname}`)
               this.$store.commit('userCenter/updateFollow', true)
@@ -114,7 +114,6 @@
             }
           })
         }
-
       },
       isAttention (hover) {
         if (this.$store.state.user.user_id !== this.$store.state.userCenter.user.user_id) {
@@ -144,7 +143,7 @@
     },
     mounted () {
       this.isAttention(false)
-      $api = new Api(this.$store)
+      $userApi = new UserApi(this.$store)
       let res = this.widthOrHeight()
       if (res === 'width') {
         this.widthHeight = 'avatar-img-width'

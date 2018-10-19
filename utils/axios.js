@@ -68,9 +68,6 @@ export default {//导出方法
   },
   needRefresh () {
     $needRefresh = true
-  },
-  getStore () {
-    return $store.state
   }
 }
 

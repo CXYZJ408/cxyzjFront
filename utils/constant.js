@@ -11,6 +11,12 @@ const Constant = {
   EACH: 203,//互相关注
   MAN: 0,//男
   WOMAN: 1,//女
-  SECRECY: 2//保密
+  SECRECY: 2,//保密
+  IMAGE_BACKGROUND: 'background',
+  IMAGE_AVATAR: 'avatar',
+  IMAGE_ARTICLE: 'article',
+  IMAGE_DISCUSSION: 'discussion',
+  IMAGE_OTHER: 'other'
+
 }
 export default Constant

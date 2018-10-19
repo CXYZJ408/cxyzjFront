@@ -27,23 +27,18 @@
 
 <script>
   import userCard from '~/components/user/userCard.vue'
-  import Api from '~/api/Api'
-  import * as $utils from '~/utils'
+  import {UserApi} from '../../../api/UserApi'
   import $status from '~/utils/status'
 
-  let $api
+  let $userApi
   export default {
     name: 'attentions',
     components: {
       userCard
     },
     async asyncData ({store}) {
-      $api = new Api(store)
-      let params = {
-        user_id: store.state.userCenter.user.user_id,
-        page_num: 0 //页码从0开始
-      }
-      return await $utils.proxyOne(params, $api.UserApi().getAttentions, store).then(res => {
+      $userApi = new UserApi(store)
+      return await $userApi.getAttentions(store.state.userCenter.user.user_id, 0).then(res => {
         let attentions = []
         if (res.status === $status.SUCCESS) {
           attentions = res.data.attentions

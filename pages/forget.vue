@@ -35,7 +35,8 @@
                         ></v-text-field>
                     </v-flex>
                     <v-flex md5>
-                        <v-btn block round class="white--text title" color="grey" :disabled="disabled" @click="send"
+                        <v-btn block round class="white--text title" color="grey" :disabled="disabled"
+                               @click="startToSendCode"
                                id="send">{{codeMsg}}
                         </v-btn>
                     </v-flex>
@@ -99,14 +100,18 @@
 </template>
 
 <script>
-  import Api from '~/api/Api'
+  import {UserApi} from '../api/UserApi'
 
   let $strength
-  let $api
+  let $userApi
   export default {
     name: 'forget',
     head: {
       title: '程序员之家 - 忘记密码'
+    },
+    mounted () {
+      $userApi = new UserApi(this.$store)
+      $strength = require('zxcvbn')
     },
     layout: 'signIn',
     methods: {
@@ -142,45 +147,54 @@
           }
         }, 5)
       },
-      send: function () {
-        let sendData
+      startToSendCode: function () {//准备发送验证码
         if (this.which === 'phone') {
-          sendData = {'phone': this.phone}
+          $userApi.userExistWithPhone(this.phone).then(res => {//先判断用户是否已注册
+            return this.sendCode(res)
+          }).then(res => {
+            this.handleCode(res)
+          })
         } else if (this.which === 'email') {
-          sendData = {'email': this.email}
+          $userApi.userExistWithEmail(this.phone).then(res => {//先判断用户是否已注册
+            return this.sendCode(res)
+          }).then(res => {
+            this.handleCode(res)
+          })
         }
-        let call = $api.UserApi().userExist
-        //判断是否已经注册过了
-        this.$utils.proxyOne(sendData, call).then((res) => {
-          if (!res.data.exist) {
-            let msg = `该${this.which === 'phone' ? '手机' : '邮箱'}还没有注册哦！`
-            this.$message.warning(msg)
-            return false
+      },
+      sendCode (res) {//发送验证码
+        if (!res.data.exist) {//如果还没有注册则进行提示
+          let msg = `该${this.which === 'phone' ? '手机' : '邮箱'}还没有注册哦！`
+          this.$message.warning(msg)
+          return false
+        } else {
+          if (this.which === 'phone') {
+            return $userApi.sendCodeUsePhone(this.phone)
           } else {
-            call = $api.UserApi().sendCode
-            return this.$utils.proxyOne(sendData, call)
+            return $userApi.sendCodeUseEmail(this.email)
           }
-        }).then((res) => {
-          if (!res) return false
-          if (res.status === this.$status.SUCCESS) {
-            //成功发送验证码
-            this.$message.success('验证码发送成功')
-            this.hasSend = true
-            let times = 60
-            let timer = setInterval(() => {
-              if (times === 0) {
-                clearInterval(timer)
-                this.hasSend = false
-                this.codeMsg = '发送验证码'
-              } else {
-                this.codeMsg = `重新获取(${times}秒)`
-                times--
-              }
-            }, 1000)
-          } else if (res.status === this.$status.CODE_SEND_FAILURE) {
-            this.$message.error('验证码发送失败，请尝试重新发送')
-          }
-        })
+        }
+      },
+      handleCode (res) {//处理发送验证码后的返回值
+        if (!res) return false
+        if (res.status === this.$status.SUCCESS) {
+          //成功发送验证码
+          this.$message.success('验证码发送成功')
+          this.hasSend = true
+          let times = 60
+          let timer = setInterval(() => {
+            if (times === 0) {
+              clearInterval(timer)
+              this.hasSend = false
+              this.codeMsg = '发送验证码'
+            } else {
+              this.codeMsg = `重新获取(${times}秒)`
+              times--
+            }
+          }, 1000)
+        } else if (res.status === this.$status.CODE_SEND_FAILURE) {
+          this.$message.error('验证码发送失败，请尝试重新发送')
+        }
       },
       change: function () {
         if (this.which === 'email') {
@@ -194,28 +208,31 @@
       },
       restPassword () {
         if (this.$refs.form.validate()) {
-          let sendData
           let $md5 = require('js-md5')
           let password = $md5(this.password1.split('').reverse().join(''))
           if (this.which === 'phone') {
-            sendData = {phone: this.phone, password: password, code: this.code}
+            $userApi.forgetPasswordUsePhone(password, this.code, this.phone).then(res => {
+              this.handleRestResult(res)
+            })
           } else {
-            sendData = {email: this.email, password: password, code: this.code}
+            $userApi.forgetPasswordUseEmail(password, this.code, this.email).then(res => {
+              this.handleRestResult(res)
+            })
           }
-          this.$utils.proxyOne(sendData, $api.UserApi().forgetPassword).then((res) => {
-            if (res.status === this.$status.SUCCESS) {
-              this.$notify({
-                title: '密码重置成功！',
-                message: '密码已成功重置，请重新登录！',
-                type: 'success'
-              })
-              this.$router.push({path: '/signIn'})
-            } else {
-              this.$notify({
-                title: '密码重置失败！',
-                type: 'error'
-              })
-            }
+        }
+      },
+      handleRestResult (res) {
+        if (res.status === this.$status.SUCCESS) {
+          this.$notify({
+            title: '密码重置成功！',
+            message: '密码已成功重置，请重新登录！',
+            type: 'success'
+          })
+          this.$router.push({path: '/signIn'})
+        } else {
+          this.$notify({
+            title: '密码重置失败！',
+            type: 'error'
           })
         }
       }
@@ -323,10 +340,7 @@
         ]
       }
     },
-    mounted () {
-      $api = new Api(this.$store)
-      $strength = require('zxcvbn')
-    }
+
   }
 </script>
 

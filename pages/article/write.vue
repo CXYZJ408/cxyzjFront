@@ -13,7 +13,7 @@
                         <div style="background: white;height: 100%">
                             <el-tooltip effect="dark" content="草稿箱" class="mt-2" placement="bottom">
                                 <v-avatar>
-                                    <v-icon class='draft' >
+                                    <v-icon class='draft'>
                                         iconfont icon-draft
                                     </v-icon>
                                 </v-avatar>
@@ -37,9 +37,8 @@
     </v-container>
 </template>
 <script>
-  import Api from '~/api/Api'
 
-  let $api
+
   export default {
     name: 'App',
     layout: 'imageBack',
@@ -50,22 +49,10 @@
       }
     },
     mounted () {
-      $api = new Api(this.$store)
     },
     methods: {
       send () {
-        let params = {
-          title: '111',
-          text: 'asdasdas',
-          status_id: 101,
-          user_id: this.$store.state.user.user_id,
-          thumbnail: '',
-          label_id: 1,
-          article_sum: '12121212'
-        }
-        this.$utils.proxyOne(params, $api.ArticleApi().writeArticle, this.$store).then((result) => {
-          console.log(result)
-        })
+
       }
     },
     created () {

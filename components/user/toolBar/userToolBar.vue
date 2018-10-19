@@ -1,17 +1,17 @@
 <template>
-    <v-card class=" toolbar"  tile flat>
+    <v-card class=" toolbar" tile flat>
         <v-container grid-list-md class="clearPadding  mt-2">
             <v-layout align-center justify-center>
                 <v-flex xl9 md12>
                     <v-layout justify-center align-center row>
-                        <v-flex md7 xl4 class="justify-center align-center">
+                        <v-flex md7 xl5 class="justify-center align-center">
                             <nuxt-link to="/"><img style="width: 60px;float: left" src="/img/login/logo-small.png"
                                                    alt="">
                             </nuxt-link>
                             <icons :icon_size="icon_size" :font_size=font_size :about=about
-                                    :index=index :userCenter=userCenter :discussion="discussion"
-                                    :education="education" :none="none"
-                                    :distance="distance" :write="write"></icons>
+                                   :index=index :userCenter=userCenter :discussion="discussion"
+                                   :education="education" :none="none"
+                                   :distance="distance" :write="write"></icons>
                         </v-flex>
                         <v-spacer></v-spacer>
                         <v-flex v-if="$store.state.isLogin" wrap md7 xl6 class="text-md-right">
@@ -45,10 +45,11 @@
 </template>
 
 <script>
-    import icons from '~/components/user/icons.vue'
+  import icons from '~/components/user/icons.vue'
+
   export default {
     name: 'userToolBar',
-    components:{
+    components: {
       icons
     },
     props: {
