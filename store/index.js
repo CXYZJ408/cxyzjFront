@@ -9,7 +9,6 @@ let defaultToken = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0ODcwMDUzODM3OTgyOTI0ODI
 export const state = () => ({
   isLogin: false,//登录状态
   token: '',
-  refreshToken: '',
   user: {},//user信息
   tokenHasUpdate: false,//客户端是否需要对cookie进行刷新操作
   tokenExpired: false,//token是否已过期
@@ -29,7 +28,6 @@ export const mutations = {
     state.isLogin = true
     state.user = data.user
     state.token = data.token
-    state.refreshToken = data.refreshToken
     state.welcome = true
   },
   cancelWelcome (state) {
@@ -37,7 +35,6 @@ export const mutations = {
   },
   logout (state) {
     state.isLogin = false
-    state.refreshToken = ''
     state.token = defaultToken
     state.tokenHasUpdate = false
     state.user = {}
@@ -47,26 +44,9 @@ export const mutations = {
     state.token = token
     console.log('setTokenOK', token.split('.')[2])
   },
-  setRefreshToken (state, token) {
-    state.refreshToken = token
-    console.log('setRefreshTokenOK')
-  },
   shouldUpdateToken (state, need) {
     console.log('shouldUpdateToken')
     state.tokenHasUpdate = need
-  },
-  setTokenRefreshToken (state, tokens) {
-    if (!!tokens.refreshToken) {
-      this.commit('setRefreshToken', tokens.refreshToken)
-    } else {
-      console.log('tokens.refreshToken is not exist')
-    }
-    if (!!tokens.token) {
-      this.commit('setToken', tokens.token)
-    } else {
-      console.log('tokens.token is not exist')
-    }
-    console.log('token reset ok')
   },
   setUserHead (state, head) {
     state.user.head_url = head
@@ -93,46 +73,33 @@ export const mutations = {
   clearToken (state) {
     state.token = ''
   },
-  clearRefreshToken (state) {
-    state.refreshToken = ''
-  },
-  clearAll (state) {//清空token
-    state.token = ''
-    state.refreshToken = ''
-  }
 }
 export const actions = {
   async nuxtServerInit (store, {req}) {//在跳转其它的页面或是刷新页面的时候，nuxt会自动调用
     //读取req中的cookie
-    let refreshToken = parseCookieByName(req.headers.cookie, 'refreshToken')//获取refresh
     let token = parseCookieByName(req.headers.cookie, 'token')//获取token
-    let tokens = {
-      token: token,
-      refreshToken: refreshToken
-    }
-    store.commit('clearAll')//清空token，防止缓存
-    store.commit('setTokenRefreshToken', tokens)//将token全部重置
-    console.log('setRefreshToken----------', store.state.token.split('.')[2])
-    if (_.isEmpty(store.state.refreshToken)) {//如果重置token之后，refreshToken仍然为空，则表示还没有登陆
-      store.commit('setToken', defaultToken)
+    store.commit('setToken', token)//将token重置
+    if (_.isEmpty(store.state.token)) {//如果重置token之后，Token仍然为空，则表示还没有登陆
+      store.commit('setToken', defaultToken)//设置默认token
       console.log('the status without login')
     } else {
-      //存在refreshToken，但token是否存在不确定
-      console.log('存在refreshToken')
+      //存在Token
       let $userApi = new UserApi(store)
       await $userApi.getUserSimple().then((res) => {
-        if (!_.isUndefined(res) && res.status === $status.SUCCESS) {
+        console.log('getUserSimple', res)
+        if (res && res.status === $status.SUCCESS) {
           //成功刷新用户信息
           store.commit('loginAgain', res.data)
         } else {
           //刷新失败
           console.log('refresh failed')
-          console.log('refreshToken and token is expired , flush failed! ')
+          console.log('token is expired , flush failed! ')
           store.commit('tokenIsExpired', true)
           store.commit('logout')
         }
       })
     }
+
   }
 }
 

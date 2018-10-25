@@ -51,3 +51,14 @@ export function setInterval (callback, interval) {
 export function clearInterval (intervalTimerId) {
   window.cancelAnimationFrame(intervalTimerId)
 }
+
+export function guid () {
+  /**
+   * @return {string}
+   */
+  function S4 () {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+  }
+
+  return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
+}

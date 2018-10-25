@@ -86,6 +86,28 @@ body {
     padding: 0 !important;
     margin: 0 !important;
 }
+.limit-one-line{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.slide-fade-enter-active {
+    transition: all .3s ease;
+}
+.slide-fade-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+    /* .slide-fade-leave-active for below version 2.1.8 */ {
+    transform: translateX(50px);
+    opacity: 0;
+}
+.fade{
+    transition: opacity  .3s ease-out;
+}
+.capital {
+    text-transform: capitalize
+}
 
 .mycard {
     width: 95%;
@@ -125,6 +147,7 @@ body {
     -webkit-box-orient: vertical !important;
     -webkit-line-clamp: 3 !important;
 }
+
 .hr {
     width: 98%;
     margin-left: 1%;

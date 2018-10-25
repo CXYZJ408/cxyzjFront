@@ -16,7 +16,6 @@
       startToWatchToken () {
         setInterval(() => {
           this.handleTokenExpired()
-          this.handleTokenHasUpdate()
         }, 1000)
       },
       handleTokenExpired () {
@@ -26,16 +25,7 @@
           $cookie.remove('refreshToken')
           this.$router.push({path: `/signIn`})
           this.$store.commit('tokenIsExpired', false)
-          this.$store.commit('clearAll')
-        }
-      },
-      handleTokenHasUpdate () {
-        if (this.$store.state.tokenHasUpdate) {
-          console.log(new Date(), '更新cookie')
-          console.log('更新前的cookie：', $cookie.get('token'))
-          $cookie.set('token', this.$store.state.token)
-          console.log('更新后的cookie：', $cookie.get('token'))
-          this.$store.commit('shouldUpdateToken', false)
+          this.$store.commit('logout')
         }
       }
     }

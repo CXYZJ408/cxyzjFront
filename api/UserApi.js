@@ -151,11 +151,11 @@ export class UserApi extends Api {
   }
 
   //用户信息获取
-  getUserSimple (send = true) {
+  async getUserSimple (send = true) {
     console.log('getUserSimple')
     let url = User + '/simple/own'
     super.pushRequest = new Request(requestMethods.GET, url, this.getUserSimple)
-    return super.judgeSend(send)
+    return await super.judgeSend(send)
   }
 
   getUserDetails (send = true) {

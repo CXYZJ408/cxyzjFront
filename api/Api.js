@@ -62,24 +62,24 @@ export class Api {
     this.apply = false
   }
 
-  send () {
+  async send () {
     this.apply = true//将apply重置为true
     let result
     if (this.requestQueue.length === 1) {
       console.log('发送一个')
-      result = proxyOne(this.requestQueue, this.returnType)
+      result = await proxyOne(this.requestQueue, this.returnType)
     } else if (this.requestQueue.length > 1) {
       console.log('发送多个')
-      result = proxy(this.requestQueue, this.returnType)
+      result = await proxy(this.requestQueue, this.returnType)
     }
     this.requestQueue = []//清空请求队列
     return result
   }
 
-  judgeSend (send) {
+  async judgeSend (send) {
     if (this.apply && send) {
       console.log('发送')
-      return Promise.resolve(this.send())
+      return await new Promise(resolve => resolve(this.send()))
     } else {
       console.log('不发送')
       return this
@@ -87,84 +87,41 @@ export class Api {
   }
 }
 
-async function judgeToken () {
-  if (_.isEmpty($store.state.token)) {
-    //如果token的值为空
-    console.log('token为空')
-    if (_.isEmpty($store.state.refreshToken)) {
-      console.log('refreshToken为空')
-      return Promise.resolve(false)
-    } else {
-      console.log('刷新token')
-      return await refreshToken()//刷新token
-    }
-  }
-  console.log('token不为空', $store.state.token.split('.')[2])
-  return Promise.resolve(true)
-}
-
 async function proxy (request, returnType) {//批量请求发送
-  return await judgeToken().then(result => {
-    if (result) {
-      let invokes = pack(request)//将请求打包
-      return  Promise.all(invokes).then(async function (results) {//将所有的请求并行执行，然后返回结果
-        let needRefresh = false
-        for (let i = 0; i < results.length; i++) {
-          if (results[i].data.status === $status.TOKEN_EXPIRED) {
-            console.log('token过期')
-            needRefresh = true
-            break //有请求没有获取到数据，需要全部重发
-          }
-        }
-        if (needRefresh) {
-          //使用refreshToken刷新
-          return await refreshToken().then(async function (refreshOk) {
-            if (refreshOk) {
-              //刷新成功
-              let invokesAgain = pack(request)
-              console.log('invokesAgain', invokesAgain)
-              return await Promise.all(invokesAgain).then(function (result) {
-                console.log('再次请求成功')
-                if (result) {
-                  console.log('开始返回数据')
-                  return pushData(results, request, returnType)
-                } else {
-                  return false
-                }
-              }).catch(() => {
-                return Promise.reject()
-              })
-            } else {
-              //刷新失败
-              console.log('再次请求失败')
-              return Promise.reject()
-            }
-          }).catch(() => {
-            return Promise.reject()
-          })
-        } else {
-          if (results) {
-            //成功请求到了数据
-            console.log('开始返回数据')
-            return pushData(results, request, returnType)
-          } else {
-            //请求数据失败
-            return false
-          }
-        }
-      }).catch((e) => {
-        return {statusCode: 404, message: 'Post not found'}
-      })
-    } else {
-      return Promise.resolve(false)
+  let invokes = pack(request)//将请求打包
+  return Promise.all(invokes).then(async function (results) {//将所有的请求并行执行，然后返回结果
+    let expire = false
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].data.status === $status.TOKEN_EXPIRED) {
+        console.log('token过期')
+        expire = true
+        break //token过期了，需要重新登录
+      }
     }
+    if (expire) {
+      //如果token过期了
+      $store.commit('tokenIsExpired', true)
+      $store.commit('logout')
+      return false
+    } else {
+      //token没有过去
+      if (!_.isEmpty(results)) {
+        //成功请求到了数据
+        console.log('开始返回数据')
+        return pushData(results, request, returnType)
+      } else {
+        //请求数据失败
+        return false
+      }
+    }
+  }).catch((e) => {
+    return {statusCode: 404, message: 'Post not found'}
   })
-
 }
 
 async function proxyOne (request, returnType) {//单个请求
   return await proxy(request, returnType).then(result => {
-    console.log('proxyOne')
+    console.log('proxyOne', result)
     if (returnType === RETURN_TYPE.Array) {//提取数据
       return result[0]
     } else {
@@ -186,10 +143,11 @@ function pushData (results, request, returnType) {//打包数据
       responseData[request[i].name] = results[i].data
     }
   }
+  console.log(responseData)
   return responseData
 }
 
-//刷新token
+//刷新token 老是出现莫名BUG，该功能已取消
 async function refreshToken () {
   console.log('refreshToken')
   const url = '/v1/user/refresh_token'
@@ -202,12 +160,12 @@ async function refreshToken () {
       //刷新成功
       $store.commit('setToken', result.data.data.token)
       $store.commit('shouldUpdateToken', true)//提醒客户端需要更新cookie中的token
-      return true
+      return Promise.resolve(true)
     } else {
       //刷新失败
       $store.commit('tokenIsExpired', true)
       $store.commit('clearAll')
-      return false
+      return Promise.resolve(false)
     }
   }).catch(() => {
     return Promise.reject()
@@ -215,7 +173,7 @@ async function refreshToken () {
 }
 
 function pack (request) {//打包
-  console.log('请求打包')
+  console.log('请求打包', request)
   let invokes = []
   for (let i = 0; i < request.length; i++) {//封装函数与参数
     invokes.push(new Promise((resolve) => {

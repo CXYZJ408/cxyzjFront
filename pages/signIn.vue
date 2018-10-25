@@ -186,6 +186,8 @@
           } else if (res.status === this.$status.CODE_SEND_FAILURE) {
             this.$message.error('验证码发送失败，请尝试重新发送')
           }
+        }).catch(e=>{
+          this.$message.error('验证码发送失败，请尝试重新发送')
         })
       },
       login () {
@@ -221,8 +223,7 @@
           this.$message.error('验证码错误！！')
         } else if (status === this.$status.SUCCESS) {
           this.$store.commit('login', res.data)
-          $cookie.set('token', res.data.token)
-          $cookie.set('refreshToken', res.data.refreshToken, {expires: 7})
+          $cookie.set('token', res.data.token,{expires: 7})
           this.$router.push({path: `/`})
         }
       }
