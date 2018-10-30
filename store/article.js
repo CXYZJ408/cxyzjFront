@@ -4,7 +4,8 @@ export const state = () => ({
   //列表信息
   articleList: [],
   page: {},
-  articleLabelId: ''//写文章时选择的文章标签id
+  articleLabel: {},//写文章时选择的文章标签信息
+  publishedArticle: {}
 })
 
 export const mutations = {
@@ -12,7 +13,10 @@ export const mutations = {
     state.articleList = data.list
     state.page = data.page
   },
-  setArticleLabelId (state, labelId) {
-    state.articleLabelId = labelId
+  setArticleLabel (state, label) {
+    state.articleLabel = label
+  },
+  setPublishedArticle (state, publishedArticle) {
+    state.publishedArticle = publishedArticle
   }
 }

@@ -143,7 +143,7 @@
       },
       onScroll () {
         let offsetTop = window.pageYOffset
-        if (offsetTop + window.screen.availHeight > document.body.scrollHeight - 200) {
+        if (offsetTop + window.setScreen.availHeight > document.body.scrollHeight - 200) {
           // 如果当前浏览部分的上端距离页面顶端的距离加上屏幕的高度大于页面高度-200 提前加载
           this.perLoad()
         }

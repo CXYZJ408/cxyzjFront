@@ -1,7 +1,7 @@
 <template>
     <v-hover class="mt-2">
         <v-chip class="chip" slot-scope="{ hover }" @click="choose()" :ripple="false"
-                :class="`elevation-${hover||$store.state.article.articleLabelId===label.label_id ?4 : 0}`"
+                :class="`elevation-${hover||$store.state.article.articleLabel.label_id===label.label_id ?4 : 0}`"
                 :style="{'background-color':backColor,'color':fontColor}">
             <nuxt-link :to="'/article/label/'+label.label_id" v-if="href">
                 <v-avatar color="white" size="22">
@@ -51,12 +51,12 @@
     methods: {
       choose () {
         this.$emit('changed')
-        if (this.hasClick && this.$store.state.article.articleLabelId === this.label.label_id) {
+        if (this.hasClick && this.$store.state.article.articleLabel.label_id === this.label.label_id) {
           this.hasClick = false
-          this.$store.commit('article/setArticleLabelId', -1)
+          this.$store.commit('article/setArticleLabel', {label_id: -1})
         } else {
           this.hasClick = true
-          this.$store.commit('article/setArticleLabelId', this.label.label_id)
+          this.$store.commit('article/setArticleLabel', this.label)
         }
       }
     }

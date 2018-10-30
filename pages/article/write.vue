@@ -28,22 +28,23 @@
                                     <img :src="$store.state.user.head_url" alt="">
                                 </v-avatar>
                             </v-flex>
-                            <v-flex md10 class="pt-3 pb-4">
+                            <v-flex md10 class="pt-3 pb-4 text-md-center">
                                 <p class="title capital limit-one-line d-inline-block clearMargin"
-                                   style="float: left;width: 180px">{{$store.state.user.nickname}}</p>
-                                <v-icon class="ml-1" style="float: left;" size="22" color="red"
-                                        v-if="$store.state.user.gender===0">
-                                    iconfont icon-nv
-                                </v-icon>
-                                <v-icon class="ml-1" size="22" color="blue"
-                                        v-if="$store.state.user.gender===1">
-                                    iconfont icon-nan
-                                </v-icon>
-                                <v-icon class="ml-1" size="22" color="grey"
-                                        v-if="$store.state.user.gender===2">
-                                    iconfont icon-suo
-                                </v-icon>
-
+                                   style="max-width: 200px;"
+                                >{{$store.state.user.nickname}}
+                                    <v-icon size="22" color="red"
+                                            v-if="$store.state.user.gender===0">
+                                        iconfont icon-nv
+                                    </v-icon>
+                                    <v-icon size="22" color="blue"
+                                            v-if="$store.state.user.gender===1">
+                                        iconfont icon-nan
+                                    </v-icon>
+                                    <v-icon size="22" color="grey"
+                                            v-if="$store.state.user.gender===2">
+                                        iconfont icon-suo
+                                    </v-icon>
+                                </p>
                             </v-flex>
                         </v-layout>
                     </v-card>
@@ -53,27 +54,32 @@
                 </v-flex>
                 <v-flex md12>
                     <v-hover>
-                        <v-btn block flat class="add py-2" slot-scope="{ hover }" @click="">
+                        <v-btn block flat class="add py-2" slot-scope="{ hover }" @click="handleCreate">
                             <v-icon color="#EDF2F8" class="fade" :size="28">iconfont icon-addpage</v-icon>
                             <span class=" pl-2 title fade" :class="hover?'white--text':'grey--text'"><b>新建文章</b></span>
                         </v-btn>
                     </v-hover>
                 </v-flex>
             </v-layout>
-            <HappyScroll color="rgba(255,152,0,.8)" class="scroll" size="5" :min-length-h="20" hide-horizontal>
+            <HappyScroll color="rgba(255,152,0,.8)" class="scroll" size="5" :min-length-h="20" hide-horizontal resize
+                         :scroll-top.sync="top">
                 <v-list :subheader="true" class="list" style=" padding-bottom: 10px!important;">
-                    <v-hover v-for="index in 12" :key="index">
+                    <v-hover v-for="(article,index) in articleList" :key="index">
                         <v-list-tile class="list-tile title" slot-scope="{ hover }"
-                                     @click="edit=index">
+                                     @click="changeArticle(article,index)">
                             <v-icon color="rgb(255,152,0)" size="22" v-if="edit===index">iconfont icon-pageedit</v-icon>
                             <template v-else>
-                                <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22">iconfont
-                                    icon-draft-page
+                                <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22"
+                                        v-if="article.status_id===100">
+                                    iconfont icon-draft-page
+                                </v-icon>
+                                <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22" v-else>
+                                    iconfont icon-page
                                 </v-icon>
                             </template>
                             <span class="pl-3 fade subheading article-title limit-one-line"
-                                  :class="hover||edit===index?'white--text':'grey--text'"><strong>未奥术大师大所多所多撒多撒大所大所大所命名......</strong></span>
-                            <v-btn flat icon class="fade ml-1" small>
+                                  :class="hover||edit===index?'white--text':'grey--text'"><strong>{{article.title}}</strong></span>
+                            <v-btn flat icon class="fade ml-1" small @click="handleDelete(article.article_id,index)">
                                 <v-icon class="fade" size="18" v-show="hover" color="red">
                                     iconfont icon-delete
                                 </v-icon>
@@ -95,7 +101,7 @@
                         multiple>
                     <v-icon :size="35" color="#FF9800">iconfont icon-file</v-icon>
                     <div class="el-upload__text mt-1">拖拽或<em>点击</em>上传文件</div>
-                    <div class="el-upload__text">支持扩展名：.md .png .jpg...</div>
+                    <div class="el-upload__text">支持扩展名：.md .txt .png .jpg</div>
                 </el-upload>
             </div>
         </div>
@@ -103,9 +109,7 @@
             <v-layout class="white">
                 <v-flex md12>
                     <input type="text" v-model="article.title" placeholder="请输入标题（最多30字）..." maxlength="30"
-                           @change="changed">
-                    <v-btn @click="save">save</v-btn>
-                    <v-btn @click="get">get</v-btn>
+                           @change="changed()" :disabled=!editable>
                 </v-flex>
                 <v-flex @mouseleave="show=false">
                     <transition name="slide-fade">
@@ -121,7 +125,7 @@
                             </a>
                             <a title="发布文章">
                                 <v-hover>
-                                    <v-btn icon class="mt-3 white" slot-scope="{ hover }" @click="check">
+                                    <v-btn icon class="mt-3 white" slot-scope="{ hover }" @click="beforePublish">
                                         <v-icon :color="hover?'white':'grey'" :size="20">
                                             iconfont icon-send
                                         </v-icon>
@@ -140,15 +144,16 @@
             <v-layout py-1 class="white">
                 <v-flex md6>
                     <span class=" pl-2 error--text"
-                          :class="{'success--text':hasSave}">{{hasSave?'已保存...':'未保存！'}}</span>
+                          :class="{'success--text':hasSave}">{{hasSave?'已保存...':'未保存...'}}</span>
                 </v-flex>
                 <v-flex md6 class="text-md-right ">
                     <span class="grey--text pr-2">字数统计：{{words}}字</span>
                 </v-flex>
             </v-layout>
             <no-ssr>
-                <mavon-editor :style="{'height':editorHeight+'px'}" :toolbars="toolbars" :navigation="true"
-                              v-model="article.text" ref="markdown" @change="changed"></mavon-editor>
+                <mavon-editor :style="{'height':editorHeight+'px'}" :toolbars="toolbars"
+                              v-model="article.text" ref="markdown" @change="changed()"
+                              :editable=editable></mavon-editor>
             </no-ssr>
         </div>
         <el-dialog
@@ -165,7 +170,7 @@
                              @changed="changed"></myLabel>
                 </v-card>
                 <v-flex md6 class="text-md-center my-3">
-                    <v-btn class="primary " block depressed round large @click="send">
+                    <v-btn class="primary " block depressed round large @click="handlePublish">
                         <span class="title py-2">确定并发布</span>
                     </v-btn>
                 </v-flex>
@@ -177,10 +182,11 @@
   import {HappyScroll} from 'vue-happy-scroll'
   import 'vue-happy-scroll/docs/happy-scroll.css'
   import uploadFile from '~/components/article/uploadFile.vue'
-  import {ArticleApi} from '../../api/ArticleApi'
+  import {ArticleApi, Draft} from '../../api/ArticleApi'
   import myLabel from '~/components/article/labelSimple.vue'
-  import constant from '../../utils/constant'
-  import {setInterval, guid} from '../../utils'
+  import Constant from '../../utils/constant'
+  import {guid} from '../../utils'
+  import Status from '../../utils/status'
 
   let $articleApi
   let _ = require('lodash')
@@ -188,17 +194,16 @@
     name: 'write',
     data () {
       return {
+        top: 0,
         dialogVisible: false,
-        edit: 1,
-        article: {
-          title: '',
-          text: ''
-        },
+        edit: 0,
+        article: {title: '', text: ''},
         needToUpdate: [],
         editorHeight: 700,
         show: false,
         editorWidth: 600,
-        hasSave: true,
+        hasSave: true,//0:未保存 1:保存中 2:已保存
+        editable: false,
         toolbars: {
           bold: true,
           italic: true,
@@ -215,7 +220,7 @@
           imagelink: true,
           code: true,
           table: true,
-          readmodel: false,
+          readmodel: true,
           htmlcode: true,
           undo: true,
           redo: true,
@@ -225,12 +230,12 @@
           alignleft: true,
           aligncenter: true,
           alignright: true,
-          /* 2.2.1 */
           subfield: true,
           preview: false,
           fullscreen: false,
           help: true,
         },
+        articleList: [],
         pictures: [],
         acceptType: ['md', 'jpeg', 'jpg', 'png', 'gif', 'txt'],
         labels: [
@@ -259,7 +264,10 @@
             label_name: '操作系统',
             link: '#icon-os'
           }],
-        storageDB: ''
+        storageDB: '',
+        updateArticleId: [],
+        newsArticleId: [],
+        changing: false
       }
     },
     computed: {
@@ -275,59 +283,265 @@
       }
     },
     mounted () {
-      this.editorHeight = window.screen.availHeight - 192
-      this.editorWidth = window.screen.availWidth - 265
-      this.initDB()
+      this.setScreen()//设置页面，同时监听窗口变化
+      this.getArticleList().then(() => {//向后台请求数据
+        console.log('initDB')
+        this.initDB().then(() => {
+          this.save(true)//存储
+          setTimeout(() => {
+            this.editable = true
+          }, 200)
+        }) //初始化本地数据库
+      })
+      this.autoSave()
+    },
+    created () {
       $articleApi = new ArticleApi(this.$store)
-      setInterval(() => {
-        this.screen()
-      }, 500)
     },
     components: {
       HappyScroll, uploadFile, myLabel
     },
     methods: {
-      changed () {
-        this.hasSave = false
-      },
-      save (article) {
-        this.storageDB.then(store => {
-          store.setItem(article.article_id, article)
+      leave () {
+        //在离开当前页面时做的一些收尾工作
+        let articleList = []
+        let all = _.union(this.updateArticleId, this.newsArticleId)
+        console.log('all', all)
+        _.forEach(all, articleId => {
+          articleList.push(this.get(articleId))//根据id到本地数据库获取每一个文章的信息
         })
-      },
-      get (articleId) {
-        this.storageDB.then(store => {
-          store.getItem(articleId).then(res => {
-            return res
+        return Promise.all(articleList).then(articles => {
+          let drafts = []
+          _.forEach(articles, article => {
+            if (!this.isInitArticle(article)) {//不是初始化文章
+              if (!_.isUndefined(article.isNews)) {//本地新建的文章
+                drafts.push(new Draft(Constant.NEWS, this.$store.state.user.user_id, article.title, article.update_time, article.label.label_id, article.text))
+              } else {//服务器已经有的文章
+                drafts.push(new Draft(article.article_id, this.$store.state.user.user_id, article.title, article.update_time, article.label.label_id, article.text))
+              }
+            }
+          })
+          console.log(drafts)
+          return new Promise(resolve => {
+            $articleApi.draftsUpdateBatch(drafts, this.$store.state.user.user_id).then(res => {//批量请求更新
+              if (res.status === Status.SUCCESS) {
+                this.storageDB.then(store => {
+                  store.clear().then(() => {
+                    resolve(true)
+                  })//清空数据库
+                })
+              }
+            })
           })
         })
       },
-      check () {
-        if (this.article.title.length < 3) {
-          this.$message.warning('标题太短啦，不要少于三个字')
+      getArticleList () {
+        return Promise.resolve($articleApi.getUserArticleList(this.$store.state.user.user_id).then(res => {
+          if (res.status === Status.SUCCESS) {
+            let i = 0
+            _.forEach(res.data.article_list, (article) => {
+              this.articleList.push(article)
+            })
+          } else {
+            //todo
+          }
+        }))
+      },
+      changeArticle (article, index) {//切换文章
+        this.editable = false//不允许编辑
+        let articleId = article.article_id
+        console.log('article', article)
+        let request = []
+        request.push(this.get(articleId))
+        if (_.isUndefined(article.isNews)) {
+          //不是本地新创建的文章，向后台读取数据
+          request.push($articleApi.getUserArticle(articleId, this.$store.state.user.user_id))
+        }
+        this.save().then(() => {
+          this.edit = index
+          Promise.all(request).then(res => {
+            console.log(res)
+            let localData = res[0]
+            if (res.length === 1) {
+              //只有一个结果表明没有向后台读取数据
+              this.article = localData
+              this.$store.commit('article/setArticleLabel', localData.label)
+            } else {
+              //有两个返回结果，对其进行比较判断
+              let serverData = res[1].data
+              if (_.isNull(localData)) {
+                //如果本地数据为null
+                this.article = serverData.article
+                this.article.label = serverData.label
+                this.$store.commit('article/setArticleLabel', serverData.label)
+              } else {
+                //比较版本号
+                if (localData.update_time > serverData.article.update_time) {
+                  this.article = localData
+                  this.$store.commit('article/setArticleLabel', localData.label)
+                  //本地版本更新
+                  if (this.updateArticleId.indexOf(localData.article_id) === -1) {
+                    //需要进行上传更新
+                    this.updateArticleId.push(localData.article_id)
+                  }
+                } else {
+                  this.article = serverData.article
+                  this.article.label = serverData.label
+                  this.$store.commit('article/setArticleLabel', serverData.label)
+                  //服务器版本更新
+                  let index = this.updateArticleId.indexOf(localData.article_id)
+                  if (index !== -1) {
+                    //取消上传更新
+                    this.updateArticleId = _.slice(this.updateArticleId, index, index + 1)
+                  }
+                }
+              }
+            }
+            return Promise.resolve()
+          }).then(() => {
+            this.editable = true//加载完毕，允许编辑
+          })
+        })
+
+      },
+      changed () {
+        if (this.editable) {
+          console.log('change')
+          this.hasSave = false
+          this.changing = true
+        }
+      },
+      autoSave () {
+        setInterval(() => {
+          if (this.changing) {
+            this.changing = false
+          } else {
+            this.save()
+          }
+        }, 600)
+      },
+      save (must = false) {
+        if (!this.hasSave || must) {
+          console.log('save')
+          //在保存的时候，需要注意对于要保存的文章判断其id是否已经存在于updateIndex与newsIndex中了，
+          // 如果存在则不管，否则添加到updateIndex中
+          //因为新增的文章必定在创建的时候已经存在于newsIndex中了
+          let articleId = this.article.article_id
+          this.articleList[this.edit].title = this.article.title
+          if (this.updateArticleId.indexOf(articleId) === -1 && this.newsArticleId.indexOf(articleId) === -1) {
+            this.updateArticleId.push(articleId)
+          }
+          this.articleList[this.edit].status_id = Constant.DRAFT
+          console.log(this.$store.state.article.label)
+          this.article.label = this.$store.state.article.articleLabel
+          this.article.status_id = Constant.DRAFT
+          console.log(this.article)
+          this.hasSave = true
+          return Promise.resolve(this.storageDB.then(store => {
+            this.article.update_time = new Date().getTime()//更新时间
+            store.setItem(this.article.article_id, this.article)
+          }))
+        }
+        return Promise.resolve(true)
+      },
+      get (articleId) {
+        return new Promise(resolve => {
+          this.storageDB.then(store => {
+            store.getItem(articleId).then(res => {
+              resolve(res)
+            })
+          })
+        })
+      },
+      beforePublish () {
+        if (this.isInitArticle(this.article)) {
+          this.$message.warning('请不要发布没有意义的文章哦！')
+        } else if (this.article.title.length < 3) {
+          this.$message.warning('文章标题太短啦，不要少于三个字')
         } else if (this.words < 20) {
           this.$message.warning('文章内容太短啦，不要少于20个字')
         } else {
           this.dialogVisible = true
         }
       },
-      autoSave () {
-        setInterval(() => {
-          if (!this.hasSave) {
-            if (_.isUndefined(this.article.article_id)) {
-              this.article.article_id = guid()
-            }
-            this.article.update_time = new Date().getTime()
-            this.save(this.article)
-            this.hasSave = true
+      createArticle () {
+        console.log('create')
+        this.save()//先保存一下
+        //创建文章的时候需要将创建好的文章id存入newsIndex中
+        let newArticle = {
+          article_id: guid(),
+          title: '未命名...',
+          status_id: Constant.DRAFT,
+          text: '',
+          isNews: true,
+          label: {
+            label_id: -1
           }
-        }, 1000 * 60)
+        }
+        this.article = newArticle
+        this.newsArticleId.push(newArticle.article_id)
+        this.articleList.push(newArticle)
+        this.$store.commit('article/setArticleLabel', newArticle.label)
+      },
+      handleCreate () {
+        this.editable = false
+        this.createArticle()
+        this.edit = this.articleList.length - 1
+        this.editable = true
+        this.save()
+        setTimeout(() => {
+          this.top = 99999999
+        }, 100)
       },
       initDB () {
         let userId = this.$store.state.user.user_id
-        this.storageDB = this.$vlf.createInstance({
+        this.storageDB = this.$vlf.createInstance({//配置数据库
           storeName: userId
         })
+        return Promise.resolve(this.loadHistory().then(() => {//加载本地数据
+          this.createArticle()//新建一篇初始化文章
+          _.reverse(this.articleList)//将列表逆序
+          this.edit = 0
+        }))
+      },
+      isInitArticle (article) {
+        return ((article.title === '未命名...' || _.isEmpty(article.title)) && _.isEmpty(article.text) && article.status_id === Constant.DRAFT)
+      },
+      loadHistory () {
+        return Promise.resolve(this.storageDB.then(store => {
+          store.iterate((value, key) => {//遍历本地数据
+            if (!_.isUndefined(value.isNews)) {
+              //本地新建的，但没有上传的文章
+              if (!this.isInitArticle(value)) {
+                //如果不是初始化的文章
+                this.articleList.push(value)
+                this.newsArticleId.push(key)
+                this.$store.commit('article/setArticleLabel', value.label)
+              } else {
+                //是初始化的文章则删除掉
+                this.storageDB.then(store => {
+                  store.removeItem(key)
+                })
+              }
+            } else {
+              //服务器已经有的，但本地有新版本没上传
+              for (let i = 1; i < this.articleList.length; i++) {
+                if (this.articleList[i].article_id === key) {
+                  if (this.articleList[i].update_time < value.update_time) {//比较版本，将旧的版本去掉
+                    this.articleList[i] = value
+                    this.updateArticleId.push(key)
+                  } else {
+                    this.storageDB.then(store => {//删除本地版本
+                      store.removeItem(key)
+                    })
+                  }
+                  break
+                }
+              }
+              this.$store.commit('article/setArticleLabel', value.label)
+            }
+          })
+        }))
       },
       getArticleSummary () {
         let article = document.createElement('body')
@@ -335,25 +549,83 @@
         let nodes = article.children
         let summary = ''
         for (let i = 0; i < nodes.length; i++) {
-          summary += nodes[i].innerText
+          let txt = nodes[i].innerText.replace(/^\s+|\s+$/g, '')
+          if (txt.length > 0) {
+            summary += txt
+          }
+          if (summary.length > 150) break
         }
         return summary.substring(0, 150)
       },
-      send () {
-        let labelId = this.$store.state.article.articleLabelId
+      handlePublish () {
+        let labelId = this.$store.state.article.articleLabel.label_id
         if (labelId === -1 || labelId.length === 0) {
           this.$message.warning('请选择文章标签！')
+        } else if (this.edit < 0) {
+          this.$message.error('当前没有文章可发布！')
         } else {
-          let articleSummary = this.getArticleSummary()
-          let thumb = ''
-          if (this.pictures.length > 0) {
-            thumb = this.pictures[0]
+          //将要发布的文章id从newsIndex或updateIndex中剔除出来
+          let index = this.newsArticleId.indexOf(this.article.article_id)
+          if (index !== -1) {
+            //是一篇新的文章
+            this.article.article_id = Constant.NEWS
+            this.newsArticleId = _.slice(this.newsArticleId, index, index + 1)
+            console.log('this.newsArticleId ', this.newsArticleId)
+            this.publish().then((res) => {
+              this.afterPublish(res)
+            }).catch((error) => {
+              console.log(error)
+              this.$message.error('发布失败，出现未知错误！')
+            })
+          } else {
+            index = this.updateArticleId.indexOf(this.article.article_id)
+            if (index !== -1) {
+              this.updateArticleId = _.slice(this.updateArticleId, index, index + 1)
+              console.log('this.updateArticleId ', this.updateArticleId)
+              this.publish().then((res) => {
+                this.afterPublish(res)
+              }).catch((error) => {
+                console.log(error)
+                this.$message.error('发布失败，出现未知错误！')
+              })
+            } else {
+              //文章没有修改，且已经发布过了
+              this.$message.warning('该文章已经发过啦！')
+              return false
+            }
           }
-          $articleApi.writeArticle(this.article.title, this.article.text, labelId, articleSummary, thumb, constant.PUBLISH, this.$store.state.user.user_id).then(res => {
-            console.log(res)
-          })
         }
-
+      },
+      afterPublish (data) {
+        this.leave().then(() => {
+          this.article.article_id = data.article_id
+          this.$store.commit('article/setPublishedArticle', this.article)
+          this.$router.push({path: '/article/published'})
+        })
+      },
+      publish () {
+        let articleSummary = this.getArticleSummary()
+        let thumbnail = this.getThumbnail()
+        let labelId = this.$store.state.article.articleLabel.label_id
+        return new Promise((resolve, reject) => {
+          $articleApi.publishArticle(this.article.title, this.article.text, labelId, articleSummary, thumbnail, this.article.article_id, this.$store.state.user.user_id).then(res => {
+            if (res.status === Status.SUCCESS) {
+              //上传成功
+              resolve(res.data)
+            }
+          }).catch(() => {
+            reject(false)
+          })
+        })
+      },
+      getThumbnail () {
+        let images = document.images
+        for (let i = 0; i < images.length; i++) {
+          if (images[i].width > 150 && images[i].height > 100) {
+            return images[i].src
+          }
+        }
+        return ''
       },
       preview () {
 
@@ -371,6 +643,7 @@
           this.handleMarkdownTxt(file)
           return Promise.resolve(true)
         } else {
+          console.log(this.$refs.markdown.$refs.toolbar_left.num, this.$refs.markdown.$refs.toolbar_left.$imgFileAdd)
           return false
         }
       },
@@ -392,24 +665,79 @@
           return Promise.resolve(true)
         }
       },
-      screen () {
-        let height = window.screen.availHeight - 192
-        let width = window.screen.availWidth - 265
-        if (height !== this.editorHeight) {
-          this.editorHeight = height
+      setScreen () {
+        this.editorHeight = window.screen.availHeight - 192
+        this.editorWidth = window.screen.availWidth - 260
+        window.onresize = () => {
+          this.editorHeight = window.screen.availHeight - 192
+          this.editorWidth = window.screen.availWidth - 260
         }
-        if (width !== this.editorWidth) {
-          this.editorWidth = width
+      },
+      handleDelete (articleId, index) {
+        this.deleteArticle(articleId).then(res => {
+          if (res) {
+            this.deleteArticleList(index)
+          }
+        })
+      },
+      deleteArticle (articleId) {
+        let newsIndex = this.newsArticleId.indexOf(articleId)
+        if (newsIndex !== -1) {
+          //本地新建的，删除本地数据即可
+          return new Promise((resolve, reject) => {
+            this.storageDB.then(store => {
+              store.removeItem(articleId).then(() => {
+                //本地删除成功
+                this.newsArticleId = _.slice(this.newsArticleId, newsIndex, newsIndex + 1)
+                resolve(true)
+              }).catch(() => {
+                reject(false)
+              })
+            })
+          })
+        } else {
+          //服务器端有数据
+          return new Promise((resolve, reject) => {
+            $articleApi.deleteArticle(articleId, this.$store.state.user.user_id).then(res => {
+              if (res.status === Status.SUCCESS) {
+                //服务器删除成功
+                let updateIndex = this.updateArticleId.indexOf(articleId)
+                if (updateIndex !== -1) {
+                  this.storageDB.then(store => {
+                    store.removeItem(articleId).then(() => {
+                      //本地删除成功
+                      resolve(true)
+                    }).catch(() => {
+                      reject(false)
+                    })
+                  })
+                }
+              }
+            }).catch(() => {
+              reject(false)
+            })
+          })
+        }
+      },
+      deleteArticleList (index) {
+        if (this.edit === index) {
+          //删除的是正在编辑的
+          this.editable = false
+          this.article = {title: '', text: ''}
+          this.edit = -1
+          this.editable = true
+        }
+        this.articleList = _.slice(this.articleList, index, index + 1)//删掉列表数据
+        if (this.articleList.length === 0) {//没有一项剩下了的时候
+          this.editable = false
         }
       }
-    },
-
+    }
   }
+
 </script>
 
-<style>
-    @import "~/assets/style/markdown.css";
-</style>
+
 <style scoped>
     input {
         background: white;
@@ -542,6 +870,8 @@
     }
 </style>
 <style>
+    @import "~/assets/style/markdown.css";
+
     html {
         overflow-y: hidden;
         overflow-x: hidden;
