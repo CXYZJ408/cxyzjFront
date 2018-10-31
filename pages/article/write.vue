@@ -65,9 +65,9 @@
                          :scroll-top.sync="top">
                 <v-list :subheader="true" class="list" style=" padding-bottom: 10px!important;">
                     <v-hover v-for="(article,index) in articleList" :key="index">
-                        <v-list-tile class="list-tile title" slot-scope="{ hover }"
-                                     @click="changeArticle(article,index)">
-                            <v-icon color="rgb(255,152,0)" size="22" v-if="edit===index">iconfont icon-pageedit</v-icon>
+                        <v-list-tile class="list-tile title" slot-scope="{ hover }">
+                            <v-icon color="rgb(255,152,0)" size="22" v-if="edit===index">iconfont icon-pageedit
+                            </v-icon>
                             <template v-else>
                                 <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22"
                                         v-if="article.status_id===100">
@@ -78,6 +78,7 @@
                                 </v-icon>
                             </template>
                             <span class="pl-3 fade subheading article-title limit-one-line"
+                                  @click="changeArticle(article,index)"
                                   :class="hover||edit===index?'white--text':'grey--text'"><strong>{{article.title}}</strong></span>
                             <v-btn flat icon class="fade ml-1" small @click="handleDelete(article.article_id,index)">
                                 <v-icon class="fade" size="18" v-show="hover" color="red">
@@ -292,6 +293,8 @@
             this.editable = true
           }, 200)
         }) //初始化本地数据库
+      }).catch(() => {
+        this.$message.error('列表信息加载失败！')
       })
       this.autoSave()
     },
@@ -336,16 +339,18 @@
         })
       },
       getArticleList () {
-        return Promise.resolve($articleApi.getUserArticleList(this.$store.state.user.user_id).then(res => {
-          if (res.status === Status.SUCCESS) {
-            let i = 0
-            _.forEach(res.data.article_list, (article) => {
-              this.articleList.push(article)
-            })
-          } else {
-            //todo
-          }
-        }))
+        return new Promise((resolve, reject) => {
+          $articleApi.getUserArticleList(this.$store.state.user.user_id).then(res => {
+            if (res.status === Status.SUCCESS) {
+              _.forEach(res.data.article_list, (article) => {
+                this.articleList.push(article)
+              })
+              resolve(true)
+            } else {
+              reject(false)
+            }
+          })
+        })
       },
       changeArticle (article, index) {//切换文章
         this.editable = false//不允许编辑
@@ -392,7 +397,7 @@
                   let index = this.updateArticleId.indexOf(localData.article_id)
                   if (index !== -1) {
                     //取消上传更新
-                    this.updateArticleId = _.slice(this.updateArticleId, index, index + 1)
+                    this.updateArticleId.splice(index, 1)
                   }
                 }
               }
@@ -402,7 +407,6 @@
             this.editable = true//加载完毕，允许编辑
           })
         })
-
       },
       changed () {
         if (this.editable) {
@@ -421,7 +425,10 @@
         }, 600)
       },
       save (must = false) {
-        if (!this.hasSave || must) {
+        if (this.edit < 0) {
+          this.hasSave = true
+        }
+        if ((!this.hasSave || must)) {
           console.log('save')
           //在保存的时候，需要注意对于要保存的文章判断其id是否已经存在于updateIndex与newsIndex中了，
           // 如果存在则不管，否则添加到updateIndex中
@@ -558,6 +565,7 @@
         return summary.substring(0, 150)
       },
       handlePublish () {
+        this.save(true)
         let labelId = this.$store.state.article.articleLabel.label_id
         if (labelId === -1 || labelId.length === 0) {
           this.$message.warning('请选择文章标签！')
@@ -569,7 +577,7 @@
           if (index !== -1) {
             //是一篇新的文章
             this.article.article_id = Constant.NEWS
-            this.newsArticleId = _.slice(this.newsArticleId, index, index + 1)
+            this.newsArticleId.splice(index, 1)
             console.log('this.newsArticleId ', this.newsArticleId)
             this.publish().then((res) => {
               this.afterPublish(res)
@@ -580,7 +588,7 @@
           } else {
             index = this.updateArticleId.indexOf(this.article.article_id)
             if (index !== -1) {
-              this.updateArticleId = _.slice(this.updateArticleId, index, index + 1)
+              this.updateArticleId.splice(index, 1)
               console.log('this.updateArticleId ', this.updateArticleId)
               this.publish().then((res) => {
                 this.afterPublish(res)
@@ -688,7 +696,7 @@
             this.storageDB.then(store => {
               store.removeItem(articleId).then(() => {
                 //本地删除成功
-                this.newsArticleId = _.slice(this.newsArticleId, newsIndex, newsIndex + 1)
+                this.newsArticleId.splice(newsIndex, 1)
                 resolve(true)
               }).catch(() => {
                 reject(false)
@@ -698,6 +706,7 @@
         } else {
           //服务器端有数据
           return new Promise((resolve, reject) => {
+            console.log('delete')
             $articleApi.deleteArticle(articleId, this.$store.state.user.user_id).then(res => {
               if (res.status === Status.SUCCESS) {
                 //服务器删除成功
@@ -711,6 +720,8 @@
                       reject(false)
                     })
                   })
+                } else {
+                  resolve(true)
                 }
               }
             }).catch(() => {
@@ -724,10 +735,11 @@
           //删除的是正在编辑的
           this.editable = false
           this.article = {title: '', text: ''}
+          console.log(this.article)
           this.edit = -1
           this.editable = true
         }
-        this.articleList = _.slice(this.articleList, index, index + 1)//删掉列表数据
+        this.articleList.splice(index, 1)//删掉列表数据
         if (this.articleList.length === 0) {//没有一项剩下了的时候
           this.editable = false
         }
@@ -805,6 +817,7 @@
 
     .article-title {
         width: 180px;
+        cursor: pointer;
     }
 
     .list-tile {

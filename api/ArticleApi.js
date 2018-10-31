@@ -70,7 +70,7 @@ export class ArticleApi extends Api {
     let params = {
       user_id: userId
     }
-    super.pushRequest = new Request(requestMethods.DELETE, url, this.handleDelete, params)
+    super.pushRequest = new Request(requestMethods.DELETE, url, this.deleteArticle, params)
     return super.judgeSend(send)
   }
 
