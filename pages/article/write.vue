@@ -190,7 +190,6 @@
 <script>
   import {HappyScroll} from 'vue-happy-scroll'
   import 'vue-happy-scroll/docs/happy-scroll.css'
-  import uploadFile from '~/components/article/uploadFile.vue'
   import {ArticleApi, Draft} from '../../api/ArticleApi'
   import myLabel from '~/components/article/labelSimple.vue'
   import Constant from '../../utils/constant'
@@ -315,10 +314,10 @@
       $articleApi = new ArticleApi(this.$store)
     },
     components: {
-      HappyScroll, uploadFile, myLabel
+      HappyScroll, myLabel
     },
     methods: {
-      expand () {
+      expand () {//控制面板展开动画
         if (this.showList) {
           this.widthLeft1 = 0
           this.time = 0.8
@@ -392,7 +391,7 @@
         })
       },
       changeArticle (article, index) {//切换文章
-        console.log('article-----',article)
+        console.log('article-----', article)
         this.editable = false//不允许编辑
         let articleId = article.article_id
         console.log('article', article)
@@ -400,7 +399,7 @@
         request.push(this.get(articleId))
         if (_.isUndefined(article.isNews)) {
           //不是本地新创建的文章，向后台读取数据
-          console.log("not news")
+          console.log('not news')
           request.push($articleApi.getUserArticle(articleId, this.$store.state.user.user_id))
         }
         this.save().then(() => {

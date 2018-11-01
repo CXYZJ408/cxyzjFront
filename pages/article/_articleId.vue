@@ -74,7 +74,7 @@
 
     mounted () {
       this.generateArticle(this)
-      this.generateCatalog(this)
+      // this.generateCatalog(this)
       this.rendered()
       this.$store.commit('setBackground', 'white')
     },
@@ -91,7 +91,7 @@
     },
     asyncData ({params, store}) {
       let $articleApi = new ArticleApi(store)
-      let id = '495628181437415424'//todo 去掉写死的id
+      let id = '507199395356213248'//todo 去掉写死的id
       return $articleApi.getArticle(id).then(res => {
         if (res.status === $status.SUCCESS) {
           res.data.article.words = 16
@@ -109,18 +109,22 @@
       generateCatalog ($vm) {
         let tmp = document.createElement('div')
         tmp.innerHTML = $vm.articleRender //获取节点数据
+        console.log('generateCatalog')
+        console.log(tmp)
         let nodes = tmp.children
         if (nodes.length) {
           for (let i = 0; i < nodes.length; i++) {
             judageH(nodes[i], i)
           }
         }
-
+        console.log(tmp)
         function judageH (node, i) {
           let reg = /^H[1-6]{1}$/
           $vm.words += node.innerText.length//统计字数
           if (reg.exec(node.tagName)) {
-            $vm.catalogs.push({title: node.innerText, id: node.children[0].getAttribute('id')})//生成目录结构数据
+            console.log(node.children[0].getAttribute('id'))
+            let id =node.children[0].getAttribute('id')
+            $vm.catalogs.push({title: node.innerText, id: id})//生成目录结构数据
           }
         }
       },

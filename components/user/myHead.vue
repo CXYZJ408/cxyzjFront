@@ -3,9 +3,9 @@
         <div class="mask" :style="{'background':'url('+ $store.state.userCenter.user.bg_url+')0 0/cover fixed '}"></div>
         <v-flex md2 ml-3>
             <div class="card">
-                <v-avatar class="avatar" :tile="true">
+                <div class="avatar" >
                     <img :src="$store.state.userCenter.user.head_url" alt="">
-                </v-avatar>
+                </div>
                 <span class="d-block title text-md-center mt-2 px-2" style="text-transform: capitalize">
                         {{$store.state.userCenter.user.nickname}}
                 </span>
@@ -202,11 +202,12 @@
     }
 
     .avatar {
-        width: 190px !important;
-        height: 130px !important;
-        border-top-left-radius: 8px !important;
-        border-top-right-radius: 8px !important;
+        text-align: center;
+        width: 190px;
+        height: 130px;
         overflow: hidden;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
     }
 
 </style>

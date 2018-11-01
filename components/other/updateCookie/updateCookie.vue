@@ -4,7 +4,7 @@
 
 <script>
   let $cookie
-  import {setInterval, clearInterval} from '../../../utils'
+  import {setInterval} from '../../../utils'
 
   export default {
     mounted () {
