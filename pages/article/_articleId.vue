@@ -103,7 +103,7 @@
       onScroll () {
         let currentTop = window.pageYOffset
         let element = this.$refs.articleContent
-        let bottom = element.offsetTop + element.offsetHeight - window.setScreen.availHeight
+        let bottom = element.offsetTop + element.offsetHeight - window.screen.availHeight
         this.progress = Math.ceil((currentTop / bottom) * 100)
       },
       generateCatalog ($vm) {

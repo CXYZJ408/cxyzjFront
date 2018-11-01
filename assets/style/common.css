@@ -11,10 +11,6 @@ body::-webkit-scrollbar {
     display: none;
 }
 
-.slide-fade-enter-active {
-    transition: all .4s ease-in-out;
-}
-
 .wrap_image {
     position: absolute;
     top: 50%;
@@ -55,6 +51,9 @@ body::-webkit-scrollbar {
     transition: all .8s cubic-bezier(0, 0, .58, 1)
 }
 
+.slide-fade-enter-active {
+    transition: all .4s ease-in-out;
+}
 .clearAll {
     margin: 0 !important;
     padding: 0 !important;
@@ -86,29 +85,35 @@ body {
     padding: 0 !important;
     margin: 0 !important;
 }
-.limit-one-line{
+
+.limit-one-line {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .slide-fade-enter-active {
     transition: all .3s ease;
 }
+
 .slide-fade-leave-active {
     transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
+
 .slide-fade-enter, .slide-fade-leave-to
-    /* .slide-fade-leave-active for below version 2.1.8 */ {
+    /* .slide-fade-leave-active for below version 2.1.8 */
+{
     transform: translateX(50px);
     opacity: 0;
 }
-.fade{
-    transition: opacity  .3s ease-out;
+
+.fade {
+    transition: opacity .3s ease-out;
 }
+
 .capital {
     text-transform: capitalize
 }
-
 
 .mycard {
     width: 95%;

@@ -1,27 +1,12 @@
 <template>
     <v-layout style="overflow: hidden">
-        <div class="write-left">
+        <div v-show="showList" class="write-left" :style="{'width':widthLeft1+'px'}">
             <v-layout wrap row>
                 <v-flex md12>
                     <v-card class="user-card" flat tile height="130" style="background-color: inherit!important;">
-                        <v-menu dark
-                                origin="center center" transition="scale-transition" left class="user-menu">
-                            <v-btn slot="activator" flat icon>
-                                <v-icon color="grey">menu</v-icon>
-                            </v-btn>
-                            <v-list subheader dense>
-                                <v-list-tile @click="">
-                                    <v-list-tile-title>
-                                        <v-icon size="16">iconfont icon-yonghu</v-icon>
-                                        <span class="pl-2">个人中心</span></v-list-tile-title>
-                                </v-list-tile>
-                                <v-list-tile @click="">
-                                    <v-list-tile-title>
-                                        <v-icon size="16">iconfont icon-save</v-icon>
-                                        <span class="pl-2">保存并返回</span></v-list-tile-title>
-                                </v-list-tile>
-                            </v-list>
-                        </v-menu>
+                        <v-btn flat icon @click="expand" class="user-menu">
+                            <v-icon color="grey">menu</v-icon>
+                        </v-btn>
                         <v-layout wrap row justify-center class="text-md-center">
                             <v-flex md12 class="pt-2">
                                 <v-avatar size="75">
@@ -56,37 +41,55 @@
                     <v-hover>
                         <v-btn block flat class="add py-2" slot-scope="{ hover }" @click="handleCreate">
                             <v-icon color="#EDF2F8" class="fade" :size="28">iconfont icon-addpage</v-icon>
-                            <span class=" pl-2 title fade" :class="hover?'white--text':'grey--text'"><b>新建文章</b></span>
+                            <span class=" pl-2 title fade"
+                                  :class="hover?'white--text':'grey--text'"><b>新建文章</b></span>
                         </v-btn>
                     </v-hover>
                 </v-flex>
             </v-layout>
-            <HappyScroll color="rgba(255,152,0,.8)" class="scroll" size="5" :min-length-h="20" hide-horizontal resize
+            <HappyScroll color="rgba(255,152,0,.8)" class="scroll" size="5" :min-length-h="20" hide-horizontal
+                         resize
                          :scroll-top.sync="top">
+
                 <v-list :subheader="true" class="list" style=" padding-bottom: 10px!important;">
-                    <v-hover v-for="(article,index) in articleList" :key="index">
-                        <v-list-tile class="list-tile title" slot-scope="{ hover }">
-                            <v-icon color="rgb(255,152,0)" size="22" v-if="edit===index">iconfont icon-pageedit
-                            </v-icon>
-                            <template v-else>
-                                <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22"
-                                        v-if="article.status_id===100">
-                                    iconfont icon-draft-page
-                                </v-icon>
-                                <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22" v-else>
-                                    iconfont icon-page
-                                </v-icon>
+                    <no-ssr>
+                        <RecycleScroller
+                                :key="true"
+                                :items="articleList"
+                                :item-height="50"
+                                :page-mode="true"
+                                key-field="article_id"
+                        >
+                            <template slot-scope="{item,index}">
+                                <v-hover>
+                                    <v-list-tile class="list-tile title" slot-scope="{ hover }">
+                                        <v-icon color="rgb(255,152,0)" size="22" v-if="edit===index">iconfont
+                                            icon-pageedit
+                                        </v-icon>
+                                        <template v-else>
+                                            <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22"
+                                                    v-if="item.status_id===100">
+                                                iconfont icon-draft-page
+                                            </v-icon>
+                                            <v-icon :class="hover?'white--text':'grey--text'" class="fade" size="22"
+                                                    v-else>
+                                                iconfont icon-page
+                                            </v-icon>
+                                        </template>
+                                        <span class="pl-3 fade subheading article-title limit-one-line"
+                                              @click="changeArticle(item,index)"
+                                              :class="hover||edit===index?'white--text':'grey--text'"><strong>{{index}}-{{item.title}}</strong></span>
+                                        <v-btn flat icon class="fade ml-1" small
+                                               @click="handleDelete(item.article_id,index)">
+                                            <v-icon class="fade" size="18" v-show="hover" color="red">
+                                                iconfont icon-delete
+                                            </v-icon>
+                                        </v-btn>
+                                    </v-list-tile>
+                                </v-hover>
                             </template>
-                            <span class="pl-3 fade subheading article-title limit-one-line"
-                                  @click="changeArticle(article,index)"
-                                  :class="hover||edit===index?'white--text':'grey--text'"><strong>{{article.title}}</strong></span>
-                            <v-btn flat icon class="fade ml-1" small @click="handleDelete(article.article_id,index)">
-                                <v-icon class="fade" size="18" v-show="hover" color="red">
-                                    iconfont icon-delete
-                                </v-icon>
-                            </v-btn>
-                        </v-list-tile>
-                    </v-hover>
+                        </RecycleScroller>
+                    </no-ssr>
                 </v-list>
             </HappyScroll>
             <div class="upload-file">
@@ -102,11 +105,16 @@
                         multiple>
                     <v-icon :size="35" color="#FF9800">iconfont icon-file</v-icon>
                     <div class="el-upload__text mt-1">拖拽或<em>点击</em>上传文件</div>
-                    <div class="el-upload__text">支持扩展名：.md .txt .png .jpg</div>
+                    <div class="el-upload__text mt-1">支持扩展名：.md .txt .png .jpg .gif</div>
                 </el-upload>
             </div>
         </div>
-        <div :style="{'width':editorWidth+'px'}">
+        <div class="write-left2" v-show="showNonList" :style="{'width':widthLeft2+'px'}">
+            <v-btn flat icon @click="expand" class="user-menu ">
+                <v-icon color="grey">menu</v-icon>
+            </v-btn>
+        </div>
+        <div :style="{'width':editorWidth+'px','transition': `all ${time}s ease-in`}">
             <v-layout class="white">
                 <v-flex md12>
                     <input type="text" v-model="article.title" placeholder="请输入标题（最多30字）..." maxlength="30"
@@ -195,7 +203,10 @@
     name: 'write',
     data () {
       return {
+        widthLeft1: 260,
+        widthLeft2: 0,
         top: 0,
+        time: 0.3,
         dialogVisible: false,
         edit: 0,
         article: {title: '', text: ''},
@@ -226,7 +237,7 @@
           undo: true,
           redo: true,
           trash: true,
-          save: true,
+          save: false,
           navigation: true,
           alignleft: true,
           aligncenter: true,
@@ -268,7 +279,9 @@
         storageDB: '',
         updateArticleId: [],
         newsArticleId: [],
-        changing: false
+        changing: false,
+        showList: true,
+        showNonList: false
       }
     },
     computed: {
@@ -305,6 +318,32 @@
       HappyScroll, uploadFile, myLabel
     },
     methods: {
+      expand () {
+        if (this.showList) {
+          this.widthLeft1 = 0
+          this.time = 0.8
+          this.showNonList = true
+          this.editorWidth = window.screen.availWidth
+          setTimeout(() => {
+            this.showList = false
+            this.time = 0.3
+            this.editorWidth = window.screen.availWidth - 52
+            this.widthLeft2 = 52
+          }, 800)
+        } else {
+          this.widthLeft2 = 0
+          this.showList = true
+          this.time = 0.3
+          this.editorWidth = window.screen.availWidth
+          setTimeout(() => {
+            this.showNonList = false
+            this.time = 0.8
+            this.editorWidth = window.screen.availWidth - 260
+            this.widthLeft1 = 260
+          }, 300)
+        }
+
+      },
       leave () {
         //在离开当前页面时做的一些收尾工作
         let articleList = []
@@ -353,6 +392,7 @@
         })
       },
       changeArticle (article, index) {//切换文章
+        console.log('article-----',article)
         this.editable = false//不允许编辑
         let articleId = article.article_id
         console.log('article', article)
@@ -360,6 +400,7 @@
         request.push(this.get(articleId))
         if (_.isUndefined(article.isNews)) {
           //不是本地新创建的文章，向后台读取数据
+          console.log("not news")
           request.push($articleApi.getUserArticle(articleId, this.$store.state.user.user_id))
         }
         this.save().then(() => {
@@ -473,32 +514,43 @@
       },
       createArticle () {
         console.log('create')
-        this.save()//先保存一下
-        //创建文章的时候需要将创建好的文章id存入newsIndex中
-        let newArticle = {
-          article_id: guid(),
-          title: '未命名...',
-          status_id: Constant.DRAFT,
-          text: '',
-          isNews: true,
-          label: {
-            label_id: -1
-          }
-        }
-        this.article = newArticle
-        this.newsArticleId.push(newArticle.article_id)
-        this.articleList.push(newArticle)
-        this.$store.commit('article/setArticleLabel', newArticle.label)
+        return new Promise(resolve => {
+          this.save().then(() => {//先保存一下
+            //创建文章的时候需要将创建好的文章id存入newsIndex中
+            let newArticle = {
+              article_id: guid(),
+              title: '未命名...',
+              status_id: Constant.DRAFT,
+              text: '',
+              isNews: true,
+              label: {
+                label_id: -1
+              }
+            }
+            this.article = newArticle
+            this.newsArticleId.push(newArticle.article_id)
+            this.articleList.push(newArticle)
+            this.$store.commit('article/setArticleLabel', newArticle.label)
+            resolve(true)
+          })
+        })
+
       },
       handleCreate () {
         this.editable = false
-        this.createArticle()
-        this.edit = this.articleList.length - 1
-        this.editable = true
-        this.save()
-        setTimeout(() => {
-          this.top = 99999999
-        }, 100)
+        return new Promise(resolve => {
+          this.createArticle().then(() => {
+            this.edit = this.articleList.length - 1
+            this.editable = true
+            this.save().then(() => {
+              resolve(true)
+            })
+          })
+          setTimeout(() => {
+            this.top = 99999999
+          }, 100)
+        })
+
       },
       initDB () {
         let userId = this.$store.state.user.user_id
@@ -506,8 +558,20 @@
           storeName: userId
         })
         return Promise.resolve(this.loadHistory().then(() => {//加载本地数据
-          this.createArticle()//新建一篇初始化文章
-          _.reverse(this.articleList)//将列表逆序
+          let newArticle = {
+            article_id: guid(),
+            title: '未命名...',
+            status_id: Constant.DRAFT,
+            text: '',
+            isNews: true,
+            label: {
+              label_id: -1
+            }
+          }
+          this.article = newArticle
+          this.newsArticleId.push(newArticle.article_id)
+          this.$store.commit('article/setArticleLabel', newArticle.label)
+          this.articleList.unshift(newArticle)
           this.edit = 0
         }))
       },
@@ -651,15 +715,20 @@
           this.handleMarkdownTxt(file)
           return Promise.resolve(true)
         } else {
-          console.log(this.$refs.markdown.$refs.toolbar_left.num, this.$refs.markdown.$refs.toolbar_left.$imgFileAdd)
-          return false
+          this.$refs.markdown.$refs.toolbar_left.$imgFileAdd(file)
+          return Promise.resolve(true)
         }
       },
       handleMarkdownTxt (file) {
+
         let fileRead = new FileReader()
         fileRead.readAsText(file)
         fileRead.onload = () => {
-          this.article.text = fileRead.result
+          this.handleCreate().then(() => {
+            this.article.title = file.name.substring(0, file.name.lastIndexOf('.'))
+            this.article.text = fileRead.result
+          })
+
         }
       },
       beforeUpload (file) {
@@ -674,11 +743,19 @@
         }
       },
       setScreen () {
-        this.editorHeight = window.screen.availHeight - 192
-        this.editorWidth = window.screen.availWidth - 260
+        this.setEditor()
         window.onresize = () => {
-          this.editorHeight = window.screen.availHeight - 192
+          this.setEditor()
+        }
+      },
+      setEditor () {
+        this.editorHeight = window.screen.availHeight - 192
+        if (this.showList) {
+          console.log(1)
           this.editorWidth = window.screen.availWidth - 260
+        } else {
+          console.log(2)
+          this.editorWidth = window.screen.availWidth - 40
         }
       },
       handleDelete (articleId, index) {
@@ -749,7 +826,6 @@
 
 </script>
 
-
 <style scoped>
     input {
         background: white;
@@ -784,12 +860,21 @@
     }
 
     .write-left {
-        width: 260px;
         background-color: #404040;
+        transition: all .8s ease-in;
+        overflow: hidden;
+    }
+
+    .write-left2 {
+        background-color: #404040;
+        transition: all .3s ease-in;
+        overflow: hidden;
+        position: relative;
     }
 
     .user-menu {
         position: absolute;
+        z-index: 99;
     }
 
     .scroll {
@@ -847,6 +932,7 @@
 
     .el-upload__text {
         color: #C6C6C6;
+        font-size: 12px;
     }
 
     .my-blue {
