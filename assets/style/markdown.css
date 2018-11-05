@@ -8,9 +8,21 @@
     -webkit-text-size-adjust: 100%;
     line-height: 1.5;
     color: #24292e;
-    font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
-    font-size: 16px;
+    font-family: -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif;
+    font-size: 1.25em;
     word-wrap: break-word;
+}
+
+.article h1::before, .article h2::before, .article h3::before, .article h4::before, .article h5::before, .article h6::before {
+    display: block;
+    content: " ";
+    height: 70px;
+    margin-top: -70px;
+    visibility: hidden;
+}
+
+.article h1:focus, .article h2:focus, .article h3:focus, .article h4:focus, .article h5:focus, .article h6:focus {
+    outline: unset !important;
 }
 
 .markdown-body .pl-c {
@@ -431,9 +443,10 @@
 }
 
 .markdown-body blockquote {
-    padding: 0 1em;
+    padding: 1em 1.3em;
     color: #6a737d;
     border-left: 0.25em solid #dfe2e5;
+    background-color: #F8F8F8;
 }
 
 .markdown-body blockquote > :first-child {

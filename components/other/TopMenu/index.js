@@ -1,4 +1,4 @@
-import foot from './footer'
+import foot from './TopMenu'
 
 foot.install = function (Vue) {
   Vue.component('Footer', foot)

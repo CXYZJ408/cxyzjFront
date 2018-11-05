@@ -1,5 +1,6 @@
 <template>
     <v-layout row wrap>
+        <input type="text" v-model="path" id="urlPath">
         <v-flex md12 class="text-md-center">
             <v-card color="#F3F3F3" class="up" flat tile :height="250">
                 <nuxt-link to="/"><img height="150" src="/img/login/logo-small.png"></nuxt-link>
@@ -8,16 +9,16 @@
             <v-card flat tile>
                 <v-layout row wrap justify-center>
                     <v-flex md12>
-                        <span class="display-0">{{article.title}}</span>
+                        <span class="display-0">{{$store.state.article.publishedArticle.title}}</span>
                     </v-flex>
-                    <v-flex md12>
-                        <nuxt-link :to="{path:`/article/${article.article_id}`}">
+                    <v-flex md12 class="mt-4">
+                        <nuxt-link :to="{path:`/article/${$store.state.article.publishedArticle.article_id}`}">
                             <span class="link">
                                 <v-icon color="#42C02E" large class="pr-2">done</v-icon>发布成功，点击查看文章
                             </span>
                         </nuxt-link>
                     </v-flex>
-                    <v-flex md12 class="mt-3">
+                    <v-flex md12 class="mt-5">
                         <v-layout justify-center>
                             <v-flex md2>
                                 <v-btn class="btn" color="#E05244">
@@ -32,7 +33,7 @@
                                 </v-btn>
                             </v-flex>
                             <v-flex md2>
-                                <v-btn class="btn" color="#3194D0">
+                                <v-btn class="btn" color="#3194D0" @click="copy">
                                     <v-icon class="mr-1">iconfont icon-link</v-icon>
                                     复制链接
                                 </v-btn>
@@ -49,7 +50,7 @@
                     </v-flex>
                     <v-flex md6 class="text-md-right mt-5">
                         <div class="title">收录于：
-                            <myLabel :label="article.label"></myLabel>
+                            <myLabel :label="$store.state.article.publishedArticle.label"></myLabel>
                         </div>
                     </v-flex>
                 </v-layout>
@@ -71,17 +72,16 @@
     },
     data: function () {
       return {
-        article: {
-          article_id: 'asd',
-          title: 'Nuxt',
-          label: {
-            label_id: '2',
-            label_name: '操作系统',
-            link: '#icon-os'
-          }
-        }
+        //TODO 修改路径
+        path: `http://localhost:3000/article/${this.$store.state.article.publishedArticle.article_id}`
       }
-
+    },
+    methods: {
+      copy () {
+        let url = document.getElementById('urlPath')
+        url.select()
+        document.execCommand('Copy')
+      }
     }
   }
 </script>
@@ -99,7 +99,7 @@
     }
 
     .display-0 {
-        font-size: 72px;
+        font-size: 58px;
     }
 
     .link {
@@ -124,5 +124,11 @@
         color: #5D6D7E;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
         font-size: 25px;
+    }
+
+    #urlPath {
+        opacity: 0;
+        position: absolute;
+        top: -100px;
     }
 </style>

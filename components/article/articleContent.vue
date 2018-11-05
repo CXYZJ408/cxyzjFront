@@ -75,7 +75,7 @@
             </v-layout>
         </v-flex>
         <v-flex md12 class="mt-2">
-            <hr class="hr-dotted">
+            <hr class="hr-dash">
         </v-flex>
     </v-layout>
 </template>
@@ -124,13 +124,15 @@
     .more {
         height: 35px;
         line-height: 35px;
-        display: inline-block
+        display: inline-block;
+        width: auto;
     }
 
     .user {
-        border-left:4px solid #009DFF;
+        border-left: 4px solid #009DFF;
     }
-    hr{
+
+    hr {
         height: 0;
         margin-top: 5px;
         margin-bottom: 10px;

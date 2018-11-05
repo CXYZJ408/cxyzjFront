@@ -180,18 +180,24 @@ function pack (request) {//打包
       let call = Methods(request[i].requestMethod)
       if (!_.isUndefined(request[i].header)) {
         //存在header
+        console.log('存在header', request[i].header)
         if (!_.isUndefined(request[i].params)) {
           //存在params
+          console.log('存在params', request[i].params)
           resolve(call(request[i].url, request[i].params, request[i].header))
         } else {
           //不存在params
-          resolve(call(request[i].url, request[i].header))
+          console.log('不存在params')
+          resolve(call(request[i].url, null, request[i].header))
         }
       } else if (!_.isUndefined(request[i].params)) {
         //不存在header，存在params
+        console.log('不存在header，存在params')
+
         resolve(call(request[i].url, request[i].params))
       } else {
         //header于params均不存在
+        console.log('header于params均不存在')
         resolve(call(request[i].url))
       }
     }))

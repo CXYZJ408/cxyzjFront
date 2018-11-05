@@ -5,6 +5,10 @@ export default async function ({store, route, redirect, error, params, req}) {
     if ((route.fullPath === '/signIn') || route.fullPath === '/signUp') {
       return redirect('/')
     }
+  }else{
+    if ((route.fullPath === '/article/write') ) {
+      return redirect('/signIn')
+    }
   }
   if (route.name === 'user-setting-userId' && store.state.user.user_id !== params.userId) {
     error({statusCode: 403, message: '未知错误！'})

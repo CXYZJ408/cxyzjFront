@@ -1,5 +1,5 @@
 <template>
-    <v-layout style="overflow: hidden">
+    <v-layout class="write">
         <div v-show="showList" class="write-left" :style="{'width':widthLeft1+'px'}">
             <v-layout wrap row>
                 <v-flex md12>
@@ -78,7 +78,7 @@
                                         </template>
                                         <span class="pl-3 fade subheading article-title limit-one-line"
                                               @click="changeArticle(item,index)"
-                                              :class="hover||edit===index?'white--text':'grey--text'"><strong>{{index}}-{{item.title}}</strong></span>
+                                              :class="hover||edit===index?'white--text':'grey--text'"><strong>{{item.title}}</strong></span>
                                         <v-btn flat icon class="fade ml-1" small
                                                @click="handleDelete(item.article_id,index)">
                                             <v-icon class="fade" size="18" v-show="hover" color="red">
@@ -162,7 +162,7 @@
             <no-ssr>
                 <mavon-editor :style="{'height':editorHeight+'px'}" :toolbars="toolbars"
                               v-model="article.text" ref="markdown" @change="changed()"
-                              :editable=editable></mavon-editor>
+                              :editable=editable @imgAdd="$imgAdd" @trash="trash"></mavon-editor>
             </no-ssr>
         </div>
         <el-dialog
@@ -191,12 +191,14 @@
   import {HappyScroll} from 'vue-happy-scroll'
   import 'vue-happy-scroll/docs/happy-scroll.css'
   import {ArticleApi, Draft} from '../../api/ArticleApi'
+  import {UtilsApi} from '../../api/UtilsApi'
   import myLabel from '~/components/article/labelSimple.vue'
   import Constant from '../../utils/constant'
-  import {guid} from '../../utils'
+  import {guid, words} from '../../utils'
   import Status from '../../utils/status'
-
+  //TODO 左边的文章栏需要自适应高度
   let $articleApi
+  let $utilsApi
   let _ = require('lodash')
   export default {
     name: 'write',
@@ -285,14 +287,7 @@
     },
     computed: {
       words: function () {
-        //用word方式计算正文字数
-        let str = this.article.text
-        str = str.replace(/(\r\n+|\s+|　+)/g, '龘')
-        str = str.replace(/[\x00-\xff]/g, 'm')
-        str = str.replace(/m+/g, '*')
-        str = str.replace(/龘+/g, '')
-        //返回字数
-        return str.length
+        return words(this.article.text)
       }
     },
     mounted () {
@@ -312,11 +307,23 @@
     },
     created () {
       $articleApi = new ArticleApi(this.$store)
+      $utilsApi = new UtilsApi(this.$store)
     },
     components: {
       HappyScroll, myLabel
     },
     methods: {
+      trash () {
+        console.log(1)
+        this.article.title = '未命名...'
+      },
+      $imgAdd (pos, $file) {
+        $utilsApi.uploadImage(Constant.IMAGE_ARTICLE, $file).then(res => {
+          if (res.status === Status.SUCCESS) {
+            this.$refs.markdown.$img2Url(pos, res.data.url)
+          }
+        })
+      },
       expand () {//控制面板展开动画
         if (this.showList) {
           this.widthLeft1 = 0
@@ -363,6 +370,7 @@
             }
           })
           console.log(drafts)
+          this.$store.commit('article/setArticleLabel', {label_id: -1})
           return new Promise(resolve => {
             $articleApi.draftsUpdateBatch(drafts, this.$store.state.user.user_id).then(res => {//批量请求更新
               if (res.status === Status.SUCCESS) {
@@ -692,14 +700,14 @@
       getThumbnail () {
         let images = document.images
         for (let i = 0; i < images.length; i++) {
-          if (images[i].width > 150 && images[i].height > 100) {
+          if (images[i].width > 150 && images[i].height > 100 && images[i].src.indexOf('Article') !== -1) {
             return images[i].src
           }
         }
         return ''
       },
       preview () {
-
+        //TODO 预览效果
       },
       errorHandle () {
         this.$message.error('上传失败！')
@@ -719,7 +727,6 @@
         }
       },
       handleMarkdownTxt (file) {
-
         let fileRead = new FileReader()
         fileRead.readAsText(file)
         fileRead.onload = () => {
@@ -906,7 +913,6 @@
 
     .list-tile {
         height: 50px;
-        font-family: -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif;
     }
 
     .menu {
@@ -966,12 +972,14 @@
         font-size: 48px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     }
+
+    .write {
+        overflow-y: hidden;
+        overflow-x: hidden;
+    }
 </style>
 <style>
     @import "~/assets/style/markdown.css";
 
-    html {
-        overflow-y: hidden;
-        overflow-x: hidden;
-    }
+
 </style>

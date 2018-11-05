@@ -62,3 +62,14 @@ export function guid () {
 
   return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
 }
+
+export function words(text) {
+  //用word方式计算正文字数
+  let str =text
+  str = str.replace(/(\r\n+|\s+|　+)/g, '龘')
+  str = str.replace(/[\x00-\xff]/g, 'm')
+  str = str.replace(/m+/g, '*')
+  str = str.replace(/龘+/g, '')
+  //返回字数
+  return str.length
+}

@@ -422,6 +422,10 @@
 </script>
 
 <style>
+    html {
+        overflow-y: auto;
+        overflow-x: auto;
+    }
     #myIndex #main {
         border-radius: 15px;
     }

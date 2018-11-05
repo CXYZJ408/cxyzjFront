@@ -60,7 +60,6 @@
 </template>
 
 <script>
-  //todo:组件的数据需要重写
   export default {
 
     mounted () {

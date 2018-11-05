@@ -37,27 +37,27 @@ axios.interceptors.response.use(response => {
 })
 
 export default {//导出方法
-  get (url, params = {}, header = {}) {
+  get (url, params = {}, headers = {}) {
     console.log('get-------', url)
-    return axios.get(url, {params}, header)
+    return axios.get(url, {params}, {headers: headers})
   },
-  post (url, params, header = {'Content-Type': 'application/x-www-form-urlencoded'}, needQS = true) {
-    if (needQS) {
+  post (url, params, headers = {'Content-Type': 'application/x-www-form-urlencoded'}) {
+    console.log('post--------',headers)
+    if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+      console.log('qs')
       params = qs.stringify(params)
     }
-    return axios.post(url, params, header)
+    return axios.post(url, params, {headers: headers})
   },
-  put (url, params, header = {}) {
-    return axios.put(url, qs.stringify(params), header)
+  put (url, params, headers = {}) {
+    return axios.put(url, qs.stringify(params), {headers: headers})
   },
-  patch (url, params, header = {}) {
-    return axios.patch(url, qs.stringify(params), {
-      header
-    })
+  patch (url, params, headers = {}) {
+    return axios.patch(url, qs.stringify(params), {headers: headers})
   },
-  delete (url, params, header = {}) {
+  delete (url, params, headers = {}) {
     console.log('delete', $store)
-    return axios.delete(url, {params}, header)
+    return axios.delete(url, {params}, {headers: headers})
   },
   setStore (store) {//注意：如果api要调用axios就必须要先设置store才行
     if (!_.isUndefined(store)) {

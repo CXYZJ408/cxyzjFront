@@ -24,15 +24,6 @@ body::-webkit-scrollbar {
     height: 100%;
 }
 
-.fade-enter-active, .fade-leave-active {
-    transition: opacity .5s;
-}
-
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
-    opacity: 0;
-}
-
 .v-overlay:before {
     background-color: #D0D3D4;
 }
@@ -47,13 +38,6 @@ body::-webkit-scrollbar {
     width: auto !important;
 }
 
-.slide-fade-leave-active {
-    transition: all .8s cubic-bezier(0, 0, .58, 1)
-}
-
-.slide-fade-enter-active {
-    transition: all .4s ease-in-out;
-}
 .clearAll {
     margin: 0 !important;
     padding: 0 !important;
@@ -71,44 +55,55 @@ a {
     text-decoration: none;
 }
 
-.slide-fade-enter {
-    transform: translateX(-10px);
-    opacity: 0;
+.font-1 {
+    font-size: 14px;
 }
 
-.slide-fade-leave-to {
-    transform: translateX(10px);
-    opacity: 0;
+.font-2 {
+    font-size: 16px;
+}
+
+.font-3 {
+    font-size: 18px;
+}
+
+.font-4 {
+    font-size: 20px;
+}
+
+.font-5 {
+    font-size: 22px;
+}
+
+.font-6 {
+    font-size: 24px;
+}
+
+.font-7 {
+    font-size: 26px;
+}
+
+.font-8 {
+    font-size: 28px;
+}
+
+.font-9 {
+    font-size: 30px;
+}
+.font-10 {
+    font-size: 35px;
 }
 
 body {
     padding: 0 !important;
     margin: 0 !important;
+    font-family: -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif !important;
 }
 
 .limit-one-line {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.slide-fade-enter-active {
-    transition: all .3s ease;
-}
-
-.slide-fade-leave-active {
-    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
-
-.slide-fade-enter, .slide-fade-leave-to
-    /* .slide-fade-leave-active for below version 2.1.8 */
-{
-    transform: translateX(50px);
-    opacity: 0;
-}
-
-.fade {
-    transition: opacity .3s ease-out;
 }
 
 .capital {
@@ -155,20 +150,18 @@ body {
 }
 
 .hr {
-    width: 98%;
-    margin-left: 1%;
     border: none;
-    border-top: 1.5px solid #BBBBBB;
+    border-top: 1.5px solid #AAADB1;
 }
 
 .hr-dotted {
-    border: none;
-    border-top: 1.5px dotted #BBBBBB;
+    border: none !important;
+    border-top: 1.5px dotted #AAADB1 !important;
 }
 
 .hr-dash {
-    border: none;
-    border-top: 1.5px dashed #BBBBBB;
+    border: none !important;
+    border-top: 1.5px dashed #AAADB1 !important;
 }
 
 .v-tabs__div {
