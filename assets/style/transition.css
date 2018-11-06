@@ -35,6 +35,22 @@
     transition: all .4s ease-in-out;
 }
 
+.width-grow-leave-active {
+    transition: all 0.8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.width-grow-enter {
+    height: 0;
+}
+
+.width-grow-leave-to {
+    height: 0;
+}
+
+.width-grow-enter-active {
+    transition: all .4s ease-in-out;
+}
+
 .fade {
     transition: opacity .3s ease-out;
 }

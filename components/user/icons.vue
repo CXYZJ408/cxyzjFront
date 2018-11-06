@@ -1,7 +1,7 @@
 <template>
     <div class="d-inline-block pt-1" style="float:left;" :class="{'pt-2':none}">
         <div class="text-md-center d-inline-block ml-2" v-if="!none">
-            <nuxt-link :to="icons[0].href" target="" >
+            <nuxt-link :to="icons[0].href" >
                 <v-icon v-bind:style="{ 'font-size':`${icon_size}px`,'color':icons[0].iconColor }">
                     {{icons[0].class}}
                 </v-icon>
@@ -12,7 +12,7 @@
         <div class="text-md-center d-inline-block">
             <el-tooltip class="ml-3" v-for="(item,index) in icons" v-if="index>0"
                         :key="index" effect="dark" :content="item.name" placement="bottom">
-                <nuxt-link :to="item.href" target="_blank">
+                <nuxt-link :to="item.href" >
                     <v-icon @mouseover="change_color(index,item.iconColor)"
                             @mouseout="change_color(index, '#BBBBBB')"
                             :style="{ 'font-size':icon_size +'px','color': default_color[index] }">

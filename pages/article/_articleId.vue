@@ -20,9 +20,8 @@
                                  v-html="articleRender" id="articleContent"></div>
                         </articleContent>
                     </v-flex>
-                    <v-flex md12>
-                        <commentList></commentList>
-                        <div style="height: 700px"></div>
+                    <v-flex md12 class="pb-5">
+                        <commentList :articleId="article.article_id"></commentList>
                     </v-flex>
                 </v-layout>
             </v-flex>
@@ -54,7 +53,7 @@
   export default {
     name: 'index',
     components: {
-      articleContent, HappyScroll,commentList
+      articleContent, HappyScroll, commentList
     },
     mounted () {
       this.generateArticle(this)
@@ -63,6 +62,7 @@
       this.$store.commit('setBackground', 'white')
 
     },
+
     computed: {},
     data: function () {
       return {
@@ -76,11 +76,9 @@
     },
     asyncData ({params, store}) {
       let $articleApi = new ArticleApi(store)
-      console.log(params)
       let id = params.articleId
       return $articleApi.getArticle(id).then(res => {
         if (res.status === $status.SUCCESS) {
-          console.log(res)
           return {article: res.data.article, user: res.data.user, label: res.data.label}
         }
       })

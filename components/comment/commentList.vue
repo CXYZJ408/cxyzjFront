@@ -29,36 +29,36 @@
         </v-flex>
         <v-flex md12 ref="expression" style="position: relative">
             <div class="more">
-                <transition name="slide-fade-up">
-                    <v-card v-show="show" color="#F8F9F9" tile flat>
-                        <v-layout row wrap justify-center class="clearMargin clearPadding">
-                            <v-flex md2 offset-md1>
-                                <v-menu
-                                        v-model="menu"
-                                        :close-on-content-click="false"
-                                        :nudge-width="200"
-                                        offset-y
-                                >
-                                    <template slot="activator">
-                                        <v-icon size="30" class="expression">
-                                            iconfont icon-expression
-                                        </v-icon>
-                                        <span class="expression pl-1">表情</span>
-                                    </template>
-                                    <v-card>
-                                        <no-ssr>
-                                            <picker :infiniteScroll="false" @select="addEmoji"></picker>
-                                        </no-ssr>
-                                    </v-card>
-                                </v-menu>
-                            </v-flex>
-                            <v-flex md8 class="text-md-right ">
-                                <span class="send-word pr-2">Ctrl or ⌘ + Enter</span>
-                                <v-btn dark color="#18ADED" class="send clearMargin" small depressed>评论</v-btn>
-                            </v-flex>
-                        </v-layout>
-                    </v-card>
-                </transition>
+                <v-card :height="height" color="#F8F9F9" tile flat class="expression-card">
+                    <v-layout row wrap justify-center class="clearMargin clearPadding">
+                        <v-flex md2 offset-md1>
+                            <v-menu
+                                    v-model="menu"
+                                    :close-on-content-click="false"
+                                    :nudge-width="200"
+                                    offset-y
+                            >
+                                <template slot="activator">
+                                    <v-icon size="30" class="expression">
+                                        iconfont icon-expression
+                                    </v-icon>
+                                    <span class="expression pl-1">表情</span>
+                                </template>
+                                <v-card>
+                                    <no-ssr>
+                                        <picker :infiniteScroll="false" @select="addEmoji"></picker>
+                                    </no-ssr>
+                                </v-card>
+                            </v-menu>
+                        </v-flex>
+                        <v-flex md8 class="text-md-right ">
+                            <span class="send-word pr-2">Ctrl or ⌘ + Enter</span>
+                            <v-btn dark color="#18ADED" class="send clearMargin" small depressed
+                                   @click="publishComment">评论
+                            </v-btn>
+                        </v-flex>
+                    </v-layout>
+                </v-card>
             </div>
         </v-flex>
         <v-flex md12 class="mt-5 ">
@@ -80,17 +80,25 @@
 <script>
   import {Picker} from 'emoji-mart-vue'
   import comment from '~/components/comment/comment.vue'
+  import {ArticleCommentApi} from '../../api/ArticleCommentApi'
+  import Status from '../../utils/status'
 
+  let $articleCommentApi
   export default {
     name: 'commentList',
     components: {
-      Picker,comment
+      Picker, comment
+    },
+    props: {
+      articleId: {
+        type: String
+      }
     },
     data: function () {
       return {
         menu: false,
         text: '',
-        show: false,
+        height: 0,
         commentList: [
           {
             comment: {
@@ -121,14 +129,35 @@
         ]
       }
     },
+    beforeDestroy () {
+      document.removeEventListener('click', this.listener)
+    },
     mounted () {
-      document.addEventListener('click', (e) => {
-        this.show = this.$refs.textArea.contains(e.target) || this.$refs.expression.contains(e.target)
-      })
+      $articleCommentApi = new ArticleCommentApi(this.$store)
+      document.addEventListener('click', this.listener)
     },
     methods: {
+      listener (e) {
+        console.log('listener')
+        try {
+          this.height = (this.$refs.textArea.contains(e.target) || this.$refs.expression.contains(e.target)) ? 40 : 0
+        } catch (e) {
+          console.log(e)
+        }
+      },
       addEmoji (emoji) {
         this.text += emoji.native
+      },
+      publishComment () {
+        $articleCommentApi.publishComment(this.text, this.articleId).then((result) => {
+          if (result.status === Status.SUCCESS) {
+            this.$message.success('评论发表成功！')
+          } else {
+            this.$message.error('评论发表失败！')
+          }
+        }).catch(() => {
+          this.$message.error('评论发表失败！')
+        })
       }
     }
   }
@@ -147,15 +176,14 @@
     }
 
     .more {
-        margin-top: -5px;
-        z-index: 99;
+        margin-top: -8px;
+        z-index: 9;
         position: absolute;
         width: 100%;
         padding-right: 8px;
     }
 
     .expression {
-        /*font-weight: 700;*/
         color: #18ADED;
     }
 
@@ -170,6 +198,11 @@
     .text-area {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     }
+
+    .expression-card {
+        overflow: hidden;
+    }
+
 </style>
 <style>
     .v-textarea.v-text-field--box.v-text-field--single-line .v-text-field__prefix, .v-textarea.v-text-field--enclosed.v-text-field--single-line .v-text-field__prefix, .v-textarea.v-text-field--box.v-text-field--single-line textarea, .v-textarea.v-text-field--enclosed.v-text-field--single-line textarea {

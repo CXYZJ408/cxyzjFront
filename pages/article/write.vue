@@ -833,6 +833,7 @@
 </script>
 
 <style scoped>
+    @import "~/assets/style/markdown.css";
     input {
         background: white;
         width: 100%;
@@ -979,7 +980,7 @@
     }
 </style>
 <style>
-    @import "~/assets/style/markdown.css";
+
 
 
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <v-layout pt-2>
+    <v-layout>
         <v-flex md1 class="text-md-center">
             <v-avatar size="60">
                 <img :src="user.head_url" alt="">
@@ -30,8 +30,8 @@
                 </v-flex>
                 <v-flex md1 class="grey--text">
                     <a>
-                        <v-icon :color="commentReply.is_obj?'red':'grey'">iconfont icon-object</v-icon>
-                        <span :class="{'red--text':commentReply.is_obj}">踩</span>
+                        <v-icon :color="commentReply.is_obj?'grey darken-3':'grey'">iconfont icon-object</v-icon>
+                        <span :class="{'grey--text text--darken-3':commentReply.is_obj}">踩</span>
                     </a>
                 </v-flex>
                 <v-spacer></v-spacer>
