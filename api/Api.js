@@ -76,10 +76,10 @@ export class Api {
     return result
   }
 
-  async judgeSend (send) {
+  judgeSend (send) {
     if (this.apply && send) {
       console.log('发送')
-      return await new Promise(resolve => resolve(this.send()))
+      return new Promise(resolve => resolve(this.send()))
     } else {
       console.log('不发送')
       return this
