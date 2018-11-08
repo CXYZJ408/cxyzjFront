@@ -193,7 +193,7 @@
         console.log(index)
         this.page.is_end = false
         let labelId = undefined
-        this.handleTimer(true)//关闭所有计时器
+        this.handleTimer(true, 'changeTabs')//关闭所有计时器
         if (index !== -1) {
           labelId = this.userLabels[index].label_id
         }
@@ -208,6 +208,7 @@
       handleTimer (stop, index) {
         console.log(index)
         if (stop) {
+          console.log('关闭所有计时器', index)
           //关闭所有计时器
           for (let i = 0; i < this.state.length; i++) {
             //关闭所有的计时器
@@ -269,7 +270,7 @@
             })
           }, 500)
         } else {
-          this.handleTimer(true)
+          this.handleTimer(true, 'getArticleList')
           console.log('没有了')
           if (_.isFunction(callback)) {
             console.log('回调')
@@ -426,6 +427,7 @@
         overflow-y: auto;
         overflow-x: auto;
     }
+
     #myIndex #main {
         border-radius: 15px;
     }

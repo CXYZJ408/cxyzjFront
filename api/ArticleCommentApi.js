@@ -38,5 +38,11 @@ export class ArticleCommentApi extends Api {
     return super.judgeSend(send)
   }
 
+  getHotCommentList (articleId, send = true) {
+    let url = `${ArticleComment}/${articleId}/hot`
+    super.pushRequest = new Request(requestMethods.GET, url, this.getHotCommentList)
+    return super.judgeSend(send)
+  }
+
   //TODO 完善未写的API
 }

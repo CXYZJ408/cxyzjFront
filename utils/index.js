@@ -1,4 +1,5 @@
 // 解析请求头cookie的指定name值
+let _ = require('lodash')
 export const parseCookieByName = (cookie, name) => {
   if (!cookie || !name) return ''
   let pattern = new RegExp(`(?:^|\\s)${name}=([^;]*)(?:;|$)`)
@@ -21,6 +22,9 @@ export function dataURLtoFile (dataUrl, filename) {//base64转file
 }
 
 export function transformTime (time) {
+  if (_.isString(time)) {
+    time = parseInt(time)
+  }
   let date = new Date(time)
   let Y = date.getFullYear() + '.'
   let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '.'
@@ -63,9 +67,9 @@ export function guid () {
   return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
 }
 
-export function words(text) {
+export function words (text) {
   //用word方式计算正文字数
-  let str =text
+  let str = text
   str = str.replace(/(\r\n+|\s+|　+)/g, '龘')
   str = str.replace(/[\x00-\xff]/g, 'm')
   str = str.replace(/m+/g, '*')

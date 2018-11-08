@@ -1,5 +1,5 @@
 <template>
-    <v-layout wrap row>
+    <v-layout wrap row ref="list">
         <v-flex md12 class="text-md-center mt-2">
             <span class="list-title">评论</span>
         </v-flex>
@@ -61,16 +61,31 @@
                 </v-card>
             </div>
         </v-flex>
+        <v-flex md12 class="mt-5 " v-if="hotCommentList&&hotCommentList.length>0">
+            <v-layout wrap row>
+                <v-flex md12 class="text-md-left">
+                    <span class="font-4">热门评论（{{hotCommentList.length}}）</span>
+                </v-flex>
+                <v-flex md12 class="pt-2">
+                    <hr class="hr" style="border-color: #E8EBEE">
+                </v-flex>
+                <v-flex md12 v-for="(item,index) in hotCommentList" :key="index">
+                    <comment :comment="item.comment" :discusser="item.discusser" :children="item.children"></comment>
+                    <hr class="hr mt-4 mb-3" style="border-color: #E8EBEE">
+                </v-flex>
+            </v-layout>
+        </v-flex>
         <v-flex md12 class="mt-5 ">
             <v-layout wrap row>
                 <v-flex md12 class="text-md-left">
-                    <span class="font-4">热门评论（3）</span>
+                    <span class="font-4">评论（{{commentList.length}}）</span>
                 </v-flex>
                 <v-flex md12 class="pt-2">
                     <hr class="hr" style="border-color: #E8EBEE">
                 </v-flex>
                 <v-flex md12 v-for="(item,index) in commentList" :key="index">
-                    <comment :comment="item.comment" :discusser="item.discusser"></comment>
+                    <comment :comment="item.comment" :discusser="item.discusser" :children="item.children"></comment>
+                    <hr v-if="index!==commentList.length-1" class="hr mt-4 mb-3" style="border-color: #E8EBEE">
                 </v-flex>
             </v-layout>
         </v-flex>
@@ -99,34 +114,11 @@
         menu: false,
         text: '',
         height: 0,
-        commentList: [
-          {
-            comment: {
-              comment_id: 'xx',
-              text: '之前有段时间也在研究nginx 并在闲置的本地服务器结合docker启了个nginx服务器',
-              create_time: 1541146487579,
-              support: 0,
-              allow_support: false,
-              allow_obj: false,
-              is_support: false,
-              is_obj: true,
-              allow_delete: true,
-              level: 1,
-              children: 0
-            },
-            discusser: {
-              user_id: '495292298867769344',
-              nickname: 'yaser',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              role: 'user',
-              introduce: '北美码工，微信公众号ninechapter。互联网时代，科技界界的一切也在随着浪潮加速改变，Google的崛起，Facebook的逆袭……在这样飞速改变和发展的环境下，昔日的业界霸主，如果不谙世事，用不了多久，就会被后来者所取代。',
-              gender: 1,
-              is_followed: false,
-              attention: 11,
-              fans: 1
-            }
-          }
-        ]
+        commentList: [],
+        page: {'is_end': false, 'page_num': -1},
+        timer: '',
+        loading: false,
+        hotCommentList: [],
       }
     },
     beforeDestroy () {
@@ -135,10 +127,54 @@
     mounted () {
       $articleCommentApi = new ArticleCommentApi(this.$store)
       document.addEventListener('click', this.listener)
+      setTimeout(() => {
+        this.onScroll()
+      }, 100)
     },
     methods: {
+      onScroll () {
+        this.timer = setInterval(() => {
+          if (this.page.is_end) {
+            clearInterval(this.timer)
+          } else if (!this.loading) {
+            let current = window.pageYOffset + window.screen.availHeight + 200
+            let element = this.$refs.list
+            const offsetTop = element.getBoundingClientRect().top + window.scrollY
+            if (current > offsetTop + element.offsetHeight) {//预加载
+              console.log('加载')
+              this.loading = true
+              this.getCommentList(this.page.page_num + 1)
+            }
+          }
+        }, 150)
+      },
+      getCommentList (pageNum) {
+        if (_.isEmpty(this.hotCommentList)) {
+          //如果hotCommentList没有获取过
+          $articleCommentApi.getHotCommentList(this.articleId, false).getCommentList(this.articleId, pageNum).then((res) => {
+            let resHotCommentList = res[0]
+            let resCommentList = res[1]
+            if (resHotCommentList.status === Status.SUCCESS) {
+              this.hotCommentList = resHotCommentList.data.hot_list
+
+            }
+            if (resCommentList.status === Status.SUCCESS) {
+              this.page = resCommentList.data.page
+              this.commentList = _.union(this.commentList, resCommentList.data.list)
+            }
+            this.loading = false
+          })
+        } else {
+          $articleCommentApi.getCommentList(this.articleId, pageNum).then((res) => {
+            if (res.status === Status.SUCCESS) {
+              this.loading = false
+              this.page = res.data.page
+              this.commentList = _.union(this.commentList, res.data.list)
+            }
+          })
+        }
+      },
       listener (e) {
-        console.log('listener')
         try {
           this.height = (this.$refs.textArea.contains(e.target) || this.$refs.expression.contains(e.target)) ? 40 : 0
         } catch (e) {
@@ -149,15 +185,23 @@
         this.text += emoji.native
       },
       publishComment () {
-        $articleCommentApi.publishComment(this.text, this.articleId).then((result) => {
-          if (result.status === Status.SUCCESS) {
-            this.$message.success('评论发表成功！')
-          } else {
+        //评论发布检查
+        if (this.text.length <= 5) {
+          this.$message.warning('评论不要少于5个字。。。。')
+        } else {
+          $articleCommentApi.publishComment(this.text, this.articleId).then((result) => {
+            if (result.status === Status.SUCCESS) {
+              this.$message.success('评论发表成功！')
+              this.commentList.unshift(result.data.list)
+
+              this.text = ''
+            } else {
+              this.$message.error('评论发表失败！')
+            }
+          }).catch(() => {
             this.$message.error('评论发表失败！')
-          }
-        }).catch(() => {
-          this.$message.error('评论发表失败！')
-        })
+          })
+        }
       }
     }
   }

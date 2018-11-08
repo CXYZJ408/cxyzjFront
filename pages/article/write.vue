@@ -831,9 +831,11 @@
   }
 
 </script>
-
-<style scoped>
+<style>
     @import "~/assets/style/markdown.css";
+
+</style>
+<style scoped>
     input {
         background: white;
         width: 100%;
@@ -978,9 +980,4 @@
         overflow-y: hidden;
         overflow-x: hidden;
     }
-</style>
-<style>
-
-
-
 </style>

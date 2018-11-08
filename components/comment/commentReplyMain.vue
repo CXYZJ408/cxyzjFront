@@ -1,5 +1,5 @@
 <template>
-    <v-layout>
+    <v-layout @mouseenter="show=true" @mouseleave="show=false">
         <v-flex md1 class="text-md-center">
             <v-avatar size="60">
                 <img :src="user.head_url" alt="">
@@ -23,22 +23,30 @@
                 </v-flex>
                 <v-flex md1 class="grey--text">
                     <a>
-                        <v-icon>iconfont icon-fab</v-icon>
-                        <span class="grey--text text--darken-1 font-1" v-if="commentReply.support===0">赞</span>
-                        <span v-else>{{commentReply.support}}</span>
+                        <v-icon size="22">iconfont icon-fab</v-icon>
+                        <span class="grey--text text--darken-1 font-2" v-if="commentReply.support===0">赞</span>
+                        <span class="font-2" v-else>{{commentReply.support}}</span>
                     </a>
                 </v-flex>
                 <v-flex md1 class="grey--text">
                     <a>
-                        <v-icon :color="commentReply.is_obj?'grey darken-3':'grey'">iconfont icon-object</v-icon>
-                        <span :class="{'grey--text text--darken-3':commentReply.is_obj}">踩</span>
+                        <v-icon size="22" :color="commentReply.is_obj?'grey darken-3':'grey'">iconfont icon-object</v-icon>
+                        <span class="grey--text font-2" :class="{'grey--text text--darken-3':commentReply.is_obj}">踩</span>
                     </a>
+                </v-flex>
+                <v-flex md1 v-if="commentReply.allow_delete">
+                    <transition name="fade">
+                        <a v-show="show">
+                            <v-icon size="22">iconfont icon-delete</v-icon>
+                            <span class="grey--text font-2">删除</span>
+                        </a>
+                    </transition>
                 </v-flex>
                 <v-spacer></v-spacer>
                 <v-flex md1 class=" text-md-right">
                     <a>
-                        <v-icon size="15">iconfont icon-reply1</v-icon>
-                        <span class="grey--text text--darken-1 font-1">回复</span>
+                        <v-icon size="22">iconfont icon-reply1</v-icon>
+                        <span class="grey--text text--darken-1 font-2">回复</span>
                     </a>
                 </v-flex>
             </v-layout>
@@ -68,7 +76,8 @@
     },
     data: function () {
       return {
-        createTime: ''
+        createTime: '',
+        show: false
       }
     }
   }
