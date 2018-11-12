@@ -5,7 +5,8 @@ export const state = () => ({
   articleList: [],
   page: {},
   articleLabel: {},//写文章时选择的文章标签信息
-  publishedArticle: {}
+  publishedArticle: {},
+  article: {}//当前文章信息
 })
 
 export const mutations = {
@@ -16,7 +17,16 @@ export const mutations = {
   setArticleLabel (state, label) {
     state.articleLabel = label
   },
+  setArticle (state, article) {
+    state.article = article
+  },
+  addArticleComments (state) {
+    state.article.comments++
+  },
   setPublishedArticle (state, publishedArticle) {
     state.publishedArticle = publishedArticle
+  },
+  setArticleId (state, articleId) {
+    state.articleId = articleId
   }
 }

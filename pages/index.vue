@@ -234,7 +234,7 @@
         })
 
       },
-      onScroll () {
+      loadCommentList () {
         let offsetTop = window.pageYOffset
         let element = this.$refs.swiper
         let top = element.offsetHeight

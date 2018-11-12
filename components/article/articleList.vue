@@ -78,14 +78,14 @@
         console.log('计时器状态改变', this.state)
         if (this.state === 1) {
           //启动计时器
-          this.onScroll()
+          this.loadCommentList()
         } else {
           //停止计时器
           clearInterval(this.timer)
           this.loading = false
         }
       },
-      onScroll () {
+      loadCommentList () {
         this.timer = setInterval(() => {
           if (!this.loading && this.state === 1) {
             let current = window.pageYOffset + window.screen.availHeight + 200
@@ -133,7 +133,7 @@
     mounted () {
       setTimeout(//防止页面还没渲染完成就执行
         () => {
-          this.onScroll()
+          this.loadCommentList()
         }, 100)
     }
 

@@ -1,5 +1,5 @@
 <template>
-    <v-container grid-list-md wrap class="clearPadding" v-scroll="onScroll">
+    <v-container grid-list-md wrap class="clearPadding">
         <v-layout row wrap style="height:63px ">
             <toolbar :font_size=28 :icon_size=28 :none=true></toolbar>
         </v-layout>
@@ -21,7 +21,7 @@
                         </articleContent>
                     </v-flex>
                     <v-flex md12 class="pb-5">
-                        <commentList :articleId="article.article_id"></commentList>
+                        <commentList></commentList>
                     </v-flex>
                 </v-layout>
             </v-flex>
@@ -43,7 +43,6 @@
   import {mavonEditor} from 'mavon-editor'
   import {ArticleApi} from '../../api/ArticleApi'
   import $status from '~/utils/status'
-  import {HappyScroll} from 'vue-happy-scroll'
   import 'vue-happy-scroll/docs/happy-scroll.css'
   import tocbot from 'tocbot'
   import {words} from '../../utils'
@@ -53,14 +52,12 @@
   export default {
     name: 'index',
     components: {
-      articleContent, HappyScroll, commentList
+      articleContent, commentList
     },
     mounted () {
       this.generateArticle(this)
-      // this.generateCatalog(this)
       this.rendered()
       this.$store.commit('setBackground', 'white')
-
     },
 
     computed: {},
@@ -79,12 +76,13 @@
       let id = params.articleId
       return $articleApi.getArticle(id).then(res => {
         if (res.status === $status.SUCCESS) {
+          store.commit('article/setArticle', res.data.article)
           return {article: res.data.article, user: res.data.user, label: res.data.label}
         }
       })
     },
     methods: {
-      onScroll () {
+      loadCommentList () {
         let currentTop = window.pageYOffset
         let element = this.$refs.articleContent
         let bottom = element.offsetTop + element.offsetHeight - window.screen.availHeight

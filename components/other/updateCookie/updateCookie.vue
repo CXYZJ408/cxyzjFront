@@ -4,7 +4,6 @@
 
 <script>
   let $cookie
-  import {setInterval} from '../../../utils'
 
   export default {
     mounted () {
@@ -16,7 +15,7 @@
       startToWatchToken () {
         setInterval(() => {
           this.handleTokenExpired()
-        }, 1000)
+        }, 5000)
       },
       handleTokenExpired () {
         if (this.$store.state.tokenExpired) {

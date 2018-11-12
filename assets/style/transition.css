@@ -52,7 +52,7 @@
 }
 
 .fade {
-    transition: opacity .3s ease-out;
+    transition: opacity .5s ease-out;
 }
 
 .fade-enter-active, .fade-leave-active {

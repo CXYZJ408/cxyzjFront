@@ -1,17 +1,27 @@
 <template>
     <v-layout row wrap pt-2>
         <v-flex md12>
-            <commentReplyMain :commentReply="comment" :user="discusser"></commentReplyMain>
+            <!--评论-->
+            <commentTemplate :comment="comment" :user="discusser" :commentIndex="commentIndex"></commentTemplate>
         </v-flex>
         <v-flex md11 offset-md1 v-if="comment.children>0">
             <v-card color="#F8F9F9" tile flat class="pl-2 py-1 pr-3">
                 <span class="d-inline-block text-md-right grey--text text--lighten-1" style="width: 100%">{{comment.children}}条回复</span>
-                <commentReplyMain v-for="(child,index) in children" :commentReply="child.reply" :user="child.replier" :key="index" :isReply="true"></commentReplyMain>
+                <!--回复-->
+                <template v-for="(child,index) in children">
+                    <replyTemplate :commentReply="child.reply"
+                                   :commentIndex="commentIndex"
+                                   :user="child.replier" :isReply="true"></replyTemplate>
+                    <hr v-if="index!==children.length-1" class="hr-dash my-1"
+                        style="border-color: #EFEFEF!important;">
+                </template>
+
                 <div class="text-md-center">
                     <el-pagination
                             background
                             layout="prev, pager, next"
-                            :total="1000">
+                            :page-size="5"
+                            :total="comment.children">
                     </el-pagination>
                 </div>
             </v-card>
@@ -20,7 +30,8 @@
 </template>
 
 <script>
-  import commentReplyMain from '~/components/comment/commentReplyMain.vue'
+  import commentTemplate from '~/components/comment/commentTemplate.vue'
+  import replyTemplate from '~/components/comment/replyTemplate.vue'
 
   export default {
     name: 'comment',
@@ -33,10 +44,18 @@
       },
       children: {
         type: Array
+      },
+      commentIndex: {
+        type: Number
       }
     },
     components: {
-      commentReplyMain
+      commentTemplate, replyTemplate
+    },
+    computed: {
+      total: function () {
+        return this.comment.children / 5
+      }
     },
     data: function () {
       return {

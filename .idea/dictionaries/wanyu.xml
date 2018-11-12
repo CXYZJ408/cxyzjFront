@@ -9,6 +9,7 @@
       <w>nuxt</w>
       <w>onload</w>
       <w>onresize</w>
+      <w>unshift</w>
       <w>vuetify</w>
     </words>
   </dictionary>

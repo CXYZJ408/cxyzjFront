@@ -22,7 +22,14 @@ export class ArticleCommentApi extends Api {
 
   publishReply (commentId, text, discusserId, articleId, send = true) {
     let url = `${ArticleReply}/publish`
-    super.pushRequest = new Request(requestMethods.POST, url, this.publishReply)
+    let params = {
+      comment_id: commentId,
+      text: text,
+      discusser_id: discusserId,
+      article_id: articleId
+    }
+    console.log('url-----', url)
+    super.pushRequest = new Request(requestMethods.POST, url, this.publishReply, params)
     return super.judgeSend(send)
   }
 
@@ -44,5 +51,16 @@ export class ArticleCommentApi extends Api {
     return super.judgeSend(send)
   }
 
-  //TODO 完善未写的API
+  deleteCommentReply (commentId, replyId, targetId, send = true) {
+    let url = `${ArticleComment}`
+    let params = {
+      target_id: targetId,
+      comment_id: commentId
+    }
+    if (!_.isNull(replyId)) {
+      params.reply_id = replyId
+    }
+    super.pushRequest = new Request(requestMethods.DELETE, url, this.deleteCommentReply, params)
+    return super.judgeSend(send)
+  }
 }
