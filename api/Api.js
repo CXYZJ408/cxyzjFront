@@ -143,7 +143,6 @@ function pushData (results, request, returnType) {//打包数据
       responseData[request[i].name] = results[i].data
     }
   }
-  console.log(responseData)
   return responseData
 }
 

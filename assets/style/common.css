@@ -90,12 +90,15 @@ a {
 .font-9 {
     font-size: 30px;
 }
+
 .font-10 {
     font-size: 35px;
 }
-:focus{
+
+:focus {
     outline: unset;
 }
+
 body {
     padding: 0 !important;
     margin: 0 !important;
@@ -168,4 +171,11 @@ body {
 
 .v-tabs__div {
     text-transform: none;
+}
+
+.v-text-field__prefix {
+    width: auto !important;
+}
+.v-textarea textarea{
+    width: auto !important;
 }

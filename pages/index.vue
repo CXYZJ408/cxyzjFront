@@ -1,6 +1,6 @@
 <template xmlns:v-swiper="http://www.w3.org/1999/xhtml">
     <div id="myIndex">
-        <v-container v-scroll="onScroll" grid-list-md class="clearPadding mb-5">
+        <v-container v-scroll="loadArticleList" grid-list-md class="clearPadding mb-5">
             <v-layout row wrap>
                 <toolbar :font_size=28 :icon_size=28 :index=true></toolbar>
             </v-layout>
@@ -234,7 +234,7 @@
         })
 
       },
-      loadCommentList () {
+      loadArticleList () {
         let offsetTop = window.pageYOffset
         let element = this.$refs.swiper
         let top = element.offsetHeight

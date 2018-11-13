@@ -5,15 +5,14 @@ export const state = () => ({
   commentList: [],
   page: {'is_end': false, 'page_num': -1},
   hotCommentList: [],
-
 })
 
 export const mutations = {
 
-  unionCommentList (state, commentList) {
-    state.commentList = _.union(state.commentList, commentList)
+  setCommentList (state, commentList) {
+    state.commentList = commentList
   },
-  unshiftCommentList (state, commentList) {
+  publishComment (state, commentList) {
     state.commentList.unshift(commentList)
   },
   setPage (state, page) {
@@ -24,7 +23,11 @@ export const mutations = {
       state.commentList[data.index].children = []
     }
     state.commentList[data.index].comment.children++
-    state.commentList[data.index].children.unshift(data.replyList)
+    state.commentList[data.index].children.push(data.replyList)
+  },
+  unionReplyList (state, data) {
+    console.log(data)
+    state.commentList[data.index].children = _.union(state.commentList[data.index].children, data.replyList)
   },
   setHotCommentList (state, hotCommentList) {
     state.hotCommentList = hotCommentList

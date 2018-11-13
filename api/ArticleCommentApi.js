@@ -39,8 +39,8 @@ export class ArticleCommentApi extends Api {
     return super.judgeSend(send)
   }
 
-  getReplyList (commentId, pageNum, send = true) {
-    let url = `${ArticleReply}/${commentId}/${pageNum}`
+  getReplyList (articleId,commentId, pageNum, send = true) {
+    let url = `${ArticleReply}/${articleId}/${commentId}/${pageNum}`
     super.pushRequest = new Request(requestMethods.GET, url, this.getReplyList)
     return super.judgeSend(send)
   }

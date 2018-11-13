@@ -1,5 +1,5 @@
 <template>
-    <v-layout wrap row ref="list">
+    <v-layout wrap row ref="list" id="loading">
         <v-flex md12 class="text-md-center mt-2">
             <span class="list-title">评论</span>
         </v-flex>
@@ -25,14 +25,34 @@
                 <v-flex md12 class="text-md-left">
                     <span class="font-4">评论（{{$store.state.article.article.comments}}）</span>
                 </v-flex>
-                <v-flex md12 class="pt-2">
+                <v-flex md12 class="pt-2" ref="comment_list_top">
                     <hr class="hr" style="border-color: #E8EBEE">
                 </v-flex>
-                <v-flex md12 v-for="(item,index) in $store.state.comment.commentList" :key="index">
-                    <comment :comment="item.comment" :discusser="item.discusser"
-                             :children="item.children" :commentIndex="index"></comment>
-                    <hr v-if="index!==$store.state.comment.commentList.length-1" class="hr mt-4 mb-3"
-                        style="border-color: #E8EBEE">
+                <v-flex md12>
+                    <transition name="fade">
+                        <v-layout wrap row v-if="!loading">
+                            <v-flex md12 v-for="(item,index) in $store.state.comment.commentList"
+                                    :key="index">
+                                <comment :comment="item.comment" :discusser="item.discusser" ref="children"
+                                         :children="item.children" :commentIndex="index"></comment>
+                                <hr v-if="index!==$store.state.comment.commentList.length-1" class="hr mt-3 mb-3"
+                                    style="border-color: #E8E8E8">
+                            </v-flex>
+                        </v-layout>
+                    </transition>
+                    <v-layout align-center justify-center v-if="loading">
+                        <v-flex md2 class="pl-3">
+                            <ball-pulse-loader color="#1890FF" style="margin: 10px auto"></ball-pulse-loader>
+                        </v-flex>
+                    </v-layout>
+                </v-flex>
+                <v-flex md12 class="text-md-center">
+                    <el-pagination
+                            background
+                            @current-change="changePage"
+                            layout="prev, pager, next"
+                            :page-count="$store.state.comment.page.total">
+                    </el-pagination>
                 </v-flex>
             </v-layout>
         </v-flex>
@@ -58,12 +78,9 @@
         loading: false,
       }
     },
-
     mounted () {
       $articleCommentApi = new ArticleCommentApi(this.$store)
-      setTimeout(() => {
-        this.loadCommentList()
-      }, 100)
+      this.observer()
     },
     methods: {
       loadCommentList () {
@@ -83,26 +100,29 @@
         }, 200)
       },
       getCommentList (pageNum) {
+        console.log('getCommentList --------')
         if (_.isEmpty(this.$store.state.comment.hotCommentList)) {
           //如果hotCommentList没有获取过
           $articleCommentApi.getHotCommentList(this.$store.state.article.article.article_id, false).getCommentList(this.$store.state.article.article.article_id, pageNum).then((res) => {
             let resHotCommentList = res[0]
             let resCommentList = res[1]
+            console.log(res)
             if (resHotCommentList.status === Status.SUCCESS) {
               this.$store.commit('comment/setHotCommentList', resHotCommentList.data.hot_list)
             }
             if (resCommentList.status === Status.SUCCESS) {
               this.$store.commit('comment/setPage', resCommentList.data.page)
-              this.$store.commit('comment/unionCommentList', resCommentList.data.list)
+              this.$store.commit('comment/setCommentList', resCommentList.data.list)
             }
             this.loading = false
           })
         } else {
           $articleCommentApi.getCommentList(this.$store.state.article.article.article_id, pageNum).then((res) => {
+            console.log(res)
             if (res.status === Status.SUCCESS) {
               this.loading = false
               this.$store.commit('comment/setPage', res.data.page)
-              this.$store.commit('comment/unionCommentList', res.data.list)
+              this.$store.commit('comment/setCommentList', res.data.list)
             }
           })
         }
@@ -117,7 +137,7 @@
             if (result.status === Status.SUCCESS) {
               this.$message.success('评论发表成功！')
               this.$store.commit('article/addArticleComments')
-              this.$store.commit('comment/unshiftCommentList', result.data.list)
+              this.$store.commit('comment/publishComment', result.data.list)
               text = ''
             } else {
               this.$message.error('评论发表失败！')
@@ -127,8 +147,26 @@
           })
         }
       },
-      test () {
-        console.log('test')
+      observer () {
+        let time = 0
+        let io = new IntersectionObserver(() => {
+          this.loading = true
+          time++
+          if (time === 2) {
+            this.getCommentList(this.$store.state.comment.page.page_num + 1)
+            io.disconnect()
+          }
+        }, {
+          threshold: [0.25]
+        })
+        let element = document.getElementById('loading')
+        io.observe(element)
+      },
+      changePage (page) {
+        //TODO 待完善，添加锚点定位，动画等效果
+        this.loading = true
+        window.scrollTo(0, this.$refs.comment_list_top.offsetTop - 120)
+        this.getCommentList(page - 1)
       }
     }
   }

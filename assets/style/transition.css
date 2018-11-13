@@ -51,12 +51,8 @@
     transition: all .4s ease-in-out;
 }
 
-.fade {
-    transition: opacity .5s ease-out;
-}
-
 .fade-enter-active, .fade-leave-active {
-    transition: opacity .5s;
+    transition: opacity 0.5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
 
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */

@@ -28,13 +28,15 @@ export function transformTime (time) {
   let date = new Date(time)
   let Y = date.getFullYear() + '.'
   let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '.'
-  let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+  let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + '  '
   let h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
   let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
   let s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
   return Y + M + D + h + m + s
 }
-
+export function firstUpperCase(str) {
+  return str.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
+}
 export function setInterval (callback, interval) {
   const now = Date.now
   let startTime = now()

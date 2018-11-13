@@ -8,20 +8,20 @@
         <v-flex md11>
             <v-layout row wrap>
                 <v-flex md5>
-                    <span class="capital font-3">{{user.nickname}}</span>
+                    <span class="capital font-4">{{user.nickname}}</span>
                 </v-flex>
                 <v-flex offset-md4 md3 class="text-md-right">
                     <span class="font-3">{{comment.level}}楼</span>
                 </v-flex>
                 <v-flex md12>
-                    <span class="grey--text text--lighten-1">
+                    <span class="grey--text text--darken-3 font-2">
                     {{createTime}}
                     </span>
                 </v-flex>
                 <v-flex md12 class="pb-2">
                     <p class="clearMargin font-2">{{comment.text}}</p>
                 </v-flex>
-                <v-flex md4 >
+                <v-flex md4>
                     <v-hover class="grey--text">
                         <a slot-scope="{ hover }" @click="support">
                             <v-icon size="22" :class="{'red--text text--darken-2':hover||comment.is_support}">
@@ -33,53 +33,50 @@
                                   v-else>{{comment.support}}</span>
                         </a>
                     </v-hover>
-                    <v-hover class="ml-2 grey--text">
-                        <transition name="fade" slot-scope="{ hover }">
-                            <a v-show="show" @click="reply" ref="replyButton">
-                                <v-icon size="22" :class="{'green--text text--light-1':hover}">iconfont icon-reply1
-                                </v-icon>
-                                <span class="font-2" :class="{'green--text text--light-1':hover}">回复</span>
-                            </a>
-                        </transition>
+                    <v-hover class="ml-3 grey--text">
+                        <a slot-scope="{ hover }" @click="reply">
+                            <v-icon size="22" :class="{'green--text text--light-1':hover}">iconfont icon-reply1
+                            </v-icon>
+                            <span class="font-2" :class="{'green--text text--light-1':hover}">回复</span>
+                        </a>
                     </v-hover>
                 </v-flex>
                 <v-spacer></v-spacer>
                 <v-flex md4 class="text-md-right grey--text">
                     <v-hover v-if="comment.allow_delete">
                         <transition name="fade" slot-scope="{ hover }">
-                            <a v-show="show">
-                                <v-icon size="22" :class="{'blue--text':hover}">iconfont icon-delete1</v-icon>
-                            </a>
+                            <v-tooltip bottom v-show="show">
+                                <a slot="activator">
+                                    <v-icon size="22" :class="{'blue--text':hover}">iconfont icon-delete1</v-icon>
+                                </a>
+                                <span>删除</span>
+                            </v-tooltip>
                         </transition>
                     </v-hover>
-                    <v-hover>
+                    <v-hover class="ml-3">
                         <transition name="fade" slot-scope="{ hover }">
-                            <a v-show="show">
-                                <v-icon size="22" :class="{'orange--text':hover}">iconfont icon-icon_tip_off</v-icon>
-                            </a>
+                            <v-tooltip bottom v-show="show" dark>
+                                <a slot="activator">
+                                    <v-icon size="22" :class="{'orange--text':hover}">iconfont icon-icon_tip_off
+                                    </v-icon>
+                                </a>
+                                <span>举报</span>
+                            </v-tooltip>
                         </transition>
                     </v-hover>
                 </v-flex>
-
-
             </v-layout>
-        </v-flex>
-        <v-flex md12 ref="reply">
-            <transition name="fade">
-                <publishComment v-show="showReply" @publishComment="publishComment" :mode="1"></publishComment>
-            </transition>
         </v-flex>
     </v-layout>
 </template>
 
 <script>
   import {transformTime} from '../../utils'
-  import publishComment from '~/components/comment/publishComment.vue'
   import {ArticleCommentApi} from '../../api/ArticleCommentApi'
 
   let $articleCommentApi
   export default {
-    name: 'commentReply',
+    name: 'commentTemplate',
     props: {
       comment: {
         type: Object
@@ -91,27 +88,22 @@
         type: Number
       }
     },
-    components: {
-      publishComment
-    },
+
     mounted () {
       this.createTime = transformTime(this.comment.create_time)
-      // document.addEventListener('click', this.listener)
       $articleCommentApi = new ArticleCommentApi(this.$store)
     },
     beforeDestroy () {
-      // document.removeEventListener('click', this.listener)
     },
     data: function () {
       return {
         createTime: '',
         show: false,
-        showReply: false
       }
     },
     methods: {
       reply () {
-        this.showReply = true
+        this.$emit('reply',this.user)
       },
       object () {
 
@@ -119,19 +111,7 @@
       support () {
 
       },
-      publishComment (text) {
-        $articleCommentApi.publishReply(this.comment.comment_id, text, this.user.user_id, this.$store.state.article.article.article_id).then(res => {
-          this.$store.commit('article/addArticleComments')
-          let data = {
-            index: this.commentIndex,
-            replyList: res.data.list
-          }
-          this.$message.success('回复发表成功！')
-          this.$store.commit('comment/publishReply', data)
-        }).catch(() => {
-          this.$message.error('回复发表失败！')
-        })
-      }
+
     }
   }
 </script>
