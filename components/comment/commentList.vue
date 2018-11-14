@@ -83,22 +83,6 @@
       this.observer()
     },
     methods: {
-      loadCommentList () {
-        this.timer = setInterval(() => {
-          if (this.$store.state.comment.page.is_end) {
-            clearInterval(this.timer)
-          } else if (!this.loading) {
-            let current = window.pageYOffset + window.screen.availHeight + 200
-            let element = this.$refs.list
-            const offsetTop = element.getBoundingClientRect().top + window.scrollY
-            if (current > offsetTop + element.offsetHeight) {//预加载
-              console.log('加载')
-              this.loading = true
-              this.getCommentList(this.$store.state.comment.page.page_num + 1)
-            }
-          }
-        }, 200)
-      },
       getCommentList (pageNum) {
         console.log('getCommentList --------')
         if (_.isEmpty(this.$store.state.comment.hotCommentList)) {
@@ -127,8 +111,26 @@
           })
         }
       },
-
-      publishComment (text) {
+      debounce (fn, wait) {//防抖技术处理
+        let timer = null
+        return function () {
+          if (timer !== null) clearTimeout(timer)
+          timer = setTimeout(fn, wait)
+        }
+      },
+      handle () {
+        console.log('执行')
+        let currentTop = window.pageYOffset
+        let element = this.$refs.articleContent
+        if (!_.isUndefined(element)) {
+          let bottom = element.offsetTop + element.offsetHeight - window.screen.availHeight
+          this.progress = Math.ceil((currentTop / bottom) * 100)
+        }
+      },
+      onScroll () {
+        window.addEventListener('scroll', this.debounce(this.handle, 150))
+      },
+      publishComment (text, $, callback) {//$表示忽略该参数
         //评论发布检查
         if (text.length <= 5) {
           this.$message.warning('评论不要少于5个字。。。。')
@@ -138,7 +140,7 @@
               this.$message.success('评论发表成功！')
               this.$store.commit('article/addArticleComments')
               this.$store.commit('comment/publishComment', result.data.list)
-              text = ''
+              callback()
             } else {
               this.$message.error('评论发表失败！')
             }

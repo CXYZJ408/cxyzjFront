@@ -50,12 +50,9 @@
       'show': function () {
         this.handleShowCard()
       },
-      'state': function () {
-        this.handleTimer()
-      }
-    },
-    beforeDestroy () {
-      clearInterval(this.timer)//销毁计时器
+      /* 'state': function () {
+         this.handleState()
+       }*/
     },
     props: {
       state: {
@@ -71,25 +68,34 @@
       userLabel: {
         type: Object,
         default: undefined
+      },
+      index: {
+        type: Number
       }
     },
     methods: {
-      handleTimer () {
-        console.log('计时器状态改变', this.state)
+      handleState () {
+        console.log('当前状态改变', this.state)
         if (this.state === 1) {
-          //启动计时器
-          this.loadCommentList()
+          this.handle()
         } else {
-          //停止计时器
-          clearInterval(this.timer)
           this.loading = false
         }
       },
-      loadCommentList () {
-        this.timer = setInterval(() => {
-          if (!this.loading && this.state === 1) {
-            let current = window.pageYOffset + window.screen.availHeight + 200
-            let element = this.$refs.list
+      debounce (fn, wait) {
+        let timeout = null
+        this.event = function () {
+          if (timeout !== null) clearTimeout(timeout)
+          timeout = setTimeout(fn, wait)
+        }
+        return this.event
+      },
+      handle () {
+        console.log('state', this.state, 'index', this.index)
+        if (!this.loading && this.state === 1) {
+          let current = window.pageYOffset + window.screen.availHeight + 200
+          let element = this.$refs.list
+          if (!_.isUndefined(element)) {
             const offsetTop = element.getBoundingClientRect().top + window.scrollY
             if (current > offsetTop + element.offsetHeight) {//预加载
               console.log('加载')
@@ -97,7 +103,10 @@
               this.load()
             }
           }
-        }, 150)
+        }
+      },
+      onScroll () {
+        window.addEventListener('scroll', this.debounce(this.handle, 150))
       },
       load () {
         console.log(this.userLabel)
@@ -127,16 +136,15 @@
         loading: false,
         show: false,
         cardStyle: 'display:none',
-        timer: null
+        event: null
       }
     },
     mounted () {
-      setTimeout(//防止页面还没渲染完成就执行
-        () => {
-          this.loadCommentList()
-        }, 100)
+      this.onScroll()
+    },
+    beforeDestroy () {
+      window.removeEventListener('scroll', this.event)
     }
-
   }
 </script>
 

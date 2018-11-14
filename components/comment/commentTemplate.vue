@@ -46,7 +46,7 @@
                     <v-hover v-if="comment.allow_delete">
                         <transition name="fade" slot-scope="{ hover }">
                             <v-tooltip bottom v-show="show">
-                                <a slot="activator">
+                                <a slot="activator" @click="deleteComment">
                                     <v-icon size="22" :class="{'blue--text':hover}">iconfont icon-delete1</v-icon>
                                 </a>
                                 <span>删除</span>
@@ -73,6 +73,8 @@
 <script>
   import {transformTime} from '../../utils'
   import {ArticleCommentApi} from '../../api/ArticleCommentApi'
+  import {CommentApi} from '../../api/CommentApi'
+  import Status from '../../utils/status'
 
   let $articleCommentApi
   export default {
@@ -102,14 +104,20 @@
       }
     },
     methods: {
-      reply () {
-        this.$emit('reply',this.user)
+      deleteComment () {
+        if (this.comment.allow_delete) {
+          this.$emit('deleteCommentReply',this.commentIndex)
+        }
       },
-      object () {
-
+      reply () {
+        this.$emit('reply', this.user)
       },
       support () {
-
+        if (!this.comment.allow_vote) {
+          this.$emit('support', true, this.commentIndex, this.comment.is_support, this.comment.comment_id)
+        } else {
+          this.$message.warning('您不能给自己投票！')
+        }
       },
 
     }

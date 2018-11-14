@@ -39,7 +39,7 @@ export class ArticleCommentApi extends Api {
     return super.judgeSend(send)
   }
 
-  getReplyList (articleId,commentId, pageNum, send = true) {
+  getReplyList (articleId, commentId, pageNum, send = true) {
     let url = `${ArticleReply}/${articleId}/${commentId}/${pageNum}`
     super.pushRequest = new Request(requestMethods.GET, url, this.getReplyList)
     return super.judgeSend(send)
@@ -51,10 +51,10 @@ export class ArticleCommentApi extends Api {
     return super.judgeSend(send)
   }
 
-  deleteCommentReply (commentId, replyId, targetId, send = true) {
+  deleteCommentReply (commentId, replyId, article_id, send = true) {
     let url = `${ArticleComment}`
     let params = {
-      target_id: targetId,
+      article_id: article_id,
       comment_id: commentId
     }
     if (!_.isNull(replyId)) {

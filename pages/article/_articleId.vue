@@ -49,6 +49,7 @@
 
   let $katex = require('@iktakahiro/markdown-it-katex')
   let $hljs = require('markdown-it-highlightjs')
+  let _ = require('lodash')
   export default {
     name: 'index',
     components: {
@@ -57,10 +58,12 @@
     mounted () {
       this.generateArticle(this)
       this.rendered()
+      this.onScroll()
       this.$store.commit('setBackground', 'white')
     },
-
-    computed: {},
+    beforeDestroy () {
+      window.removeEventListener('scroll', this.event)
+    },
     data: function () {
       return {
         catalogs: [],
@@ -68,7 +71,8 @@
         words: 0,
         images: [],
         progress: 0,
-        currentIndex: 0
+        currentIndex: 0,
+        event: null
       }
     },
     asyncData ({params, store}) {
@@ -82,11 +86,24 @@
       })
     },
     methods: {
-      loadCommentList () {
+      debounce (fn, wait) {//防抖技术处理
+        let timer = null
+        this.event = function () {
+          if (timer !== null) clearTimeout(timer)
+          timer = setTimeout(fn, wait)
+        }
+        return this.event
+      },
+      handle () {
         let currentTop = window.pageYOffset
         let element = this.$refs.articleContent
-        let bottom = element.offsetTop + element.offsetHeight - window.screen.availHeight
-        this.progress = Math.ceil((currentTop / bottom) * 100)
+        if (!_.isUndefined(element)) {
+          let bottom = element.offsetTop + element.offsetHeight - window.screen.availHeight
+          this.progress = Math.ceil((currentTop / bottom) * 100)
+        }
+      },
+      onScroll () {
+        window.addEventListener('scroll', this.debounce(this.handle, 150))
       },
       generateArticle ($vm) {
         let marked = mavonEditor.getMarkdownIt()

@@ -86,7 +86,6 @@
       },
       mouseOver () {
         this.show = true
-
         setTimeout(() => {
           if (this.show) {
             this.$store.commit('userCard/needToFlush', this.user.user_id)

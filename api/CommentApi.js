@@ -9,15 +9,15 @@ export class CommentApi extends Api {
     super(store)
   }
 
-  supportCommentReply (commentId, replyId, targetId, send = true) {
+  supportCommentReply (isComment, commentReplyId, targetId, send = true) {
     let url = `${Comment}/support`
     let params = {
       target_id: targetId
     }
-    if (_.isNull(commentId)) {
-      params.reply_id = replyId
+    if (!isComment) {
+      params.reply_id = commentReplyId
     } else {
-      params.comment_id = commentId
+      params.comment_id = commentReplyId
     }
     super.pushRequest = new Request(requestMethods.POST, url, this.supportCommentReply, params)
     return super.judgeSend(send)
@@ -37,33 +37,32 @@ export class CommentApi extends Api {
     return super.judgeSend(send)
   }
 
-  cancelObjectCommentReply (commentId, replyId, targetId, send = true) {
+  cancelObjectCommentReply (isComment, commentReplyId, targetId, send = true) {
     let url = `${Comment}/object`
     let params = {
       target_id: targetId
     }
-    if (_.isNull(commentId)) {
-      params.reply_id = replyId
+    if (!isComment) {
+      params.reply_id = commentReplyId
     } else {
-      params.comment_id = commentId
+      params.comment_id = commentReplyId
     }
     super.pushRequest = new Request(requestMethods.DELETE, url, this.cancelObjectCommentReply, params)
     return super.judgeSend(send)
   }
 
-  cancelSupportCommentReply (commentId, replyId, targetId, send = true) {
+  cancelSupportCommentReply (isComment, commentReplyId, targetId, send = true) {
     let url = `${Comment}/support`
     let params = {
       target_id: targetId
     }
-    if (_.isNull(commentId)) {
-      params.reply_id = replyId
+    if (!isComment) {
+      params.reply_id = commentReplyId
     } else {
-      params.comment_id = commentId
+      params.comment_id = commentReplyId
     }
     super.pushRequest = new Request(requestMethods.DELETE, url, this.cancelSupportCommentReply, params)
     return super.judgeSend(send)
   }
-
 
 }

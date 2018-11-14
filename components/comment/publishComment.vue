@@ -29,10 +29,10 @@
                 </v-layout>
             </v-card>
         </v-flex>
-        <v-flex md12 class="" ref="expression" style="position: relative">
+        <v-flex md12 ref="expression" style="position: relative">
             <div class="more " :class="{'mode':mode===0}">
                 <v-card :height="height" color="#F8F9F9" tile flat class="expression-card">
-                    <v-layout row wrap justify-center class="clearMargin clearPadding">
+                    <v-layout row wrap justify-center class="clearMargin clearPadding" v-if="height>0">
                         <v-flex :class="{'md3':mode!==0,'md2 offset-md1':mode===0}">
                             <v-menu
                                     v-model="menu"
@@ -40,18 +40,21 @@
                                     :nudge-width="200"
                                     offset-y
                                     lazy
+
                             >
                                 <template slot="activator">
-                                    <v-icon size="30" class="expression">
-                                        iconfont icon-expression
-                                    </v-icon>
-                                    <span class="expression pl-1">表情</span>
+                                    <span @click="show">
+                                        <v-icon size="30" class="expression">
+                                            iconfont icon-expression
+                                        </v-icon>
+                                        <span class="expression pl-1">表情</span>
+                                    </span>
                                 </template>
-                                <!--<v-card>
+                                <v-card v-if="menu">
                                     <no-ssr>
                                         <picker :infiniteScroll="false" @select="addEmoji"></picker>
                                     </no-ssr>
-                                </v-card>-->
+                                </v-card>
                             </v-menu>
                         </v-flex>
                         <v-flex md8 class="text-md-right ">
@@ -121,7 +124,10 @@
         }
       },
       publishComment () {
-        this.$emit('publishComment', this.text, this.replyUser)
+        this.$emit('publishComment', this.text, this.replyUser,()=>{
+          console.log('执行回调')
+          this.text=''
+        })
 
       },
       addEmoji (emoji) {

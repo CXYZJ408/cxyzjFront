@@ -9,7 +9,8 @@
                     </span>
                 </v-flex>
                 <v-flex md12 class="py-2">
-                    <p class="clearMargin font-2"><a href="" class=" ml-1 capital">@{{reply.discusser_nickname}}：</a>{{reply.text}}</p>
+                    <p class="clearMargin font-2"><a href="" class=" ml-1 capital">@{{reply.discusser_nickname}}：</a>{{reply.text}}
+                    </p>
                 </v-flex>
                 <v-flex md4>
                     <v-hover class="grey--text">
@@ -36,7 +37,7 @@
                     <v-hover v-if="reply.allow_delete">
                         <transition name="fade" slot-scope="{ hover }">
                             <v-tooltip bottom v-show="show">
-                                <a slot="activator">
+                                <a slot="activator" @click="deleteReply">
                                     <v-icon size="22" :class="{'blue--text':hover}">iconfont icon-delete1</v-icon>
                                 </a>
                                 <span>删除</span>
@@ -76,6 +77,9 @@
       },
       commentIndex: {
         type: Number
+      },
+      replyIndex: {
+        type: Number
       }
     },
     mounted () {
@@ -92,13 +96,23 @@
     },
     methods: {
       replyComment () {
-        this.$emit('reply',this.user)
+        this.$emit('reply', this.user)
       },
       object () {
 
       },
-      support () {
+      deleteReply () {
+        if (this.reply.allow_delete) {
+          this.$emit('deleteCommentReply', this.commentIndex, this.replyIndex)
+        }
 
+      },
+      support () {
+        if (!this.reply.allow_vote) {
+          this.$emit('support', false, this.commentIndex, this.reply.is_support, this.reply.reply_id, this.replyIndex)
+        } else {
+          this.$message.warning('您不能给自己投票！')
+        }
       },
 
     }

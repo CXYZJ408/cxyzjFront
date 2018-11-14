@@ -4,9 +4,23 @@
             <v-layout wrap row>
                 <v-flex md12>
                     <v-card class="user-card" flat tile height="130" style="background-color: inherit!important;">
-                        <v-btn flat icon @click="expand" class="user-menu">
-                            <v-icon color="grey">menu</v-icon>
-                        </v-btn>
+                        <v-menu open-on-hover bottom
+                                transition="scale-transition"
+                                class="user-menu">
+                            <v-btn flat icon slot="activator">
+                                <v-icon color="grey">menu</v-icon>
+                            </v-btn>
+                            <v-list dark subheader dense>
+                                <v-list-tile @click="expand">
+                                        <v-list-tile-title>收起</v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile>
+                                        <v-list-tile-title>
+                                            <nuxt-link to="/" style="color:white">返回首页</nuxt-link>
+                                        </v-list-tile-title>
+                                </v-list-tile>
+                            </v-list>
+                        </v-menu>
                         <v-layout wrap row justify-center class="text-md-center">
                             <v-flex md12 class="pt-2">
                                 <v-avatar size="75">
@@ -110,9 +124,23 @@
             </div>
         </div>
         <div class="write-left2" v-show="showNonList" :style="{'width':widthLeft2+'px'}">
-            <v-btn flat icon @click="expand" class="user-menu ">
-                <v-icon color="grey">menu</v-icon>
-            </v-btn>
+            <v-menu open-on-hover bottom
+                    transition="scale-transition"
+            >
+                <v-btn flat icon slot="activator">
+                    <v-icon color="grey">menu</v-icon>
+                </v-btn>
+                <v-list dark subheader dense>
+                    <v-list-tile @click="expand">
+                        <v-list-tile-title>展开</v-list-tile-title>
+                    </v-list-tile>
+                    <v-list-tile >
+                        <v-list-tile-title>
+                            <nuxt-link to="/" style="color:white">返回首页</nuxt-link>
+                        </v-list-tile-title>
+                    </v-list-tile>
+                </v-list>
+            </v-menu>
         </div>
         <div :style="{'width':editorWidth+'px','transition': `all ${time}s ease-in`}">
             <v-layout class="white">
@@ -293,7 +321,6 @@
     mounted () {
       this.setScreen()//设置页面，同时监听窗口变化
       this.getArticleList().then(() => {//向后台请求数据
-        console.log('initDB')
         this.initDB().then(() => {
           this.save(true)//存储
           setTimeout(() => {
@@ -314,7 +341,6 @@
     },
     methods: {
       trash () {
-        console.log(1)
         this.article.title = '未命名...'
       },
       $imgAdd (pos, $file) {
@@ -833,7 +859,9 @@
 </script>
 <style>
     @import "~/assets/style/markdown.css";
-
+    .v-menu__content{
+        z-index: 9999!important;
+    }
 </style>
 <style scoped>
     input {

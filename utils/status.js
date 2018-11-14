@@ -19,5 +19,8 @@ const Status = {
   OUT_OF_TIME: 119,//验证过期
   USER_HAS_FOLLOWED: 120,  //用户已关注
   USER_NOT_FOLLOWED: 121,//该用户未关注
+  COMMENT_HAS_DELETE: 124,//评论已删除
+  USER_HAS_SUPPORT_OR_OBJECT: 125,//已支持或者已反对
+  USER_NOT_SUPPORT_OR_OBJECT:126,//未支持或者未反对
 }
 export default Status

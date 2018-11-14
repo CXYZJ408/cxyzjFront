@@ -23,6 +23,9 @@ export const mutations = {
   addArticleComments (state) {
     state.article.comments++
   },
+  setArticleComments (state, comments) {
+    state.article.comments = comments
+  },
   setPublishedArticle (state, publishedArticle) {
     state.publishedArticle = publishedArticle
   },

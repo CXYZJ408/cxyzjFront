@@ -2,7 +2,8 @@
     <v-layout row wrap pt-2>
         <v-flex md12>
             <!--评论-->
-            <commentTemplate @reply="reply" :comment="comment" :user="discusser"
+            <commentTemplate @reply="reply" @support="support" @deleteCommentReply="deleteCommentReply"
+                             :comment="comment" :user="discusser"
                              :commentIndex="commentIndex"></commentTemplate>
         </v-flex>
         <v-flex md11 offset-md1 v-if="comment.children>0">
@@ -12,8 +13,9 @@
                     <span class="d-inline-block text-md-right grey--text text--lighten-1 font-3 pt-1"
                           style="width: 100%">{{comment.children}}条回复</span>
                     <template v-for="(child,index) in children">
-                        <replyTemplate :reply="child.reply" @reply="reply"
-                                       :commentIndex="commentIndex"
+                        <replyTemplate :reply="child.reply" @reply="reply" @support="support"
+                                       @deleteCommentReply="deleteCommentReply"
+                                       :commentIndex="commentIndex" :replyIndex="index"
                                        :user="child.replier"></replyTemplate>
                         <hr v-if="index!==children.length-1" class="hr-dash my-1"
                             style="border-color: #EFEFEF!important;">
@@ -64,6 +66,9 @@
   import {ArticleCommentApi} from '../../api/ArticleCommentApi'
   import publishComment from '~/components/comment/publishComment.vue'
   import Status from '../../utils/status'
+  import {CommentApi} from '../../api/CommentApi'
+
+  let $commentApi
 
   let $articleCommentApi
   export default {
@@ -92,6 +97,7 @@
     },
     mounted () {
       $articleCommentApi = new ArticleCommentApi(this.$store)
+      $commentApi = new CommentApi(this.$store)
       if (this.comment.children <= 5) {
         this.page.is_end = true
         this.hasLoad = this.comment.children
@@ -111,24 +117,92 @@
       }
     },
     methods: {
-      refresh () {
-        //重新初始化参数
-        this.replyUser = {}
-        this.page = {
-          is_end: false,
-          page_num: 0,
-          total: 0
+      deleteCommentReply (commentIndex, replyIndex = null) {
+        if (_.isNull(replyIndex)) {
+          $articleCommentApi.deleteCommentReply(this.$store.state.comment.commentList[commentIndex].comment.comment_id,
+            replyIndex, this.$store.state.article.article.article_id).then(res => {
+            console.log(res)
+            if (res.status === Status.SUCCESS) {
+              let data = {
+                deleteComment: true,
+                commentIndex: commentIndex,
+              }
+              this.$store.commit('comment/deleteCommentReply', data)
+              this.$store.commit('article/setArticleComments', res.data.comments)
+              this.$message.success('删除成功！')
+            } else if (res.status === Status.COMMENT_HAS_DELETE) {
+              this.$message.warning('该评论已经不存在！')
+            }
+          })
+        } else {
+          $articleCommentApi.deleteCommentReply(this.$store.state.comment.commentList[commentIndex].comment.comment_id,
+            this.$store.state.comment.commentList[commentIndex].children[replyIndex].reply.reply_id,
+            this.$store.state.article.article.article_id).then(res => {
+            console.log(res)
+            if (res.status === Status.SUCCESS) {
+              let data = {
+                deleteComment: false,
+                commentIndex: commentIndex,
+                replyIndex: replyIndex
+              }
+              this.$store.commit('comment/deleteCommentReply', data)
+              this.$store.commit('article/setArticleComments', res.data.comments)
+              this.$message.success('删除成功！')
+            } else if (res.status === Status.COMMENT_HAS_DELETE) {
+              this.$message.warning('该回复已经不存在！')
+            }
+          })
         }
-        this.hasLoad = 5
-        this.hasUp = false
-        this.showReply = false
-        if (this.comment.children <= 5) {
-          this.page.is_end = true
-          this.hasLoad = this.comment.children
-        }
-
       },
-      publishComment (text, replyUser) {
+      support (isComment, commentIndex, isSupport, commentReplyId, replyIndex) {
+        console.log(isSupport)
+        if (isSupport) {
+          console.log('取消')
+          //已经投过票，则取消投票
+          $commentApi.cancelSupportCommentReply(isComment, commentReplyId, this.$store.state.article.article.article_id).then(res => {
+            console.log(res)
+            if (res.status === Status.SUCCESS) {
+              this.$message.success('取消投票成功！')
+              //更新投票信息
+              let data = {
+                isComment: isComment,
+                isSupport: !isSupport,
+                commentIndex: commentIndex,
+                support: res.data.support,
+                replyIndex: replyIndex
+              }
+              this.$store.commit('comment/setCommentSupport', data)
+            } else if (res.status === Status.COMMENT_HAS_DELETE) {
+              this.$message.warning('该评论已被删除！')
+            } else if (res.status === Status.USER_NOT_SUPPORT_OR_OBJECT) {
+              this.$message.warning('您未支持或反对该评论！')
+            }
+          })
+        } else {
+          console.log('投票')
+          //未投票
+          $commentApi.supportCommentReply(isComment, commentReplyId, this.$store.state.article.article.article_id).then(res => {
+            console.log(res)
+            if (res.status === Status.SUCCESS) {
+              this.$message.success('投票成功！')
+              //更新投票信息
+              let data = {
+                isComment: isComment,
+                isSupport: !isSupport,
+                commentIndex: commentIndex,
+                support: res.data.support,
+                replyIndex: replyIndex
+              }
+              this.$store.commit('comment/setCommentSupport', data)
+            } else if (res.status === Status.COMMENT_HAS_DELETE) {
+              this.$message.warning('该评论已被删除！')
+            } else if (res.status === Status.USER_HAS_SUPPORT_OR_OBJECT) {
+              this.$message.warning('您已支持过该评论了！')
+            }
+          })
+        }
+      },
+      publishComment (text, replyUser, callback) {
         if (text.length <= 5) {
           this.$message.warning('评论不要少于5个字。。。。')
         } else {
@@ -140,8 +214,10 @@
                 replyList: res.data.list
               }
               this.$message.success('回复发表成功！')
+              this.hasLoad++
               this.showReply = false
               this.$store.commit('comment/publishReply', data)
+              callback()
             } else {
               this.$message.error('回复发表失败！')
             }

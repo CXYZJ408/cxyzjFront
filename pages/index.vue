@@ -1,6 +1,6 @@
 <template xmlns:v-swiper="http://www.w3.org/1999/xhtml">
     <div id="myIndex">
-        <v-container v-scroll="loadArticleList" grid-list-md class="clearPadding mb-5">
+        <v-container grid-list-md class="clearPadding mb-5" v-scroll="onScroll">
             <v-layout row wrap>
                 <toolbar :font_size=28 :icon_size=28 :index=true></toolbar>
             </v-layout>
@@ -93,7 +93,7 @@
                                 <v-tabs-items v-model="currentItem" class="article-list">
                                     <v-tab-item :lazy="true">
                                         <articleList :articleList="articleList" :page="page" :userLabel="undefined"
-                                                     @getArticleList="getArticleList"
+                                                     @getArticleList="getArticleList" :index="-1"
                                                      :state="state[0]" v-if="articleList.length!==0"></articleList>
                                         <div v-else class="animation">
                                             <div class="spinner">
@@ -107,7 +107,7 @@
                                             :key="index" :value="'tab-'+label.label_id"
                                             :lazy="true"
                                     >
-                                        <articleList :articleList="articleList" :page="page"
+                                        <articleList :articleList="articleList" :page="page" :index="index"
                                                      :userLabel="label" @getArticleList="getArticleList"
                                                      :state="state[index+1]"
                                                      v-if="articleList.length!==0"></articleList>
@@ -186,6 +186,7 @@
         })
         this.$store.commit('cancelWelcome')
       }
+      this.onScroll()
       this.$store.commit('setBackground', '#F3F3F3')
     },
     methods: {
@@ -193,31 +194,29 @@
         console.log(index)
         this.page.is_end = false
         let labelId = undefined
-        this.handleTimer(true, 'changeTabs')//关闭所有计时器
+        this.handleState(true, 'changeTabs')//关闭所有子页面
         if (index !== -1) {
           labelId = this.userLabels[index].label_id
         }
         setTimeout(() => {
           this.articleList = []//如果是获取第一页，则数据清空
           this.getArticleList(0, labelId, () => {
-            this.handleTimer(false, index + 1)//启动计时器
+            this.handleState(false, index + 1)//启动子页面
           })
         }, 310)
-
       },
-      handleTimer (stop, index) {
+      handleState (stop, index) {
         console.log(index)
         if (stop) {
-          console.log('关闭所有计时器', index)
-          //关闭所有计时器
+          console.log('关闭所有子页面')
+          //关闭所有子页面
           for (let i = 0; i < this.state.length; i++) {
-            //关闭所有的计时器
             if (this.state[i] !== 0) {
               this.state[i] = 0
             }
           }
         } else {
-          //开启指定计时器
+          //开启指定页面
           this.state[index] = 1
         }
 
@@ -232,26 +231,26 @@
         this.$nextTick(() => {
           this.currentItem = 'tab-' + item.label_id//更新当前item
         })
-
       },
-      loadArticleList () {
+      onScroll () {
         let offsetTop = window.pageYOffset
         let element = this.$refs.swiper
-        let top = element.offsetHeight
-        if (offsetTop >= top + 35) {
-          // 如果当前浏览部分的上端距离大于轮播图下边，则固定board和hotTopic
-          if (!this.isFixed) {
-            this.isFixed = true
-            let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
-            let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
-            this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
-            this.topicStyle = 'width:' + width + 'px'
+        if (!_.isUndefined(element)) {
+          let top = element.offsetHeight
+          if (offsetTop >= top + 35) {
+            // 如果当前浏览部分的上端距离大于轮播图下边，则固定board和hotTopic
+            if (!this.isFixed) {
+              this.isFixed = true
+              let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
+              let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
+              this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
+              this.topicStyle = 'width:' + width + 'px'
+            }
+          } else {
+            this.isFixed = false
+            this.style = ''
           }
-        } else {
-          this.isFixed = false
-          this.style = ''
-        }
-      },
+        }      },
       getArticleList (pageNum, labelId, callback) {//获取文章列表
         console.log('开始读取', labelId)
         if (!this.page.is_end) {
@@ -270,7 +269,7 @@
             })
           }, 500)
         } else {
-          this.handleTimer(true, 'getArticleList')
+          this.handleState(true)
           console.log('没有了')
           if (_.isFunction(callback)) {
             console.log('回调')
@@ -290,6 +289,7 @@
     },
     data: function () {
       return {
+        timer: null,
         state: [1, 0, 0, 0, 0],
         isFixed: false,
         boardStyle: '',
