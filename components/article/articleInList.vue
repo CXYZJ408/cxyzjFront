@@ -6,7 +6,7 @@
                     <v-layout row wrap>
                         <v-flex md12>
                             <v-card-title style="padding: 0">
-                                <nuxt-link :to="'/article/'+article.article_id">
+                                <nuxt-link :to="'/articles/'+article.article_id">
                                     <span class="title2">{{article.title}}</span>
                                 </nuxt-link>
                                 <v-hover close-delay="50" class="ml-3">
@@ -18,7 +18,7 @@
                             </v-card-title>
                         </v-flex>
                         <v-flex md12>
-                            <nuxt-link :to="'/article/'+article.article_id">
+                            <nuxt-link :to="'/articles/'+article.article_id">
                                 <p class="myText limit-2line">{{article.article_sum}}</p>
                             </nuxt-link>
                         </v-flex>

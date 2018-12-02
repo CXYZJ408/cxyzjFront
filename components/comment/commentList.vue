@@ -154,10 +154,10 @@
         let io = new IntersectionObserver(() => {
           this.loading = true
           time++
-          if (time === 2) {
-            this.getCommentList(this.$store.state.comment.page.page_num + 1)
-            io.disconnect()
-          }
+          console.log(time)
+          this.getCommentList(this.$store.state.comment.page.page_num + 1)
+          io.disconnect()
+
         }, {
           threshold: [0.25]
         })

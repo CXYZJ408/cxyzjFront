@@ -12,7 +12,7 @@
                         <span class="display-0">{{$store.state.article.publishedArticle.title}}</span>
                     </v-flex>
                     <v-flex md12 class="mt-4">
-                        <nuxt-link :to="{path:`/article/${$store.state.article.publishedArticle.article_id}`}">
+                        <nuxt-link :to="{path:`/articles/${$store.state.article.publishedArticle.article_id}`}">
                             <span class="link">
                                 <v-icon color="#42C02E" large class="pr-2">done</v-icon>发布成功，点击查看文章
                             </span>

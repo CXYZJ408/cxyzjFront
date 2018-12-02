@@ -49,10 +49,7 @@
       },
       'show': function () {
         this.handleShowCard()
-      },
-      /* 'state': function () {
-         this.handleState()
-       }*/
+      }
     },
     props: {
       state: {

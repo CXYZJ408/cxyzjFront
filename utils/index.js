@@ -10,7 +10,6 @@ export const parseCookieByName = (cookie, name) => {
 
 export function dataURLtoFile (dataUrl, filename) {//base64转file
   let arr = dataUrl.split(',')
-  console.log(arr)
   let mime = arr[0].match(/:(.*?);/)[1]
   let bstr = atob(arr[1])
   let n = bstr.length

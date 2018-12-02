@@ -11,6 +11,7 @@ export class ArticleApi extends Api {
 
   getArticle (articleId, send = true) {
     let url = Article + `/${articleId}`
+    console.log('getArticle-----------------------------------',url)
     super.pushRequest = new Request(requestMethods.GET, url, this.getArticle)
     return super.judgeSend(send)
   }

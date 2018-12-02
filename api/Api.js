@@ -146,31 +146,6 @@ function pushData (results, request, returnType) {//打包数据
   return responseData
 }
 
-//刷新token 老是出现莫名BUG，该功能已取消
-async function refreshToken () {
-  console.log('refreshToken')
-  const url = '/v1/user/refresh_token'
-  $axios.needRefresh()
-  return await new Promise((resolve) => {
-    resolve($axios.get(url))
-  }).then((result) => {
-    if (result.data.status === $status.SUCCESS) {
-      console.log('refreshSuccess')
-      //刷新成功
-      $store.commit('setToken', result.data.data.token)
-      $store.commit('shouldUpdateToken', true)//提醒客户端需要更新cookie中的token
-      return Promise.resolve(true)
-    } else {
-      //刷新失败
-      $store.commit('tokenIsExpired', true)
-      $store.commit('clearAll')
-      return Promise.resolve(false)
-    }
-  }).catch(() => {
-    return Promise.reject()
-  })
-}
-
 function pack (request) {//打包
   console.log('请求打包', request)
   let invokes = []

@@ -21,7 +21,7 @@ export const mutations = {
   loginAgain (state, data) {
     console.log('LoginAgain')
     state.isLogin = true
-    state.user = data.user
+	state.user = data.user
   },
   login (state, data) {
     console.log('start set user')

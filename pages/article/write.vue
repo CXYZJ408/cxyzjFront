@@ -12,12 +12,12 @@
                             </v-btn>
                             <v-list dark subheader dense>
                                 <v-list-tile @click="expand">
-                                        <v-list-tile-title>收起</v-list-tile-title>
+                                    <v-list-tile-title>收起</v-list-tile-title>
                                 </v-list-tile>
                                 <v-list-tile>
-                                        <v-list-tile-title>
-                                            <nuxt-link to="/" style="color:white">返回首页</nuxt-link>
-                                        </v-list-tile-title>
+                                    <v-list-tile-title @click="leave">
+                                        <nuxt-link to="/" style="color:white">返回首页</nuxt-link>
+                                    </v-list-tile-title>
                                 </v-list-tile>
                             </v-list>
                         </v-menu>
@@ -134,7 +134,7 @@
                     <v-list-tile @click="expand">
                         <v-list-tile-title>展开</v-list-tile-title>
                     </v-list-tile>
-                    <v-list-tile >
+                    <v-list-tile>
                         <v-list-tile-title>
                             <nuxt-link to="/" style="color:white">返回首页</nuxt-link>
                         </v-list-tile-title>
@@ -319,6 +319,15 @@
       }
     },
     mounted () {
+      window.onbeforeunload = (e) => {
+        let event = e || window.event
+        if (event) {
+          this.leave()
+          // console.log(this.leave)
+          event.returnValue = '确定要关闭窗口吗？'
+        }
+        return '确定要关闭窗口吗?'
+      }
       this.setScreen()//设置页面，同时监听窗口变化
       this.getArticleList().then(() => {//向后台请求数据
         this.initDB().then(() => {
@@ -374,16 +383,18 @@
             this.widthLeft1 = 260
           }, 300)
         }
-
       },
       leave () {
         //在离开当前页面时做的一些收尾工作
+        console.log('leave')
         let articleList = []
         let all = _.union(this.updateArticleId, this.newsArticleId)
         console.log('all', all)
+        if (all.length === 0) return Promise.resolve(true)
         _.forEach(all, articleId => {
           articleList.push(this.get(articleId))//根据id到本地数据库获取每一个文章的信息
         })
+        console.log(articleList)
         return Promise.all(articleList).then(articles => {
           let drafts = []
           _.forEach(articles, article => {
@@ -632,7 +643,7 @@
               for (let i = 1; i < this.articleList.length; i++) {
                 if (this.articleList[i].article_id === key) {
                   if (this.articleList[i].update_time < value.update_time) {//比较版本，将旧的版本去掉
-                    this.articleList[i] = value
+                    this.articleList.splice(i, 1, value)
                     this.updateArticleId.push(key)
                   } else {
                     this.storageDB.then(store => {//删除本地版本
@@ -662,7 +673,7 @@
         return summary.substring(0, 150)
       },
       handlePublish () {
-        this.save(true)
+        this.save()
         let labelId = this.$store.state.article.articleLabel.label_id
         if (labelId === -1 || labelId.length === 0) {
           this.$message.warning('请选择文章标签！')
@@ -859,8 +870,9 @@
 </script>
 <style>
     @import "~/assets/style/markdown.css";
-    .v-menu__content{
-        z-index: 9999!important;
+
+    .v-menu__content {
+        z-index: 9999 !important;
     }
 </style>
 <style scoped>
