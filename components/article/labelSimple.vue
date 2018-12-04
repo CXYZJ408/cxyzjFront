@@ -1,7 +1,7 @@
 <template>
     <v-hover class="mt-2">
-        <v-chip class="chip" slot-scope="{ hover }" @click="choose()" :ripple="false"
-                :class="`elevation-${hover||$store.state.article.articleLabel.label_id===label.label_id ?4 : 0}`"
+        <v-chip class="chip" slot-scope="{ hover }" @click="choose" :ripple="false"
+                :class="`elevation-${hover||isSelect ?4 : 0}`"
                 :style="{'background-color':backColor,'color':fontColor}">
             <nuxt-link :to="'/article/label/'+label.label_id" v-if="href">
                 <v-avatar color="white" size="22">
@@ -25,41 +25,53 @@
 
 <script>
   export default {
-    name: 'labelSimple',
-    props: {
-      label: {
-        type: Object
-      },
-      backColor: {
-        type: String,
-        default: '#FEF7F1'
-      },
-      fontColor: {
-        type: String,
-        default: '#2C3E50'
-      },
-      href: {
-        type: Boolean,
-        default: true
-      },
-    },
-    data () {
-      return {
-        hasClick: false
-      }
-    },
-    methods: {
-      choose () {
-        this.$emit('changed')
-        if (this.hasClick && this.$store.state.article.articleLabel.label_id === this.label.label_id) {
-          this.hasClick = false
-          this.$store.commit('article/setArticleLabel', {label_id: -1})
-        } else {
-          this.hasClick = true
-          this.$store.commit('article/setArticleLabel', this.label)
+	name: 'labelSimple',
+	props: {
+	  label: {
+		type: Object
+	  },
+	  backColor: {
+		type: String,
+		default: '#FEF7F1'
+	  },
+	  fontColor: {
+		type: String,
+		default: '#2C3E50'
+	  },
+	  href: {
+		type: Boolean,
+		default: true
+	  },
+	},
+	data () {
+	  return {
+		hasClick: false
+	  }
+	},
+	computed: {
+	  isSelect () {
+	    if ( !this.href ) {
+	      return this.$store.state.article.articleLabel.label_id===this.label.label_id
+        }else{
+	      return false
         }
-      }
-    }
+	  }
+	},
+	methods: {
+	  choose () {
+	    if ( !this.href ) {
+		  this.$emit('changed')
+		  if ( this.hasClick && this.$store.state.article.articleLabel.label_id === this.label.label_id ) {
+			this.hasClick = false
+			this.$store.commit('article/setArticleLabel', { label_id: -1 })
+		  } else {
+			this.hasClick = true
+			this.$store.commit('article/setArticleLabel', this.label)
+		  }
+        }
+
+	  }
+	}
   }
 </script>
 

@@ -11,30 +11,39 @@
                             <span class="title2">标签管理</span>
                         </v-flex>
                     </v-layout>
-                    <hr class="hr">
+                    <hr class="hr-dotted">
                     <v-layout>
                         <v-flex md12 class="px-3 my-2">
                             <v-tabs
                                     v-model="tab"
                                     slider-color="#18ADED"
+                                    style="min-height: 70vh;"
                             >
-                                <v-tab ripple>
+                                <v-tab ripple v-if="$store.state.isLogin">
                                     <span class="headline" :class="tab===0?'my-blue':'grey--text'">我的标签</span>
                                 </v-tab>
                                 <v-tab ripple>
                                     <span class="headline " :class="tab===1?'my-blue':'grey--text'">全部标签</span>
                                 </v-tab>
                                 <v-tab-item>
-                                    <v-layout row wrap mb-4>
-                                        <v-flex md4 xl3 class="my-2 " v-for="(item,index) in user_labels" :key="index">
-                                            <my_label :label="item"></my_label>
+                                    <v-layout row wrap mb-4 v-if="labels.length>0">
+                                        <v-flex md4 xl3 class="my-2"
+                                                v-for="(item,index) in labels" :key="index">
+                                            <my_label :label="item" @select="select" :index="index"></my_label>
                                         </v-flex>
                                     </v-layout>
+                                    <v-layout row wrap mb-4 v-else>
+                                        <v-flex md12 class="text-md-center my-2">
+                                            <div class="display-3 grey--text " style="padding-top: 25vh">您还没有选择自己的标签哦！
+                                            </div>
+                                        </v-flex>
+                                    </v-layout>
+
                                 </v-tab-item>
                                 <v-tab-item>
                                     <v-layout row wrap mb-4>
                                         <v-flex md4 xl3 class="my-2 " v-for="(item,index) in labels" :key="index">
-                                            <my_label :label="item"></my_label>
+                                            <my_label :label="item" :index="index" @select="select"></my_label>
                                         </v-flex>
                                     </v-layout>
                                 </v-tab-item>
@@ -48,129 +57,93 @@
 </template>
 
 <script>
-  import my_label from '~/components/article/label.vue'
+  import myLabel from '~/components/article/label.vue'
+  import { ArticleLabelApi } from '../../api/ArticleLabelApi'
+  import Status from '../../utils/status'
 
+  let $articleLabelApi
   export default {
-    name: 'labels',
-    components: {
-      my_label
-    },
+	name: 'labels',
+	components: {
+	  my_label: myLabel
+	},
+	methods: {
+	  select (index, isSelect) {
+		if ( !this.$store.state.isLogin ) {
+		  this.$message.warning('请先登录！')
+		  return false
+		}
+		if ( isSelect ) {
+		  $articleLabelApi.addUserLabel(this.labels[ index ].label_id).then(result => {
+			if ( result.status === Status.SUCCESS ) {
+			  this.labels[ index ].collections = result.data.collections
+			  this.labels[ index ].is_select = true
+			  this.$message.success(`成功关注了${this.labels[ index ].label_name}`)
+			}
+		  })
+		} else {
+		  $articleLabelApi.deleteUserLabel(this.labels[ index ].label_id).then(result => {
+			if ( result.status === Status.SUCCESS ) {
+			  this.labels[ index ].collections = result.data.collections
+			  this.labels[ index ].is_select = false
+			  this.$message.success(`成功取消关注了${this.labels[ index ].label_name}`)
+			}
+		  })
+		}
+	  },
+	  getUserLabel () {
+		$articleLabelApi.getUserLabelListDetails().then(result => {
+		  if ( result.status === Status.SUCCESS ) {
+			//获取用户标签信息
+			this.labels = result.data.label
+		  } else if ( result.status === Status.NO_USER_LABEL ) {
+			this.labels = []
+		  }
+		}).catch(() => {
+		  this.$message.error('出错啦！')
+		})
+	  },
 
-    data: () => {
-      return {
-        tab: '',
-        user_labels: [
-          {
-            label_id: '123456',
-            label_name: '操作系统',
-            quantity: 4,
-            link: '#icon-os',
-            introduce: '操作系统（Operating System，简称OS）是管理和控制计算机硬件与软件资源的计算机程序，是直接运行在“裸机”上的最基本的系统软件，任何其他软件都必须在操作系统的支持下才能运行。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '操作系统',
-            quantity: 4,
-            link: '#icon-os',
-            introduce: '操作系统（Operating System，简称OS）是管理和控制计算机硬件与软件资源的计算机程序，是直接运行在“裸机”上的最基本的系统软件，任何其他软件都必须在操作系统的支持下才能运行。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '操作系统',
-            quantity: 4,
-            link: '#icon-os',
-            introduce: '操作系统（Operating System，简称OS）是管理和控制计算机硬件与软件资源的计算机程序，是直接运行在“裸机”上的最基本的系统软件，任何其他软件都必须在操作系统的支持下才能运行。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '操作系统',
-            quantity: 4,
-            link: '#icon-os',
-            introduce: '操作系统（Operating System，简称OS）是管理和控制计算机硬件与软件资源的计算机程序，是直接运行在“裸机”上的最基本的系统软件，任何其他软件都必须在操作系统的支持下才能运行。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '操作系统',
-            quantity: 4,
-            link: '#icon-os',
-            introduce: '操作系统（Operating System，简称OS）是管理和控制计算机硬件与软件资源的计算机程序，是直接运行在“裸机”上的最基本的系统软件，任何其他软件都必须在操作系统的支持下才能运行。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '操作系统',
-            quantity: 4,
-            link: '#icon-os',
-            introduce: '操作系统（Operating System，简称OS）是管理和控制计算机硬件与软件资源的计算机程序，是直接运行在“裸机”上的最基本的系统软件，任何其他软件都必须在操作系统的支持下才能运行。',
-            collection: 3,
-            is_select: false
-          },
-        ],
-        labels: [
-          {
-            label_id: '123456',
-            label_name: '前端',
-            quantity: 4,
-            link: '#icon-front',
-            introduce: '前端开发是创建Web页面或app等前端界面呈现给用户的过程。前端开发通过HTML，CSS及JavaScript以及衍生出来的各种技术、框架、解决方案，来实现互联网产品的用户界面交互。',
-            collection: 3,
-            is_select: false
-          },
-          {
-            label_id: '123456',
-            label_name: '前端',
-            quantity: 4,
-            link: '#icon-front',
-            introduce: '前端开发是创建Web页面或app等前端界面呈现给用户的过程。前端开发通过HTML，CSS及JavaScript以及衍生出来的各种技术、框架、解决方案，来实现互联网产品的用户界面交互。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '前端',
-            quantity: 4,
-            link: '#icon-front',
-            introduce: '前端开发是创建Web页面或app等前端界面呈现给用户的过程。前端开发通过HTML，CSS及JavaScript以及衍生出来的各种技术、框架、解决方案，来实现互联网产品的用户界面交互。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '前端',
-            quantity: 4,
-            link: '#icon-front',
-            introduce: '前端开发是创建Web页面或app等前端界面呈现给用户的过程。前端开发通过HTML，CSS及JavaScript以及衍生出来的各种技术、框架、解决方案，来实现互联网产品的用户界面交互。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '前端',
-            quantity: 4,
-            link: '#icon-front',
-            introduce: '前端开发是创建Web页面或app等前端界面呈现给用户的过程。前端开发通过HTML，CSS及JavaScript以及衍生出来的各种技术、框架、解决方案，来实现互联网产品的用户界面交互。',
-            collection: 3,
-            is_select: false
-          }, {
-            label_id: '123456',
-            label_name: '前端',
-            quantity: 4,
-            link: '#icon-front',
-            introduce: '前端开发是创建Web页面或app等前端界面呈现给用户的过程。前端开发通过HTML，CSS及JavaScript以及衍生出来的各种技术、框架、解决方案，来实现互联网产品的用户界面交互。',
-            collection: 3,
-            is_select: false
-          }]
-      }
-    },
-    mounted () {
-      this.$store.commit('setBackground', '#F3F3F3')
-      if (this.$route.query.tab === 'user') {
-        this.tab = 0
-      } else {
-        this.tab = 1
-      }
-    }
+	  geArticleLabel () {
+		$articleLabelApi.getArticleLabelListDetails().then(result => {
+		  if ( result.status === Status.SUCCESS ) {
+			//获取标签信息
+			this.labels = result.data.label
+		  }
+		}).catch(() => {
+		  this.$message.error('出错啦！')
+		})
+	  },
+	  handleTab () {
+		if ( this.tab === 0 ) {
+		  this.getUserLabel()
+		} else {
+		  this.geArticleLabel()
+		}
+	  }
+	},
+	data: () => {
+	  return {
+		tab: '',
+		labels: []
+	  }
+	},
+	watch: {
+	  tab: function () {
+		this.handleTab()
+	  }
+	},
+	created () {
+	  $articleLabelApi = new ArticleLabelApi(this.$store)
+	},
+	mounted () {
+	  this.$store.commit('setBackground', '#F3F3F3')
+	  if ( this.$route.query.tab === 'user' ) {
+		this.tab = 0
+	  } else {
+		this.tab = 1
+	  }
+	}
   }
 </script>
 

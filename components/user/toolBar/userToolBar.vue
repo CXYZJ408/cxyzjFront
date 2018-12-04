@@ -136,7 +136,7 @@
     .toolbar {
         position: fixed;
         width: 100%;
-        z-index: 999;
+        z-index: 99;
         background-color: white;
         margin: 0 !important;
         padding: 0 !important;

@@ -1,5 +1,5 @@
 <template>
-    <v-container grid-list-md wrap class="clearPadding mb-5" v-scroll="onScroll">
+    <v-container grid-list-md wrap class="clearPadding mb-5">
         <v-layout row wrap style="height:65px ">
             <toolbar :font_size=28 :icon_size=28 :none=true></toolbar>
         </v-layout>
@@ -16,34 +16,52 @@
                             <v-layout row wrap align-center justify-center pt-3>
                                 <v-flex md8><span class="display-1"><strong>{{label.label_name}}</strong></span>
                                 </v-flex>
-                                <v-flex md8 class="my-3"><span class="my-font pl-4 ">一共有&nbsp;{{label.quantity}}&nbsp;篇文章&nbsp;<strong>·</strong>&nbsp;{{label.collection}}&nbsp;人关注</span>
+                                <v-flex md8 class="my-3"><span class="my-font pl-4 ">一共有&nbsp;{{label.quantity}}&nbsp;篇文章&nbsp;<strong>·</strong>&nbsp;{{label.collections}}&nbsp;人关注</span>
                                 </v-flex>
                                 <v-flex md11 class="text-md-right">
-                                    <v-btn outline round color="#8E44AD" depressed>
+                                    <v-btn outline round color="#8E44AD" depressed nuxt to="/article/write">
                                         <v-icon left size="30">iconfont icon-write</v-icon>
                                         <span class="title">投稿</span>
                                     </v-btn>
-
-                                    <v-btn round color="#2EC16C" dark depressed>
+                                    <v-btn round color="#2EC16C" dark depressed @click="select">
                                         <v-icon left size="30">add</v-icon>
                                         <span class="title">{{label.is_select?'已关注':'关注'}}</span>
                                     </v-btn>
                                 </v-flex>
                             </v-layout>
                         </v-flex>
-                        <v-divider vertical inset class="my-hr my-3"></v-divider>
+                        <v-divider vertical inset class="my-3"></v-divider>
                         <v-flex md7 class="pl-4 pt-3">
                             <v-flex md12>
                                 <span class="headline"><strong>简介:</strong></span>
                             </v-flex>
                             <v-flex md12>
-                                <p class="my-font px-4">&nbsp;&nbsp;&nbsp;&nbsp;{{label.introduce}}</p>
+                                <p class="my-font px-4">&nbsp;&nbsp;&nbsp;&nbsp;{{introduce}}</p>
+                                <div class="text-md-right">
+                                    <v-dialog v-model="dialog" width="600px">
+                                        <div class=" mr-4 blue--text more" slot="activator" @click="dialog=true">更多...
+                                        </div>
+                                        <v-card>
+                                            <v-card-title>
+                                                <span class="display-2 green--text">{{label.label_name}}</span>
+                                            </v-card-title>
+                                            <v-card-text class="font-3 grey--text text--darken-2"
+                                                         style="line-height: 35px;">
+                                                &nbsp;&nbsp;{{label.introduce}}
+                                            </v-card-text>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn color="green darken-1" flat="flat" @click="dialog = false">确定
+                                                </v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
+                                </div>
                             </v-flex>
                         </v-flex>
                     </v-layout>
                 </v-card>
             </v-flex>
-
         </v-layout>
         <v-layout align-center justify-center mt-3>
             <v-flex md11 xl8>
@@ -56,10 +74,10 @@
                                     hide-slider
                                     grow
                             >
-                                <v-tab ripple>
+                                <v-tab ripple active-class="active" @click="changeTabs(0)">
                                     <span class="label" :class="{'active':tabs===0}">热门文章</span>
                                 </v-tab>
-                                <v-tab ripple active-class="active">
+                                <v-tab ripple active-class="active" @click="changeTabs(1)">
                                     <span class=" label" :class="{'active':tabs===1}">最新文章</span>
                                 </v-tab>
 
@@ -71,28 +89,22 @@
                         <v-flex md12>
                             <v-tabs-items v-model="tabs">
                                 <v-tab-item
-                                        v-for="n in 2"
-                                        :key="n"
+                                        v-for="index in 2"
+                                        :key="index-1"
                                         lazy
                                 >
-                                    <dynamic v-for="(item,index) in dynamics" :dynamic="item"
-                                             :key="index"></dynamic>
-                                    <!--TODO api完成后完善瀑布加载-->
-                                    <v-layout row wrap justify-center>
-                                        <v-flex md8 v-show="showLoadMore">
-                                            <v-btn flat round block dark class="title black--text"
-                                                   @click="loadMore">
-                                                加载更多
-                                            </v-btn>
-                                        </v-flex>
-                                        <v-flex md12 v-show="showLoad" class="text-md-center ma-3">
-                                            <v-progress-circular
-                                                    :size="40"
-                                                    color="grey"
-                                                    indeterminate
-                                            ></v-progress-circular>
-                                        </v-flex>
-                                    </v-layout>
+                                    <articleList :articleList="articleList" :page="page" :index="index-1"
+                                                 :userLabel="label" @getArticleList="getArticleListByLabel"
+                                                 :isLabelArticleList="true"
+                                                 :articleType=type
+                                                 :state="state[index-1]"
+                                                 v-if="articleList.length!==0"></articleList>
+                                    <div v-else class="animation">
+                                        <div class="spinner">
+                                            <div class="dot1"></div>
+                                            <div class="dot2"></div>
+                                        </div>
+                                    </div>
                                 </v-tab-item>
                             </v-tabs-items>
                         </v-flex>
@@ -104,240 +116,145 @@
 </template>
 
 <script>
-  import dynamic from '~/components/index/dynamic.vue'
-  //todo 要将list改成和主页一样的
+  import articleList from '~/components/article/articleList.vue'
+  import { ArticleLabelApi } from '../../../api/ArticleLabelApi'
+  import Status from '../../../utils/status'
+  import Constant from '../../../utils/constant'
+  import { setString } from '../../../utils'
+
+  let $articleLabelApi
+  let _ = require('lodash')
+
   export default {
-    name: 'myLabel',
-    components: {
-      dynamic
-    },
-    mounted () {
-      this.$store.commit('setBackground', '#F3F3F3')
-    },
-    methods: {
-      perLoad () {
-        if (this.loadTimes % 3 === 0) {
-          this.scrollDisabled = true// 如果加载的次数可以被3整除则暂停加载，同时显示加载更多的按钮
-          this.showLoadMore = true
-          this.showLoad = false // 禁用加载动画
-        }
-        if (!this.scrollDisabled) {
-          this.scrollDisabled = true
-          this.showLoad = true // 显示加载动画
-          this.loadMore()// 加载操作
-        }
-      },
-      loadMore () {
-        let temp = this.dynamics[0] // todo 需要修改
-        setTimeout(() => {
-          for (let i = 0; i < 5; i++) {
-            this.dynamics.push(temp)
-          }
-          this.scrollDisabled = false
-          this.showLoad = false
-          if (this.showLoadMore) {
-            this.showLoadMore = false
-          }
-          this.loadTimes++ // 加载次数计数
-        }, 800)
-      },
-      onScroll () {
-        let offsetTop = window.pageYOffset
-        if (offsetTop + window.setScreen.availHeight > document.body.scrollHeight - 200) {
-          // 如果当前浏览部分的上端距离页面顶端的距离加上屏幕的高度大于页面高度-200 提前加载
-          this.perLoad()
-        }
-      }
-    },
-    data: () => {
-      return {
-        tabs: '',
-        scrollDisabled: false,
-        showLoadMore: false,
-        loadTimes: 1,
-        showLoad: false,
-        dynamics: [
-          {
-            title: 'Python使用Requests抓取包图网小视频',
-            text: '涉及到的知识点\n' +
-              'input 标签的 onchange 事件是在上传完文件之后触发\n' +
-              '当 input 标签 type="file" 时，使用 files 属性获取到上传的文件对象\n' +
-              'readAsDataURL 用于将读取内容转换成 base64 编码\n' + ~
-                '区分 canvas 的 画布 和 绘画环境：\n' +
-              '画布：对应代码中的 cvs，可以设置画布 width，height；\n' +
-              '绘画环境：对应代码中的 ctx，由 cvs 得来。ctx = cvs.getContext(\'2d\')，可以设置 fillStyle，fillRect 等；\n' +
-              '\n' +
-              '作者：_我亦飘零\n' +
-              '链接：https://www.jianshu.com/p/4ba393be278b\n' +
-              '來源：简书\n' +
-              '简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。',
-            thumbnail: '/img/Temp/2.jpg',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: '8979651',
-            is_collected: false,
-            user: {
-              user_id: '490538974364827648',
-              nickname: '野望',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '前端'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '学习Python的建议',
-            text: 'Python是最容易入门的编程语言，没有之一。如果初学者接触的第一门语言是C或者C++，对他们来说最难的不是语法，而是容易出现内存泄漏、指针等问题。有时候排查这些问题对初学者的打击很大，尤其是没掌握排查BUG技巧时。',
-            thumbnail: '/img/Temp/1.jpg',
-            views: 2,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: '8979651',
-            is_collected: false,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/Avatar/cxyzj.png',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '编程语言'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '使用PHP扩展Xhprof分析项目性能实践',
-            text: '项目即将上线，想通过一些工具来分析代码的稳定性和效率，想起在上个团队时使用过的xhprof扩展；因为换了新电脑，所以需要重新编译此扩展，现将安装与实际排查过程完整记录下来，方便自己回顾和帮助更多的读者。',
-            thumbnail: '',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: '8979651',
-            is_collected: true,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/login/14.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '架构'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '「Android」SocialSdk-快速接入社会化登录分享',
-            text: '使用 微博、QQ、微信、钉钉 原生 SDK 接入，提供这些平台的登录、分享功能支持。针对业务逻辑对各个平台的接口进行封装，对外提供一致的表现，在减轻接入压力的同时，又能获得原生 SDK 最大的灵活性',
-            thumbnail: '/img/Temp/4.jpg',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: '8979651',
-            is_collected: false,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: 'Android'
-            },
-            update_time: '两天前'
-          },
-          {
-            title: '从爬虫到机器学习预测，我是如何一步一步做到的？',
-            text: '前一段时间与大家分享了北京二手房房价分析的实战项目，分为分析和建模两篇。文章发出后，得到了大家的肯定和支持，在此表示感谢。\n' +
-              '数据分析实战—北京二手房房价分析\n' +
-              '数据分析实战—北京二手房房价分析（建模篇）\n' +
-              '除了数据',
-            thumbnail: '/img/login/4.jpg',
-            views: 12,
-            comments: 5,
-            collections: 4,
-            type: 'article',
-            dynamic_id: '8979651',
-            is_collected: true,
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/login/9.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            },
-            topic: {
-              name: '人工智能'
-            },
-            update_time: '两天前'
-          }
-        ],
-        label: {
-          label_id: '123456',
-          label_name: '操作系统',
-          quantity: 4,
-          link: '#icon-os',
-          introduce: '操作系统（Operating System，简称OS）是管理和控制计算机硬件与软件资源的计算机程序，是直接运行在“裸机”上的最基本的系统软件，任何其他软件都必须在操作系统的支持下才能运行。',
-          collection: 3,
-          is_select: false
-        }
-      }
-    }
+	name: 'myLabel',
+	components: {
+	  articleList
+	},
+	created () {
+	  $articleLabelApi = new ArticleLabelApi(this.$store)
+	  this.init()
+	},
+	mounted () {
+	  this.$store.commit('setBackground', '#F3F3F3')
+	},
+	methods: {
+	  select () {
+		if ( this.$store.state.isLogin ) {
+		  if ( !this.label.is_select ) {
+			$articleLabelApi.addUserLabel(this.labels.label_id).then(result => {
+			  if ( result.status === Status.SUCCESS ) {
+				this.labels.collections = result.data.collections
+				this.labels.is_select = true
+				this.$message.success(`成功关注了${this.labels.label_name}`)
+			  }
+			})
+		  } else {
+			$articleLabelApi.deleteUserLabel(this.labels.label_id).then(result => {
+			  if ( result.status === Status.SUCCESS ) {
+				this.labels.collections = result.data.collections
+				this.labels.is_select = false
+				this.$message.success(`成功取消关注了${this.labels.label_name}`)
+			  }
+			})
+		  }
+		} else {
+		  this.$message.warning('请先登录！')
+		}
+	  },
+	  changeTabs (index) {//tab变更
+		if ( index === 0 ) {
+		  this.type = Constant.HOT_LIST
+		} else {
+		  this.type = Constant.NEW_LIST
+		}
+		this.page.is_end = false
+		this.handleState(true)//关闭所有子页面
+		setTimeout(() => {
+		  this.articleList = []//如果是获取第一页，则数据清空
+		  this.getArticleListByLabel(0, this.type, () => {
+			this.handleState(false, index)//启动子页面
+		  })
+		}, 250)
+	  },
+	  handleState (stop, index) {
+		if ( stop ) {
+		  console.log('关闭所有子页面')
+		  //关闭所有子页面
+		  this.state = [ 0, 0 ]
+		} else {
+		  //开启指定页面
+		  this.state[ index ] = 1
+		}
+	  },
+	  getArticleListByLabel (pageNum, type, callback) {
+		console.log('type:', type)
+		if ( !this.page.is_end ) {
+		  setTimeout(() => {
+			$articleLabelApi.getArticleListByLabelIdAndType(this.label.label_id, pageNum, type).then(result => {
+			  if ( result.status === Status.SUCCESS ) {
+				this.pushArticle(result.data.list)
+				this.page = result.data.page
+				if ( _.isFunction(callback) ) {
+				  callback()
+				}
+			  }
+			}).catch(() => {
+			  this.$message.error('获取文章数据失败！')
+			})
+		  }, 500)
+		} else {
+		  this.handleState(true)
+		  if ( _.isFunction(callback) ) {
+			callback()
+		  }
+		}
+	  },
+	  pushArticle (articleList) {
+		_.forEach(articleList, (item) => {
+		  item.label = this.label
+		  this.articleList.push(item)
+		})
+	  },
+	  init () {
+		let labelId = this.$route.fullPath.split('/')[ 3 ]//读取labelId
+		this.label.label_id = labelId
+		$articleLabelApi.getArticleLabelDetails(labelId, false).getArticleListByLabelIdAndType(this.label.label_id, 0, Constant.HOT_LIST)
+		  .then(result => {
+			console.log(result)
+			let articleLabelInfo = result[ 0 ]
+			let articleList = result[ 1 ]
+			if ( articleLabelInfo.status === Status.SUCCESS ) {
+			  this.label = articleLabelInfo.data.label
+			  this.introduce = setString(this.label.introduce, 140)
+			} else if ( articleLabelInfo.status === Status.LABEL_NOT_EXIST ) {
+			  this.$message.error('该标签信息不存在！')
+			}
+			if ( articleList.status === Status.SUCCESS ) {
+			  this.pushArticle(articleList.data.list)
+			  this.page = articleList.data.page
+			} else if ( articleList.status === Status.LABEL_NOT_EXIST ) {
+			  this.$message.error('该标签信息不存在！')
+			}
+		  }).catch(() => {
+		  this.$message.error('获取标签数据失败！')
+		})
+
+	  }
+	},
+	data: () => {
+	  return {
+		dialog: false,
+		tabs: '',
+		introduce: '',
+		type: Constant.HOT_LIST,
+		state: [ 1, 0 ],
+		articleList: [],
+		page: {},
+		label: {
+		  label_id: ''
+		}
+	  }
+	}
   }
 </script>
 
@@ -362,10 +279,6 @@
         margin: 0;
     }
 
-    .my-hr {
-        border: 1px dashed #BBBBBB;
-    }
-
     .my-font {
         font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
         font-size: 18px;
@@ -387,5 +300,9 @@
 
     .active {
         color: #18ADED !important;
+    }
+
+    .more:hover {
+        cursor: pointer;
     }
 </style>

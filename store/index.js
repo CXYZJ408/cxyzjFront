@@ -12,7 +12,6 @@ export const state = () => ({
   user: {},//user信息
   tokenHasUpdate: false,//客户端是否需要对cookie进行刷新操作
   tokenExpired: false,//token是否已过期
-  welcome: false,//在登录和注册之后，主页会显示相应的欢迎信息
   background: ''
 })
 
@@ -28,11 +27,8 @@ export const mutations = {
     state.isLogin = true
     state.user = data.user
     state.token = data.token
-    state.welcome = true
   },
-  cancelWelcome (state) {
-    state.welcome = false
-  },
+
   logout (state) {
     state.isLogin = false
     state.token = defaultToken

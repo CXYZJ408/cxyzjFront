@@ -36,112 +36,125 @@
 <script>
   import articleInList from '~/components/article/articleInList.vue'
   import userCard from '~/components/user/userCard.vue'
+  import Constant from '../../utils/constant'
 
   let _ = require('lodash')
   export default {
-    name: 'articleList',
-    components: {
-      articleInList, userCard
-    },
-    watch: {
-      '$store.state.userCard.hover': function () {
-        this.handleShowCard()
-      },
-      'show': function () {
-        this.handleShowCard()
-      }
-    },
-    props: {
-      state: {
-        //计时器状态指示器：0停止，1运行
-        type: Number
-      },
-      articleList: {
-        type: Array
-      },
-      page: {
-        type: Object
-      },
-      userLabel: {
-        type: Object,
-        default: undefined
-      },
-      index: {
-        type: Number
-      }
-    },
-    methods: {
-      handleState () {
-        console.log('当前状态改变', this.state)
-        if (this.state === 1) {
-          this.handle()
-        } else {
-          this.loading = false
-        }
-      },
-      debounce (fn, wait) {
-        let timeout = null
-        this.event = function () {
-          if (timeout !== null) clearTimeout(timeout)
-          timeout = setTimeout(fn, wait)
-        }
-        return this.event
-      },
-      handle () {
-        console.log('state', this.state, 'index', this.index)
-        if (!this.loading && this.state === 1) {
-          let current = window.pageYOffset + window.screen.availHeight + 200
-          let element = this.$refs.list
-          if (!_.isUndefined(element)) {
-            const offsetTop = element.getBoundingClientRect().top + window.scrollY
-            if (current > offsetTop + element.offsetHeight) {//预加载
-              console.log('加载')
-              this.loading = true
-              this.load()
-            }
-          }
-        }
-      },
-      onScroll () {
-        window.addEventListener('scroll', this.debounce(this.handle, 150))
-      },
-      load () {
-        console.log(this.userLabel)
-        if (!_.isUndefined(this.userLabel)) {
-          this.$emit('getArticleList', this.page.page_num + 1, this.userLabel.label_id, () => {
-            this.loading = false
-            console.log('加载结束')
-          })
-        } else {
-          this.$emit('getArticleList', this.page.page_num + 1, undefined, () => {
-            this.loading = false
-            console.log('加载结束')
-          })
-        }
-      },
-      handleShowCard () {
-        if (this.show || this.$store.state.userCard.hover) {
-          let top = (this.$store.state.userCard.index + 1) * 160 - 40
-          this.cardStyle = 'top:' + top + 'px;'
-        } else {
-          this.cardStyle = 'display:none'
-        }
-      }
-    },
-    data: function () {
-      return {
-        loading: false,
-        show: false,
-        cardStyle: 'display:none',
-        event: null
-      }
-    },
-    mounted () {
-      this.onScroll()
-    },
-    beforeDestroy () {
-      window.removeEventListener('scroll', this.event)
-    }
+	name: 'articleList',
+	components: {
+	  articleInList, userCard
+	},
+	watch: {
+	  '$store.state.userCard.hover': function () {
+		this.handleShowCard()
+	  },
+	  'show': function () {
+		this.handleShowCard()
+	  }
+	},
+	props: {
+	  state: {
+		//计时器状态指示器：0停止，1运行
+		type: Number
+	  },
+	  articleList: {
+		type: Array
+	  },
+	  page: {
+		type: Object
+	  },
+	  userLabel: {
+		type: Object,
+		default: undefined
+	  },
+	  index: {
+		type: Number
+	  },
+	  isLabelArticleList: {
+		type: Boolean,
+		default: false
+	  },
+	  articleType: {
+		type: String,
+		default: Constant.HOT_LIST
+	  }
+	},
+	methods: {
+	  handleState () {
+		if ( this.state === 1 ) {
+		  this.handle()
+		} else {
+		  this.loading = false
+		}
+	  },
+	  debounce (fn, wait) {
+		let timeout = null
+		this.event = function () {
+		  if ( timeout !== null ) clearTimeout(timeout)
+		  timeout = setTimeout(fn, wait)
+		}
+		return this.event
+	  },
+	  handle () {
+		if ( !this.loading && this.state === 1 ) {
+		  let current = window.pageYOffset + window.screen.availHeight + 200
+		  let element = this.$refs.list
+		  if ( !_.isUndefined(element) ) {
+			const offsetTop = element.getBoundingClientRect().top + window.scrollY
+			if ( current > offsetTop + element.offsetHeight ) {//预加载
+			  this.loading = true
+			  this.load()
+			}
+		  }
+		}
+	  },
+	  onScroll () {
+		window.addEventListener('scroll', this.debounce(this.handle, 150))
+	  },
+	  load () {
+		if ( this.isLabelArticleList ) {
+		  this.$emit('getArticleList', this.page.page_num + 1,this.articleType, () => {
+			this.loading = false
+			console.log('加载结束')
+		  })
+		} else {
+		  if ( !_.isUndefined(this.userLabel) ) {
+			this.$emit('getArticleList', this.page.page_num + 1, this.userLabel.label_id, () => {
+			  this.loading = false
+			  console.log('加载结束')
+			})
+		  } else {
+			this.$emit('getArticleList', this.page.page_num + 1, undefined, () => {
+			  this.loading = false
+			  console.log('加载结束')
+			})
+		  }
+		}
+
+	  },
+	  handleShowCard () {
+		if ( this.show || this.$store.state.userCard.hover ) {
+		  let top = ( this.$store.state.userCard.index + 1 ) * 160 - 40
+		  this.cardStyle = 'top:' + top + 'px;'
+		} else {
+		  this.cardStyle = 'display:none'
+		}
+	  }
+	},
+	data: function () {
+	  return {
+		loading: false,
+		show: false,
+		cardStyle: 'display:none',
+		event: null
+	  }
+	},
+	mounted () {
+	  this.onScroll()
+	},
+	beforeDestroy () {
+	  window.removeEventListener('scroll', this.event)
+	}
   }
 </script>
 

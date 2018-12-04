@@ -28,7 +28,6 @@ export class ArticleCommentApi extends Api {
       discusser_id: discusserId,
       article_id: articleId
     }
-    console.log('url-----', url)
     super.pushRequest = new Request(requestMethods.POST, url, this.publishReply, params)
     return super.judgeSend(send)
   }

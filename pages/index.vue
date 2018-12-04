@@ -28,17 +28,13 @@
                 <v-flex md9 xl7>
                     <v-card id="main">
                         <v-layout row wrap justify-center align-center>
-                            <v-flex md3>
-                                <v-card-title class="headline green--text pb-2">
-                                    <strong class="mt-1 pl-2">热门文章</strong>
-                                </v-card-title>
-                            </v-flex>
-                            <v-flex md8 class="mt-3">
+                            <v-card-title class="headline green--text pb-2">
+                                <strong class="mt-1 pl-2">热门文章</strong>
+                            </v-card-title>
+                            <v-flex md9 class="mt-3">
                                 <v-tabs
                                         v-model="currentItem"
                                         right
-                                        class="mr-2"
-                                        grow
                                 >
                                     <v-tab ripple active-class="active" @click="changeTabs(-1)">
                                         <span class="label">推荐</span>
@@ -54,16 +50,15 @@
                                     </v-tab>
                                     <v-tabs-slider color="#18ADED"></v-tabs-slider>
                                     <v-menu
-                                            v-if="more.length"
-                                            bottom
+                                            v-if="more.length>0"
                                             class="v-tabs__div"
-                                            right
-                                            style="width: 20px"
+                                            offset-y
                                     >
-                                        <a slot="activator" class="v-tabs__item">
-                                            <v-icon size="25" color="grey">more_vert</v-icon>
+                                        <a slot="activator" class=" font-6 v-tabs__item ">
+                                            更多
+                                            <v-icon size="24">iconfont icon-more</v-icon>
                                         </a>
-                                        <v-list>
+                                        <v-list class="grey lighten-3">
                                             <v-list-tile
                                                     v-for="(item,index) in more"
                                                     :key="index"
@@ -76,7 +71,7 @@
                                     </v-menu>
                                 </v-tabs>
                             </v-flex>
-                            <v-flex md1 class="mt-3">
+                            <v-flex md1 class="mt-3" v-if="$store.state.isLogin">
                                 <nuxt-link :to="{path:'/article/labels?tab=user'}">
                                     <el-tooltip>
                                         <div slot="content">标签管理</div>
@@ -127,8 +122,8 @@
                     <div :class="{fixed:isFixed}" :style="topicStyle" ref="hotTopic">
                         <v-card class="card py-3">
                             <v-layout row wrap align-center justify-center px-2>
-                                <v-flex md4>
-                                    <span class="title2">热门标签</span>
+                                <v-flex md5>
+                                    <span class="font-5">热门标签</span>
                                 </v-flex>
                                 <v-spacer></v-spacer>
                                 <v-flex md5>
@@ -167,258 +162,244 @@
   import myLabel from '~/components/article/labelSimple.vue'
   import articleList from '~/components/article/articleList.vue'
   import $status from '~/utils/status'
-  import {ArticleApi} from '../api/ArticleApi'
+  import { ArticleApi } from '../api/ArticleApi'
+  import { ArticleLabelApi } from '../api/ArticleLabelApi'
+  import Status from '../utils/status'
 
   let _ = require('lodash')
   let $articleApi
+  let $articleLabelApi
   export default {
-    name: 'index',
-    components: {
-      board, myLabel, articleList
-    },
-    mounted () {
-      $articleApi = new ArticleApi(this.$store)
-      if (this.$store.state.welcome) {
-        this.$notify({
-          title: '登录成功！',
-          message: `你好${this.$store.state.user.nickname}，欢迎登录程序员之家！`,
-          type: 'success'
-        })
-        this.$store.commit('cancelWelcome')
-      }
-      this.onScroll()
-      this.$store.commit('setBackground', '#F3F3F3')
-    },
-    methods: {
-      changeTabs (index) {//tab变更
-        console.log(index)
-        this.page.is_end = false
-        let labelId = undefined
-        this.handleState(true, 'changeTabs')//关闭所有子页面
-        if (index !== -1) {
-          labelId = this.userLabels[index].label_id
-        }
-        setTimeout(() => {
-          this.articleList = []//如果是获取第一页，则数据清空
-          this.getArticleList(0, labelId, () => {
-            this.handleState(false, index + 1)//启动子页面
-          })
-        }, 310)
-      },
-      handleState (stop, index) {
-        console.log(index)
-        if (stop) {
-          console.log('关闭所有子页面')
-          //关闭所有子页面
-          for (let i = 0; i < this.state.length; i++) {
-            if (this.state[i] !== 0) {
-              this.state[i] = 0
-            }
-          }
-        } else {
-          //开启指定页面
-          this.state[index] = 1
-        }
+	name: 'index',
+	components: {
+	  board, myLabel, articleList
+	},
+	created () {
+	  $articleApi = new ArticleApi(this.$store)
+	  $articleLabelApi = new ArticleLabelApi(this.$store)
+	  this.init()
+	},
+	mounted () {
+	  this.onScroll()
+	  this.$store.commit('setBackground', '#F3F3F3')
+	},
+	methods: {
+	  changeTabs (index) {//tab变更
+		console.log(index)
+		this.page.is_end = false
+		let labelId = undefined
+		this.handleState(true)//关闭所有子页面
+		if ( index !== -1 ) {
+		  labelId = this.userLabels[ index ].label_id
+		}
+		setTimeout(() => {
+		  this.articleList = []//如果是获取第一页，则数据清空
+		  this.getArticleList(0, labelId, () => {
+			this.handleState(false, index + 1)//启动子页面
+		  })
+		}, 250)
+	  },
+	  handleState (stop, index) {
+		if ( stop ) {
+		  console.log('关闭所有子页面')
+		  //关闭所有子页面
+		  for ( let i = 0; i < this.state.length; i++ ) {
+			if ( this.state[ i ] !== 0 ) {
+			  this.state[ i ] = 0
+			}
+		  }
+		} else {
+		  //开启指定页面
+		  this.state[ index ] = 1
+		}
+	  },
+	  addItem (item) {
+		const removed = _.head(this.userLabels) //删除头元素,为新的元素腾出位置
+		this.userLabels = _.drop(this.userLabels)
+		this.userLabels.push(item)//将新元素加入userlabel
+		_.pull(this.more, item)//在more中删除新加入的元素
+		this.more.push(removed)//在more中加入从userlabel中删除的元素
+		this.changeTabs(3)
+		this.$nextTick(() => {
+		  this.currentItem = 'tab-' + item.label_id//更新当前item
+		})
+	  },
+	  init () {
+		/**
+		 * 页面初始化
+		 * 读取文章列表
+		 * 读取轮播图列表
+		 * 读取用户label列表
+		 * 读取文章label列表
+		 */
+		$articleApi.getArticleList(0).then(result => {
+		  if ( result.status === $status.SUCCESS ) {
+			this.articleList = result.data.list
+			this.page = result.data.page
+		  }
+		}).catch((e) => {
+		  console.log(e)
+		  this.$message.error('获取数据失败！')
+		})
 
-      },
-      addItem (item) {
-        const removed = _.head(this.userLabels) //删除头元素,为新的元素腾出位置
-        this.userLabels = _.drop(this.userLabels)
-        this.userLabels.push(item)//将新元素加入userlabel
-        _.pull(this.more, item)//在more中删除新加入的元素
-        this.more.push(removed)//在more中加入从userlabel中删除的元素
-        this.changeTabs(3)
-        this.$nextTick(() => {
-          this.currentItem = 'tab-' + item.label_id//更新当前item
-        })
-      },
-      onScroll () {
-        let offsetTop = window.pageYOffset
-        let element = this.$refs.swiper
-        if (!_.isUndefined(element)) {
-          let top = element.offsetHeight
-          if (offsetTop >= top + 35) {
-            // 如果当前浏览部分的上端距离大于轮播图下边，则固定board和hotTopic
-            if (!this.isFixed) {
-              this.isFixed = true
-              let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
-              let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
-              this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
-              this.topicStyle = 'width:' + width + 'px'
-            }
-          } else {
-            this.isFixed = false
-            this.style = ''
-          }
-        }      },
-      getArticleList (pageNum, labelId, callback) {//获取文章列表
-        console.log('开始读取', labelId)
-        if (!this.page.is_end) {
-          setTimeout(() => {
-            $articleApi.getArticleList(pageNum, labelId).then(result => {
-              if (result.status === this.$status.SUCCESS) {
-                for (let i = 0; i < result.data.list.length; i++) {
-                  this.articleList.push(result.data.list[i])
-                }
-                this.page = result.data.page
-              }
-              if (_.isFunction(callback)) {
-                console.log('回调')
-                callback()
-              }
-            })
-          }, 500)
-        } else {
-          this.handleState(true)
-          console.log('没有了')
-          if (_.isFunction(callback)) {
-            console.log('回调')
-            callback()
-          }
-        }
-      }
-    },
+		$articleLabelApi.returnType = $articleLabelApi.RETURN_TYPE.Map//设置返回方式为map形式
+		$articleLabelApi.waitSend()//暂不发送请求
+		$articleLabelApi.getArticleLabelListSimple()
+		if ( this.$store.state.isLogin ) {
+		  //已经登陆了，读取用户的标签
+		  $articleLabelApi.getUserLabelListSimple()
+		}
+		$articleLabelApi.send().then(result => {//发送请求
+		  let articleLabelResult = result.getArticleLabelListSimple//读取文章标签列表信息
+		  let userLabelResult
+		  if ( !_.isUndefined(result.getUserLabelListSimple) ) {//如果发送了获取用户标签列表信息
+			userLabelResult = result.getUserLabelListSimple//读取数据
+			if ( userLabelResult.status === Status.SUCCESS ) {//成功获取数据
+			  if ( userLabelResult.data.label.length > 4 ) {//如果用户标签列表个数大于4个，则将剩余的放入到more里面
+				this.userLabels = _.slice(userLabelResult.data.label, 0, 4)
+				this.more = _.slice(userLabelResult.data.label, 4)
+			  } else {
+				this.userLabels = userLabelResult.data.label
+			  }
+			}
+		  }
+		  if ( articleLabelResult.status === Status.SUCCESS ) {//成功读取
+			this.labels = articleLabelResult.data.label
+			if ( !this.$store.state.isLogin ) {//如果没有登录
+			  this.userLabels = _.slice(articleLabelResult.data.label, 0, 4)
+			}
+		  }
+		})
+	  },
+	  onScroll () {
+		let offsetTop = window.pageYOffset
+		let element = this.$refs.swiper
+		if ( !_.isUndefined(element) ) {
+		  let top = element.offsetHeight
+		  if ( offsetTop >= top + 35 ) {
+			// 如果当前浏览部分的上端距离大于轮播图下边，则固定board和hotTopic
+			if ( !this.isFixed ) {
+			  this.isFixed = true
+			  let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
+			  let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
+			  this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
+			  this.topicStyle = 'width:' + width + 'px'
+			}
+		  } else {
+			this.isFixed = false
+			this.style = ''
+		  }
+		}
+	  },
+	  getArticleList (pageNum, labelId, callback) {//获取文章列表
+		console.log('开始读取', labelId)
+		if ( !this.page.is_end ) {
+		  setTimeout(() => {
+			$articleApi.getArticleList(pageNum, labelId).then(result => {
+			  if ( result.status === this.$status.SUCCESS ) {
+				for ( let i = 0; i < result.data.list.length; i++ ) {
+				  this.articleList.push(result.data.list[ i ])
+				}
+				this.page = result.data.page
+			  }
+			  if ( _.isFunction(callback) ) {
+				callback()
+			  }
+			})
+		  }, 500)
+		} else {
+		  this.handleState(true)
+		  console.log('没有了')
+		  if ( _.isFunction(callback) ) {
+			console.log('回调')
+			callback()
+		  }
+		}
+	  }
+	},
 
-    asyncData ({store}) {
-      $articleApi = new ArticleApi(store)
-      return $articleApi.getArticleList(0).then(result => {
-        if (result.status === $status.SUCCESS) {
-          return {articleList: result.data.list, page: result.data.page}
-        }
-      })
-    },
-    data: function () {
-      return {
-        timer: null,
-        state: [1, 0, 0, 0, 0],
-        isFixed: false,
-        boardStyle: '',
-        topicStyle: '',
-        scrollDisabled: false,
-        showLoadMore: false,
-        loadTimes: 1,
-        showLoad: false,
-        currentItem: '',
-        //轮播图配置
-        swiperOption: {
-          loop: true,
-          slidesPerView: 'auto',
-          spaceBetween: 30,
-          autoplay: true,
-          effect: 'fade',
-          fadeEffect: {
-            crossFade: true,
-          },
-          navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-          },
-          pagination: {
-            el: '.swiper-pagination',
-            dynamicBullets: true
-          }
-        },
-        swiperItems: [
-          '/img/Temp/1.jpg', '/img/Temp/2.jpg', '/img/Temp/3.jpg', '/img/Temp/4.jpg'
-        ],
-        userLabels: [
-          {
-            label_id: '2',
-            label_name: '操作系统',
-            link: '#icon-os'
-          },
-          {
-            label_id: '1',
-            label_name: '前端',
-            link: '#icon-front'
-          },
-          {
-            label_id: '4',
-            label_name: '人工智能',
-            link: '#icon-AI'
-          },
-          {
-            label_id: '3',
-            label_name: 'Android',
-            link: '#icon-android'
-          }
-        ],
-        more: [
-          {
-            label_id: '5',
-            label_name: '算法',
-            link: '#icon-os'
-          }
-        ],
-        labels: [
-          {
-            label_id: '123456',
-            label_name: '操作系统',
-            link: '#icon-os'
-          },
-          {
-            label_id: '123456',
-            label_name: '前端',
-            link: '#icon-front'
-          },
-          {
-            label_id: '123456',
-            label_name: '人工智能',
-            link: '#icon-AI'
-          },
-          {
-            label_id: '123456',
-            label_name: 'Android',
-            link: '#icon-android'
-          }],
-        boards: [
-          {
-            icon: 'icon-discussion',
-            iconStyle: {
-              color: '#18ADED'
-            },
-            back: {
-              background: 'rgba(24, 173, 237, .4)'
-            },
-            text: '发讨论',
-            href: '/discussions'
-          },
-          {
-            icon: 'icon-write',
-            iconStyle: {
-              color: '#8E44AD'
-            },
-            back: {
-              background: 'rgba(166, 57, 168, .4)'
-            },
-            text: '写文章',
-            href: '/article/write'
-          },
-          {
-            icon: 'icon-educate',
-            iconStyle: {
-              color: '#259B24'
-            },
-            back: {
-              background: 'rgba(37, 155, 36, .4)'
-            },
-            text: '学知识',
-            href: '/educate'
-          },
-          {
-            icon: 'icon-about',
-            iconStyle: {
-              color: '#FF9800'
-            },
-            back: {
-              background: 'rgba(255, 128, 0, .4)'
-            },
-            text: '关于',
-            href: '/about'
-          }
-        ]
-      }
-    },
+	data: function () {
+	  return {
+		articleList: [],
+		page: {},
+		state: [ 1, 0, 0, 0, 0 ],//子页面状态器
+		isFixed: false,
+		boardStyle: '',
+		topicStyle: '',
+		currentItem: '',
+		//轮播图配置
+		swiperOption: {
+		  loop: true,
+		  slidesPerView: 'auto',
+		  spaceBetween: 30,
+		  autoplay: true,
+		  effect: 'fade',
+		  fadeEffect: {
+			crossFade: true,
+		  },
+		  navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev',
+		  },
+		  pagination: {
+			el: '.swiper-pagination',
+			dynamicBullets: true
+		  }
+		},
+		swiperItems: [
+		  '/img/Temp/1.jpg', '/img/Temp/2.jpg', '/img/Temp/3.jpg', '/img/Temp/4.jpg'
+		],
+		userLabels: [],
+		more: [],
+		labels: [],
+		boards: [
+		  {
+			icon: 'icon-discussion',
+			iconStyle: {
+			  color: '#18ADED'
+			},
+			back: {
+			  background: 'rgba(24, 173, 237, .4)'
+			},
+			text: '发讨论',
+			href: '/discussions'
+		  },
+		  {
+			icon: 'icon-write',
+			iconStyle: {
+			  color: '#8E44AD'
+			},
+			back: {
+			  background: 'rgba(166, 57, 168, .4)'
+			},
+			text: '写文章',
+			href: '/article/write'
+		  },
+		  {
+			icon: 'icon-educate',
+			iconStyle: {
+			  color: '#259B24'
+			},
+			back: {
+			  background: 'rgba(37, 155, 36, .4)'
+			},
+			text: '学知识',
+			href: '/educate'
+		  },
+		  {
+			icon: 'icon-about',
+			iconStyle: {
+			  color: '#FF9800'
+			},
+			back: {
+			  background: 'rgba(255, 128, 0, .4)'
+			},
+			text: '关于',
+			href: '/about'
+		  }
+		]
+	  }
+	},
   }
 </script>
 

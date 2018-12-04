@@ -61,61 +61,65 @@
 
 <script>
   export default {
-
-    mounted () {
-      this.createTime = this.$utils.transformTime(this.article.update_time)
-    },
-    props: {
-      article: {
-        type: Object
-      },
-      label: {
-        type: Object
-      },
-      user: {
-        type: Object
-      },
-      index: {
-        type: Number
-      }
-    },
-    methods: {
-      operation () {
-        // todo 等api写好后需要修改
-        this.dynamic.is_collected = !this.dynamic.is_collected
-      },
-      mouseOver () {
-        this.show = true
-        setTimeout(() => {
-          if (this.show) {
-            this.$store.commit('userCard/needToFlush', this.user.user_id)
-            let data = {
-              index: this.index,
-              hover: true
-            }
-            this.$store.commit('userCard/setHover', data)
-          }
-        }, 200)
-      },
-      mouseLeave () {
-        this.show = false
-        setTimeout(() => {
-          if (!this.show) {
-            let data = {
-              index: this.index,
-              hover: false
-            }
-            this.$store.commit('userCard/setHover', data)
-          }
-        }, 100)
-      }
-    },
-    data: function () {
-      return {
-        show: false,
-        createTime: ''
-      }
-    }
+	created () {
+	  this.createTime = this.$utils.transformTime(this.article.update_time)
+	},
+	props: {
+	  article: {
+		type: Object
+	  },
+	  label: {
+		type: Object
+	  },
+	  user: {
+		type: Object
+	  },
+	  index: {
+		type: Number
+	  }
+	},
+	watch: {
+	  'article.update_time': function () {
+		this.createTime = this.$utils.transformTime(this.article.update_time)
+	  }
+	},
+	methods: {
+	  operation () {
+		// todo 等api写好后需要修改
+		this.dynamic.is_collected = !this.dynamic.is_collected
+	  },
+	  mouseOver () {
+		this.show = true
+		setTimeout(() => {
+		  if ( this.show ) {
+			this.$store.commit('userCard/needToFlush', this.user.user_id)
+			let data = {
+			  index: this.index,
+			  hover: true
+			}
+			this.$store.commit('userCard/setHover', data)
+		  }
+		}, 200)
+	  },
+	  mouseLeave () {
+		this.show = false
+		setTimeout(() => {
+		  if ( !this.show ) {
+			let data = {
+			  index: this.index,
+			  hover: false
+			}
+			this.$store.commit('userCard/setHover', data)
+		  }
+		}, 100)
+	  }
+	},
+	data: function () {
+	  return {
+		show: false,
+		createTime: ''
+	  }
+	}
   }
 </script>
 

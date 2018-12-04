@@ -17,7 +17,8 @@ const Constant = {
   IMAGE_ARTICLE: 'article',
   IMAGE_DISCUSSION: 'discussion',
   IMAGE_OTHER: 'other',
-  NEWS:'0000000000'
-
+  NEWS: '0000000000',
+  NEW_LIST: 'new',
+  HOT_LIST: 'hot'
 }
 export default Constant

@@ -21,6 +21,8 @@ const Status = {
   USER_NOT_FOLLOWED: 121,//该用户未关注
   COMMENT_HAS_DELETE: 124,//评论已删除
   USER_HAS_SUPPORT_OR_OBJECT: 125,//已支持或者已反对
-  USER_NOT_SUPPORT_OR_OBJECT:126,//未支持或者未反对
+  USER_NOT_SUPPORT_OR_OBJECT: 126,//未支持或者未反对
+  NO_USER_LABEL: 137,//用户没有自定义标签
+  LABEL_NOT_EXIST : 134,//标签不存在
 }
 export default Status
