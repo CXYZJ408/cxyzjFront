@@ -125,7 +125,7 @@ async function proxyOne (request, returnType) {//单个请求
     if (returnType === RETURN_TYPE.Array) {//提取数据
       return result[0]
     } else {
-      return result[request[0].name]
+      return result
     }
   })
 }
