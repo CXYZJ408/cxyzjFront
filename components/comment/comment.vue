@@ -18,7 +18,7 @@
                                        :commentIndex="commentIndex" :replyIndex="index"
                                        :user="child.replier"></replyTemplate>
                         <hr v-if="index!==children.length-1" class="hr-dash my-1"
-                            style="border-color: #EFEFEF!important;">
+                            style="border-color: #E8E8E8!important;">
                     </template>
                     <v-layout row wrap py-2>
                         <v-flex md4>
@@ -46,14 +46,14 @@
                         </v-flex>
                     </v-layout>
                 </template>
-                <publishComment v-if="showReply" @cancel="cancel" @publishComment="publishComment"
+                <publishComment v-if="showReply" @cancel="cancel" @publishComment="publishReply"
                                 :mode="1" :replyUser="replyUser"></publishComment>
             </v-card>
         </v-flex>
         <v-flex md12 v-else class="clearAll">
 
             <v-card color="#F8F9F9" tile flat class="pl-2 pt-4 pr-3" v-if="showReply">
-                <publishComment @cancel="cancel" @publishComment="publishComment"
+                <publishComment @cancel="cancel" @publishComment="publishReply"
                                 :mode="1" :replyUser="replyUser"></publishComment>
             </v-card>
         </v-flex>
@@ -63,193 +63,198 @@
 <script>
   import commentTemplate from '~/components/comment/commentTemplate.vue'
   import replyTemplate from '~/components/comment/replyTemplate.vue'
-  import {ArticleCommentApi} from '../../api/ArticleCommentApi'
+  import { ArticleCommentApi } from '../../api/ArticleCommentApi'
   import publishComment from '~/components/comment/publishComment.vue'
   import Status from '../../utils/status'
-  import {CommentApi} from '../../api/CommentApi'
+  import { CommentApi } from '../../api/CommentApi'
 
   let $commentApi
 
   let $articleCommentApi
   export default {
-    name: 'comment',
-    props: {
-      comment: {
-        type: Object
-      },
-      discusser: {
-        type: Object
-      },
-      children: {
-        type: Array
-      },
-      commentIndex: {
-        type: Number
-      }
-    },
-    components: {
-      commentTemplate, replyTemplate, publishComment
-    },
-    computed: {
-      leftLoad: function () {
-        return this.comment.children - this.hasLoad
-      }
-    },
-    mounted () {
-      $articleCommentApi = new ArticleCommentApi(this.$store)
-      $commentApi = new CommentApi(this.$store)
-      if (this.comment.children <= 5) {
-        this.page.is_end = true
-        this.hasLoad = this.comment.children
-      }
-    },
-    data: function () {
-      return {
-        page: {
-          is_end: false,
-          page_num: 0,
-          total: 0
-        },
-        hasUp: false,
-        hasLoad: 5,
-        showReply: false,
-        replyUser: {}
-      }
-    },
-    methods: {
-      deleteCommentReply (commentIndex, replyIndex = null) {
-        if (_.isNull(replyIndex)) {
-          $articleCommentApi.deleteCommentReply(this.$store.state.comment.commentList[commentIndex].comment.comment_id,
-            replyIndex, this.$store.state.article.article.article_id).then(res => {
-            console.log(res)
-            if (res.status === Status.SUCCESS) {
-              let data = {
-                deleteComment: true,
-                commentIndex: commentIndex,
-              }
-              this.$store.commit('comment/deleteCommentReply', data)
-              this.$store.commit('article/setArticleComments', res.data.comments)
-              this.$message.success('删除成功！')
-            } else if (res.status === Status.COMMENT_HAS_DELETE) {
-              this.$message.warning('该评论已经不存在！')
-            }
-          })
-        } else {
-          $articleCommentApi.deleteCommentReply(this.$store.state.comment.commentList[commentIndex].comment.comment_id,
-            this.$store.state.comment.commentList[commentIndex].children[replyIndex].reply.reply_id,
-            this.$store.state.article.article.article_id).then(res => {
-            console.log(res)
-            if (res.status === Status.SUCCESS) {
-              let data = {
-                deleteComment: false,
-                commentIndex: commentIndex,
-                replyIndex: replyIndex
-              }
-              this.$store.commit('comment/deleteCommentReply', data)
-              this.$store.commit('article/setArticleComments', res.data.comments)
-              this.$message.success('删除成功！')
-            } else if (res.status === Status.COMMENT_HAS_DELETE) {
-              this.$message.warning('该回复已经不存在！')
-            }
-          })
-        }
-      },
-      support (isComment, commentIndex, isSupport, commentReplyId, replyIndex) {
-        console.log(isSupport)
-        if (isSupport) {
-          console.log('取消')
-          //已经投过票，则取消投票
-          $commentApi.cancelSupportCommentReply(isComment, commentReplyId, this.$store.state.article.article.article_id).then(res => {
-            console.log(res)
-            if (res.status === Status.SUCCESS) {
-              this.$message.success('取消投票成功！')
-              //更新投票信息
-              let data = {
-                isComment: isComment,
-                isSupport: !isSupport,
-                commentIndex: commentIndex,
-                support: res.data.support,
-                replyIndex: replyIndex
-              }
-              this.$store.commit('comment/setCommentSupport', data)
-            } else if (res.status === Status.COMMENT_HAS_DELETE) {
-              this.$message.warning('该评论已被删除！')
-            } else if (res.status === Status.USER_NOT_SUPPORT_OR_OBJECT) {
-              this.$message.warning('您未支持或反对该评论！')
-            }
-          })
-        } else {
-          console.log('投票')
-          //未投票
-          $commentApi.supportCommentReply(isComment, commentReplyId, this.$store.state.article.article.article_id).then(res => {
-            console.log(res)
-            if (res.status === Status.SUCCESS) {
-              this.$message.success('投票成功！')
-              //更新投票信息
-              let data = {
-                isComment: isComment,
-                isSupport: !isSupport,
-                commentIndex: commentIndex,
-                support: res.data.support,
-                replyIndex: replyIndex
-              }
-              this.$store.commit('comment/setCommentSupport', data)
-            } else if (res.status === Status.COMMENT_HAS_DELETE) {
-              this.$message.warning('该评论已被删除！')
-            } else if (res.status === Status.USER_HAS_SUPPORT_OR_OBJECT) {
-              this.$message.warning('您已支持过该评论了！')
-            }
-          })
-        }
-      },
-      publishComment (text, replyUser, callback) {
-        if (text.length <= 5) {
-          this.$message.warning('评论不要少于5个字。。。。')
-        } else {
-          $articleCommentApi.publishReply(this.comment.comment_id, text, replyUser.user_id, this.$store.state.article.article.article_id).then(res => {
-            if (res.status === Status.SUCCESS) {
-              this.$store.commit('article/addArticleComments')
-              let data = {
-                index: this.commentIndex,
-                replyList: res.data.list
-              }
-              this.$message.success('回复发表成功！')
-              this.hasLoad++
-              this.showReply = false
-              this.$store.commit('comment/publishReply', data)
-              callback()
-            } else {
-              this.$message.error('回复发表失败！')
-            }
-          }).catch(() => {
-            this.$message.error('回复发表失败！')
-          })
-        }
-      },
-      cancel () {
-        this.showReply = false
-      },
-      reply (replyUser) {
-        this.replyUser = replyUser
-        this.showReply = true
-      },
-      up () {
-        this.hasUp = true
-      },
-      loadMore () {
-        this.page.page_num++
-        $articleCommentApi.getReplyList(this.$store.state.article.article.article_id, this.comment.comment_id, this.page.page_num).then(res => {
-          console.log(res.data)
-          this.page = res.data.page
-          let data = {
-            index: this.commentIndex,
-            replyList: res.data.list
-          }
-          this.hasLoad += res.data.list.length
-          this.$store.commit('comment/unionReplyList', data)
-        })
-      }
-    }
+	name: 'comment',
+	props: {
+	  comment: {
+		type: Object
+	  },
+	  discusser: {
+		type: Object
+	  },
+	  children: {
+		type: Array
+	  },
+	  commentIndex: {
+		type: Number
+	  }
+	},
+	components: {
+	  commentTemplate, replyTemplate, publishComment
+	},
+	computed: {
+	  leftLoad: function () {
+		return this.comment.children - this.hasLoad
+	  }
+	},
+	mounted () {
+	  $articleCommentApi = new ArticleCommentApi(this.$store)
+	  $commentApi = new CommentApi(this.$store)
+	  if ( this.comment.children <= 5 ) {
+		this.page.is_end = true
+		this.hasLoad = this.comment.children
+	  }
+	},
+	data: function () {
+	  return {
+		page: {
+		  is_end: false,
+		  page_num: 0,
+		  total: 0
+		},
+		hasUp: false,
+		hasLoad: 5,
+		showReply: false,
+		replyUser: {}
+	  }
+	},
+	methods: {
+	  deleteCommentReply (commentIndex, replyIndex = null) {
+		if ( _.isNull(replyIndex) ) {
+		  $articleCommentApi.deleteCommentReply(
+			this.$store.state.comment.commentList[ commentIndex ].comment.comment_id,
+			replyIndex, this.$store.state.article.article.article_id).then(res => {
+			console.log(res)
+			if ( res.status === Status.SUCCESS ) {
+			  let data = {
+				deleteComment: true,
+				commentIndex: commentIndex,
+			  }
+			  this.$store.commit('comment/deleteCommentReply', data)
+			  this.$store.commit('article/setArticleComments', res.data.comments)
+			  this.$message.success('删除成功！')
+			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {
+			  this.$message.warning('该评论已经不存在！')
+			}
+		  })
+		} else {
+		  $articleCommentApi.deleteCommentReply(
+			this.$store.state.comment.commentList[ commentIndex ].comment.comment_id,
+			this.$store.state.comment.commentList[ commentIndex ].children[ replyIndex ].reply.reply_id,
+			this.$store.state.article.article.article_id).then(res => {
+			console.log(res)
+			if ( res.status === Status.SUCCESS ) {
+			  let data = {
+				deleteComment: false,
+				commentIndex: commentIndex,
+				replyIndex: replyIndex
+			  }
+			  this.$store.commit('comment/deleteCommentReply', data)
+			  this.$store.commit('article/setArticleComments', res.data.comments)
+			  this.$message.success('删除成功！')
+			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {
+			  this.$message.warning('该回复已经不存在！')
+			}
+		  })
+		}
+	  },
+	  support (isComment, commentIndex, isSupport, commentReplyId, replyIndex) {
+		console.log(isSupport)
+		if ( isSupport ) {
+		  console.log('取消')
+		  //已经投过票，则取消投票
+		  $commentApi.cancelSupportCommentReply(isComment, commentReplyId,
+			this.$store.state.article.article.article_id).then(res => {
+			console.log(res)
+			if ( res.status === Status.SUCCESS ) {
+			  this.$message.success('取消投票成功！')
+			  //更新投票信息
+			  let data = {
+				isComment: isComment,
+				isSupport: !isSupport,
+				commentIndex: commentIndex,
+				support: res.data.support,
+				replyIndex: replyIndex
+			  }
+			  this.$store.commit('comment/setCommentSupport', data)
+			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {
+			  this.$message.warning('该评论已被删除！')
+			} else if ( res.status === Status.USER_NOT_SUPPORT_OR_OBJECT ) {
+			  this.$message.warning('您未支持或反对该评论！')
+			}
+		  })
+		} else {
+		  console.log('投票')
+		  //未投票，进行投票操作
+		  $commentApi.supportCommentReply(isComment, commentReplyId,
+			this.$store.state.article.article.article_id).then(res => {
+			console.log(res)
+			if ( res.status === Status.SUCCESS ) {
+			  this.$message.success('投票成功！')
+			  //更新投票信息
+			  let data = {
+				isComment: isComment,
+				isSupport: !isSupport,
+				commentIndex: commentIndex,
+				support: res.data.support,
+				replyIndex: replyIndex
+			  }
+			  this.$store.commit('comment/setCommentSupport', data)
+			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {
+			  this.$message.warning('该评论已被删除！')
+			} else if ( res.status === Status.USER_HAS_SUPPORT_OR_OBJECT ) {
+			  this.$message.warning('您已支持过该评论了！')
+			}
+		  })
+		}
+	  },
+	  publishReply (text, replyUser, callback) {
+		if ( text.length <= 5 ) {
+		  this.$message.warning('评论不要少于5个字。。。。')
+		} else {
+		  $articleCommentApi.publishReply(this.comment.comment_id, text, replyUser.user_id,
+			this.$store.state.article.article.article_id).then(res => {
+			if ( res.status === Status.SUCCESS ) {
+			  this.$store.commit('article/addArticleComments')
+			  let data = {
+				index: this.commentIndex,
+				replyList: res.data.list
+			  }
+			  this.$message.success('回复发表成功！')
+			  this.hasLoad++
+			  this.showReply = false
+			  this.$store.commit('comment/publishReply', data)
+			  callback()
+			} else {
+			  this.$message.error('回复发表失败！')
+			}
+		  }).catch(() => {
+			this.$message.error('回复发表失败！')
+		  })
+		}
+	  },
+	  cancel () {
+		this.showReply = false
+	  },
+	  reply (replyUser) {
+		this.replyUser = replyUser
+		this.showReply = true
+	  },
+	  up () {
+		this.hasUp = true
+	  },
+	  loadMore () {
+		this.page.page_num++
+		$articleCommentApi.getReplyList(this.$store.state.article.article.article_id, this.comment.comment_id, this.page.page_num).then(res => {
+		  console.log(res.data)
+		  this.page = res.data.page
+		  let data = {
+			index: this.commentIndex,
+			replyList: res.data.list
+		  }
+		  this.hasLoad += res.data.list.length
+		  this.$store.commit('comment/unionReplyList', data)
+		})
+	  }
+	}
   }
 </script>
 

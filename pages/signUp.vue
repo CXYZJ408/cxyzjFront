@@ -359,7 +359,8 @@
             this.$message.warning('密码太简单啦，加强一下吧！')
           } else {
             this.user.password = $md5(this.password1.split('').reverse().join(''))//将密码逆序同时进行md5处理
-            $userApi.registerUser(this.us.ni, this.user.email, this.user.password, this.user.gender, this.user.phone, this.user.head_url).then((res) => {
+            $userApi.registerUser(this.user.nickname, this.user.email, this.user.password,
+              this.user.gender, this.user.phone, this.user.head_url).then((res) => {
               //再次检测
               if (res.status === this.$status.NICKNAME_EXIST) {
                 this.step = '1'

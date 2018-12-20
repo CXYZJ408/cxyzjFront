@@ -106,21 +106,18 @@
 		window.addEventListener('scroll', this.debounce(this.handle, 150))
 	  },
 	  generateArticle ($vm) {
-		let marked = mavonEditor.getMarkdownIt()
-		let opts = {
-		  auto: false,
-		  code: false
-		}
+		let marked = mavonEditor.getMarkdownIt()//获取渲染引擎
+		let opts = { auto: false, code: false }
 		marked.use($hljs, opts).use($katex)
-		$vm.articleRender = marked.render($vm.article.text)
+		$vm.articleRender = marked.render($vm.article.text)//页面渲染
 	  },
 	  rendered () {
 		//等待文章主题内容加载完毕并出现在页面上
 		let observer = new IntersectionObserver(() => {
-		  tocbot.init({
+		  tocbot.init({//初始化文章目录
 			tocSelector: '.catalog',
 			contentSelector: '#articleContent',
-			headingSelector: 'h1, h2, h3, h4, h5, h6',
+			headingSelector: 'h1, h2, h3, h4, h5, h6',//提取对应标签作为文章目录
 			orderedList: false
 		  })
 		  let tmp = document.createElement('div')
@@ -128,11 +125,11 @@
 		  let nodes = tmp.children
 		  let article = ''
 		  if ( nodes.length ) {
-			for ( let i = 0; i < nodes.length; i++ ) {
+			for ( let i = 0; i < nodes.length; i++ ) {//遍历节点
 			  article += nodes[ i ].innerText
 			}
 		  }
-		  this.words = words(article)
+		  this.words = words(article)//计算文章字数
 		  observer.disconnect()
 		})
 		observer.observe(document.getElementById('articleContent'))

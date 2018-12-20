@@ -87,7 +87,7 @@
 		  this.loading = false
 		}
 	  },
-	  debounce (fn, wait) {
+	  debounce (fn, wait) {//防抖技术，保证方法只在滚动结束后执行
 		let timeout = null
 		this.event = function () {
 		  if ( timeout !== null ) clearTimeout(timeout)
@@ -95,7 +95,7 @@
 		}
 		return this.event
 	  },
-	  handle () {
+	  handle () {//滚动结束后执行的计算操作
 		if ( !this.loading && this.state === 1 ) {
 		  let current = window.pageYOffset + window.screen.availHeight + 200
 		  let element = this.$refs.list
@@ -103,13 +103,13 @@
 			const offsetTop = element.getBoundingClientRect().top + window.scrollY
 			if ( current > offsetTop + element.offsetHeight ) {//预加载
 			  this.loading = true
-			  this.load()
+			  this.load()//加载页面数据
 			}
 		  }
 		}
 	  },
 	  onScroll () {
-		window.addEventListener('scroll', this.debounce(this.handle, 150))
+		window.addEventListener('scroll', this.debounce(this.handle, 150))//注册滚动条监听事件
 	  },
 	  load () {
 		if ( this.isLabelArticleList ) {

@@ -23,7 +23,7 @@
                                         <v-icon left size="30">iconfont icon-write</v-icon>
                                         <span class="title">投稿</span>
                                     </v-btn>
-                                    <v-btn round color="#2EC16C" dark depressed @click="select">
+                                    <v-btn round color="#2EC16C" dark depressed @click="choose">
                                         <v-icon left size="30">add</v-icon>
                                         <span class="title">{{label.is_select?'已关注':'关注'}}</span>
                                     </v-btn>
@@ -138,7 +138,7 @@
 	  this.$store.commit('setBackground', '#F3F3F3')
 	},
 	methods: {
-	  select () {
+	  choose () {
 		if ( this.$store.state.isLogin ) {
 		  if ( !this.label.is_select ) {
 			$articleLabelApi.addUserLabel(this.labels.label_id).then(result => {
@@ -218,9 +218,8 @@
 	  init () {
 		let labelId = this.$route.fullPath.split('/')[ 3 ]//读取labelId
 		this.label.label_id = labelId
-		$articleLabelApi.getArticleLabelDetails(labelId, false).getArticleListByLabelIdAndType(this.label.label_id, 0, Constant.HOT_LIST)
-		  .then(result => {
-			console.log(result)
+		$articleLabelApi.getArticleLabelDetails(labelId, false).
+        getArticleListByLabelIdAndType(this.label.label_id, 0, Constant.HOT_LIST).then(result => {
 			let articleLabelInfo = result[ 0 ]
 			let articleList = result[ 1 ]
 			if ( articleLabelInfo.status === Status.SUCCESS ) {

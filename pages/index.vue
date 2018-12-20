@@ -28,9 +28,9 @@
                 <v-flex md9 xl7>
                     <v-card id="main">
                         <v-layout row wrap justify-center align-center>
-                            <v-card-title class="headline green--text pb-2">
-                                <strong class="mt-1 pl-2">热门文章</strong>
-                            </v-card-title>
+                            <v-flex md2 class="headline green--text mt-3 pl-5">
+                                <strong class="mt-1 ">热门文章</strong>
+                            </v-flex>
                             <v-flex md9 class="mt-3">
                                 <v-tabs
                                         v-model="currentItem"
@@ -71,6 +71,7 @@
                                     </v-menu>
                                 </v-tabs>
                             </v-flex>
+                            <v-spacer></v-spacer>
                             <v-flex md1 class="mt-3" v-if="$store.state.isLogin">
                                 <nuxt-link :to="{path:'/article/labels?tab=user'}">
                                     <el-tooltip>

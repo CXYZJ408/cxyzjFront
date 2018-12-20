@@ -87,7 +87,8 @@
         console.log('getCommentList --------')
         if (_.isEmpty(this.$store.state.comment.hotCommentList)) {
           //如果hotCommentList没有获取过
-          $articleCommentApi.getHotCommentList(this.$store.state.article.article.article_id, false).getCommentList(this.$store.state.article.article.article_id, pageNum).then((res) => {
+          $articleCommentApi.getHotCommentList(this.$store.state.article.article.article_id, false)
+            .getCommentList(this.$store.state.article.article.article_id, pageNum).then((res) => {
             let resHotCommentList = res[0]
             let resCommentList = res[1]
             console.log(res)
@@ -101,7 +102,8 @@
             this.loading = false
           })
         } else {
-          $articleCommentApi.getCommentList(this.$store.state.article.article.article_id, pageNum).then((res) => {
+          $articleCommentApi.getCommentList(this.$store.state.article.article.article_id, pageNum)
+            .then((res) => {
             console.log(res)
             if (res.status === Status.SUCCESS) {
               this.loading = false
@@ -135,7 +137,8 @@
         if (text.length <= 5) {
           this.$message.warning('评论不要少于5个字。。。。')
         } else {
-          $articleCommentApi.publishComment(text, this.$store.state.article.article.article_id).then((result) => {
+          $articleCommentApi.publishComment(text, this.$store.state.article.article.article_id)
+            .then((result) => {
             if (result.status === Status.SUCCESS) {
               this.$message.success('评论发表成功！')
               this.$store.commit('article/addArticleComments')
