@@ -9,10 +9,10 @@
             <v-card flat tile>
                 <v-layout row wrap justify-center>
                     <v-flex md12>
-                        <span class="display-0">{{$store.state.article.publishedArticle.title}}</span>
+                        <span class="display-0">{{$store.state.article.publishedArticle.article.title}}</span>
                     </v-flex>
                     <v-flex md12 class="mt-4">
-                        <nuxt-link :to="{path:`/articles/${$store.state.article.publishedArticle.article_id}`}">
+                        <nuxt-link :to="{path:`/articles/${$store.state.article.publishedArticle.article.article_id}`}">
                             <span class="link">
                                 <v-icon color="#42C02E" large class="pr-2">done</v-icon>发布成功，点击查看文章
                             </span>
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import myLabel from '~/components/article/labelSimple.vue'
+  import myLabel from '~/components/article/labelURL.vue'
 
   export default {
     name: 'publishSuccess',
@@ -73,11 +73,12 @@
     data: function () {
       return {
         //TODO 修改路径
-        path: `http://localhost:3000/article/${this.$store.state.article.publishedArticle.article_id}`
+        path: `http://localhost:3000/articles/${this.$store.state.article.publishedArticle.article.article_id}`
       }
     },
     methods: {
       copy () {
+        this.$message.success("链接复制成功！")
         let url = document.getElementById('urlPath')
         url.select()
         document.execCommand('Copy')

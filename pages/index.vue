@@ -2,10 +2,10 @@
     <div id="myIndex">
         <v-container grid-list-md class="clearPadding mb-5" v-scroll="onScroll">
             <v-layout row wrap>
-                <toolbar :font_size=28 :icon_size=28 :index=true></toolbar>
+                <toolbar :font_size=28 :icon_size=28 :index=true @down="down" @up="up"></toolbar>
             </v-layout>
             <v-layout align-center justify-center wrap ref="swiper"
-                      style="margin-top: 90px!important;height:65vh;min-height: 500px">
+                      style="height:65vh;min-height: 500px" mt-3>
                 <v-flex md12 xl9 wrap>
                     <no-ssr>
                         <div>
@@ -160,7 +160,7 @@
 
 <script>
   import board from '~/components/index/board.vue'
-  import myLabel from '~/components/article/labelSimple.vue'
+  import myLabel from '~/components/article/labelURL.vue'
   import articleList from '~/components/article/articleList.vue'
   import $status from '~/utils/status'
   import { ArticleApi } from '../api/ArticleApi'
@@ -185,6 +185,12 @@
 	  this.$store.commit('setBackground', '#F3F3F3')
 	},
 	methods: {
+	  down () {//页面向下滚动
+		this.hotTop = 30
+	  },
+	  up () {//页面向上滚动
+		this.hotTop = 70
+	  },
 	  changeTabs (index) {//tab变更
 		console.log(index)
 		this.page.is_end = false
@@ -282,13 +288,14 @@
 			if ( !this.isFixed ) {
 			  this.isFixed = true
 			  let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
-			  let height = this.$refs.hotTopic.offsetHeight + 70 //重新设置距离顶部的高度
+			  let height = this.$refs.hotTopic.offsetHeight + this.hotTop //重新设置距离顶部的高度
 			  this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
-			  this.topicStyle = 'width:' + width + 'px'
+			  this.topicStyle = 'width:' + width + 'px;top:' + this.hotTop + 'px'
 			}
 		  } else {
 			this.isFixed = false
-			this.style = ''
+			this.topicStyle = ''
+			this.boardStyle = ''
 		  }
 		}
 	  },
@@ -321,6 +328,7 @@
 
 	data: function () {
 	  return {
+		hotTop: 0,
 		articleList: [],
 		page: {},
 		state: [ 1, 0, 0, 0, 0 ],//子页面状态器
@@ -416,7 +424,6 @@
 
     #myIndex .fixed {
         position: fixed;
-        top: 70px;
     }
 
     #myIndex .fixed2 {

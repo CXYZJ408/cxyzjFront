@@ -4,7 +4,7 @@
             <h1>{{article.title}}</h1>
             <hr>
         </v-flex>
-        <v-flex md12 class="pt-3">
+        <v-flex md12 class="pt-3" v-if="!readModel">
             <v-layout class="user pa-2">
                 <v-flex md1>
                     <v-avatar size="65">
@@ -49,30 +49,12 @@
                     <articleLabel :label="label" fontColor="white" backColor="#5DADE2"></articleLabel>
                 </v-flex>
                 <v-spacer></v-spacer>
-                <v-flex md2 class="text-md-right"><span class="subheading grey--text more"
-                > 举报文章</span></v-flex>
+                <v-flex md2 class="text-md-right" v-if="allowReport"><span
+                        class="subheading grey--text more"> 举报文章</span></v-flex>
             </v-layout>
         </v-flex>
         <v-flex md12>
-            <v-layout mt-1>
-                <v-flex md6>
-                    <v-icon color="grey" size="22">iconfont icon-attention</v-icon>
-                    <span class="body-2 pl-1 grey--text">{{article.views}}</span>
-                    <v-icon class="ml-3" color="grey" size="22">iconfont icon-comment2</v-icon>
-                    <span class="body-2 pl-1 grey--text">{{article.comments}}</span>
-                    <v-icon class="ml-3" color="grey" size="20" :class="{'redfont':article.is_collected}">iconfont
-                        icon-collection
-                    </v-icon>
-                    <span class="body-2 pl-1 grey--text" :class="{'redfont':article.is_collected}">{{article.collections}}</span>
-                </v-flex>
-                <v-spacer></v-spacer>
-                <v-flex md3 class="text-md-right ">
-                    <nuxt-link to="/">
-                        <v-icon color="#FF9800" size="22">iconfont icon-share</v-icon>
-                        <span class="black--text body-2 pl-2">分享</span>
-                    </nuxt-link>
-                </v-flex>
-            </v-layout>
+            <slot name="articleTools"></slot>
         </v-flex>
         <v-flex md12 class="mt-2">
             <hr class="hr-dash">
@@ -81,35 +63,42 @@
 </template>
 
 <script>
-  import articleLabel from '~/components/article/labelSimple.vue'
+  import articleLabel from '~/components/article/labelURL.vue'
 
   export default {
-    name: 'articleContent',
-    components: {
-      articleLabel
-    },
-    mounted () {
-      this.createTime = this.$utils.transformTime(this.article.update_time)
-    },
-    props: {
-      article: {
-        type: Object
+	name: 'articleContent',
+	components: {
+	  articleLabel
+	},
+	mounted () {
+	  this.createTime = this.$utils.transformTime(this.article.update_time)
+	},
+	props: {
+	  readModel:{
+	    type:Boolean
       },
-      user: {
-        type: Object
-      },
-      label: {
-        type: Object
-      },
-      catalogs: {
-        type: Array
-      }
-    },
-    data: function () {
-      return {
-        createTime: ''
-      }
-    },
+	  article: {
+		type: Object
+	  },
+	  user: {
+		type: Object
+	  },
+	  label: {
+		type: Object
+	  },
+	  catalogs: {
+		type: Array
+	  },
+	  allowReport: {
+		type: Boolean,
+		default: true
+	  }
+	},
+	data: function () {
+	  return {
+		createTime: ''
+	  }
+	},
 
   }
 </script>

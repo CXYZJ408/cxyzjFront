@@ -12,7 +12,6 @@ axios.interceptors.request.use(config => {
     token = 'Bearer ' + $store.state.token//在请求头部加上token，用于用户认证
     config.headers.Authorization = token
   }
-
   return config
 }, error => {
   return Promise.reject(error)

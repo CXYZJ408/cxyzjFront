@@ -20,21 +20,21 @@ export function dataURLtoFile (dataUrl, filename) {//base64转file
   return new File([ u8arr ], filename, { type: mime })
 }
 
-export function setString(str, len) {
-  var strlen = 0;
-  var s = "";
-  for (var i = 0; i < str.length; i++) {
-	if (str.charCodeAt(i) > 128) {
-	  strlen += 2;
+export function setString (str, len) {
+  var strlen = 0
+  var s = ''
+  for ( var i = 0; i < str.length; i++ ) {
+	if ( str.charCodeAt(i) > 128 ) {
+	  strlen += 2
 	} else {
-	  strlen++;
+	  strlen++
 	}
-	s += str.charAt(i);
-	if (strlen >= len) {
-	  return s+"...";
+	s += str.charAt(i)
+	if ( strlen >= len ) {
+	  return s + '...'
 	}
   }
-  return s;
+  return s
 }
 
 export function transformTime (time) {
@@ -53,27 +53,6 @@ export function transformTime (time) {
 
 export function firstUpperCase (str) {
   return str.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase())
-}
-
-export function setInterval (callback, interval) {
-  const now = Date.now
-  let startTime = now()
-  let endTime = startTime
-  let intervalTimer
-  const loop = () => {
-	intervalTimer = window.requestAnimationFrame(loop)
-	endTime = now()
-	if ( endTime - startTime >= interval ) {
-	  startTime = endTime = now()
-	  callback()
-	}
-  }
-  intervalTimer = window.requestAnimationFrame(loop)
-  return intervalTimer
-}
-
-export function clearInterval (intervalTimerId) {
-  window.cancelAnimationFrame(intervalTimerId)
 }
 
 export function guid () {
@@ -96,4 +75,36 @@ export function words (text) {
   str = str.replace(/龘+/g, '')
   //返回字数
   return str.length
+}
+
+export function scrollToSmooth (size, callback) {
+  let currentTop = document.documentElement.scrollTop || document.body.scrollTop
+  let decrement
+  let interval
+  interval = setInterval(() => {
+	console.log(Math.abs(currentTop - size))
+	if ( Math.abs(currentTop - size) > 1 ) {
+	  if ( Math.abs(currentTop - size) < 20 ) {
+		decrement = 1
+	  } else if ( Math.abs(currentTop - size) < 100 && Math.abs(currentTop - size) >= 20 ) {
+		decrement = 7
+	  } else if ( Math.abs(currentTop - size) >= 100 && Math.abs(currentTop - size) < 500 ) {
+		decrement = 15
+	  } else {
+		decrement = 30
+	  }
+	  if ( currentTop > size ) {
+		currentTop -= decrement
+	  } else {
+		currentTop += decrement
+	  }
+	  scrollTo(0, currentTop)
+	} else {
+	  clearInterval(interval)
+	  console.log('clear', interval)
+	  if ( _.isFunction(callback) ) {
+		callback()
+	  }
+	}
+  }, 1)
 }
