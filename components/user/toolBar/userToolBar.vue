@@ -1,5 +1,5 @@
 <template>
-    <ToolBarTemplate @up="up" @down="down">
+    <ToolBarTemplate @up="up" @down="down" :otherHeight="otherHeight" ref="ToolBarTemplate">
         <v-container grid-list-md class="clearPadding  mt-2" slot="toolBarMain">
             <v-layout align-center justify-center>
                 <v-flex xl9 md12>
@@ -23,7 +23,7 @@
                             </el-tooltip>
                             <el-dropdown @command="handleCommand" trigger="click">
                                 <v-avatar :size="40" class="avatar ml-2">
-                                    <img :src="$store.state.user.head_url" v-bind:class="widthHeight" alt="">
+                                    <img :src="$store.state.user.head_url" :class="widthHeight" alt="">
                                 </v-avatar>
                                 <el-dropdown-menu slot="dropdown">
                                     <el-dropdown-item command="userCenter">个人中心</el-dropdown-item>
@@ -53,6 +53,10 @@
 	  icons
 	},
 	props: {
+	  otherHeight: {
+		type: Number,
+		default: 0
+	  },
 	  index: {
 		type: Boolean,
 		default: false
@@ -116,6 +120,7 @@
 		  $cookie.remove('token')//移除token
 		  $cookie.remove('refreshToken')
 		  this.$router.push({ path: `/` })
+		  location.reload()
 		} else if ( command === 'userCenter' ) {
 		  this.$router.push({ path: `/user/${this.$store.state.user.user_id}/articles` })
 		}

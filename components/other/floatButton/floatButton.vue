@@ -14,17 +14,9 @@
         <v-btn fab small color="white" @click="deleteArticle" v-if="deleteBtn">
             <v-icon color="red" size="25">delete</v-icon>
         </v-btn>
-        <v-btn fab small color="white" @click="comment" v-if="commentBtn">
-            <v-icon color="green" size="25">iconfont icon-comment</v-icon>
-        </v-btn>
+
         <v-btn fab small color="white" @click="share" v-if="shareBtn">
             <v-icon color="#FFA015" size="25">iconfont icon-share</v-icon>
-        </v-btn>
-        <v-btn fab small color="white" @click="collect" v-if="collectBtn">
-            <v-icon color="grey" size="25">iconfont icon-collection</v-icon>
-        </v-btn>
-        <v-btn fab small color="white" @click="collected" v-if="collectedBtn">
-            <v-icon color="red" size="25">iconfont icon-collection</v-icon>
         </v-btn>
         <v-btn fab small color="white" @click="read" v-if="readBtn">
             <v-icon color="blue" size="25">iconfont icon-read</v-icon>
@@ -32,6 +24,39 @@
         <v-btn fab small color="white" @click="read" v-if="!readBtn&&exitRead">
             <v-icon color="blue" size="25">iconfont icon-quit</v-icon>
         </v-btn>
+        <v-badge
+                color="green"
+                right
+                overlap
+                v-if="commentBtn"
+        >
+            <span slot="badge">{{$store.state.article.article.comments}}</span>
+            <v-btn fab small color="white" @click="comment" >
+                <v-icon color="green" size="25">iconfont icon-comment</v-icon>
+            </v-btn>
+        </v-badge>
+        <v-badge
+                color="grey"
+                right
+                overlap
+                v-if="collectBtn"
+        >
+            <span slot="badge">{{$store.state.article.article.collections}}</span>
+            <v-btn fab small color="white" class="clearAll" @click="collect">
+                <v-icon color="grey" size="25">iconfont icon-collection</v-icon>
+            </v-btn>
+        </v-badge>
+        <v-badge
+                color="red"
+                right
+                overlap
+                v-if="collectedBtn"
+        >
+            <span slot="badge">{{$store.state.article.article.collections}}</span>
+            <v-btn fab small color="white" class="clearAll" @click="cancelCollect">
+                <v-icon color="red" size="25">iconfont icon-collection</v-icon>
+            </v-btn>
+        </v-badge>
     </v-speed-dial>
 </template>
 
@@ -60,35 +85,27 @@
 	},
 	methods: {
 	  editArticle () {
-		console.log('editArticle')
 		this.$emit('editArticle')
 	  },
-	  collected () {
-		console.log('collected')
-		this.$emit('collected')
+	  cancelCollect () {
+		this.$emit('cancelCollect')
 	  },
 	  publishArticle () {
-		console.log('publishArticle')
 		this.$emit('publishArticle')
 	  },
 	  deleteArticle () {
-		console.log('deleteArticle')
 		this.$emit('deleteArticle')
 	  },
 	  comment () {
-		console.log('comment')
 		this.$emit('comment')
 	  },
 	  read () {
-		console.log('read')
 		this.$emit('read')
 	  },
 	  share () {
-		console.log('share')
 		this.$emit('share')
 	  },
 	  collect () {
-		console.log('collect')
 		this.$emit('collect')
 	  },
 	  top () {
@@ -100,13 +117,4 @@
   }
 </script>
 
-<style>
-    .v-speed-dial--bottom:not(.v-speed-dial--absolute) {
-        bottom: 30px;
-    }
-
-    .v-speed-dial--right {
-        right: 50px;
-    }
-</style>
 

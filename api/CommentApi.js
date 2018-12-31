@@ -9,6 +9,7 @@ export class CommentApi extends Api {
     super(store)
   }
 
+
   supportCommentReply (isComment, commentReplyId, targetId, send = true) {
     let url = `${Comment}/support`
     let params = {

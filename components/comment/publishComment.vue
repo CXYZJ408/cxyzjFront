@@ -4,25 +4,32 @@
             <v-card color="#F8F9F9" tile flat class="send-comment">
                 <v-layout row wrap justify-center :class="{'pt-3':mode===0}" ref="textArea">
                     <v-flex md1 class="text-md-center" v-if="mode===0">
-                        <v-avatar size="52">
-                            <img :src="$store.state.user.head_url" alt="">
+                        <v-avatar size="52" :color="$store.state.isLogin?'white':'blue'">
+                            <img :src="$store.state.user.head_url" alt="" v-if="$store.state.isLogin">
+                            <v-icon v-else color="white">iconfont icon-yonghu</v-icon>
                         </v-avatar>
                     </v-flex>
                     <v-flex :class="{'md11':mode!==0,'md10':mode===0}">
-                        <v-textarea
-                                class="text-area"
-                                v-model="text"
-                                counter="1000"
-                                rows="1"
-                                placeholder="输入评论"
-                                auto-grow
-                                solo
-                                flat
-                                color="blue"
-                                v-on:keyup.ctrl.enter="publishComment"
-                                v-on:keyup.meta.enter="publishComment"
-                                @click="show"
-                                :prefix="prefix"
+                        <div v-if="!$store.state.isLogin"
+                             style="text-align: center;background-color: white;height: 55px;margin-bottom: 20px">
+                            <v-btn color="blue" dark depressed class="mt-2" round nuxt to="/signIn"><span
+                                    class="font-3">登录</span></v-btn>
+                            <span style="vertical-align:-5px" class="font-3">后发表评论</span>
+                        </div>
+                        <v-textarea v-else
+                                    class="text-area"
+                                    v-model="text"
+                                    counter="1000"
+                                    rows="1"
+                                    placeholder="输入评论"
+                                    auto-grow
+                                    solo
+                                    flat
+                                    color="blue"
+                                    v-on:keyup.ctrl.enter="publishComment"
+                                    v-on:keyup.meta.enter="publishComment"
+                                    @click="show"
+                                    :prefix="prefix"
                         >
                         </v-textarea>
                     </v-flex>
@@ -60,7 +67,7 @@
                         <v-flex md8 class="text-md-right ">
                             <span class="send-word pr-2">Ctrl or ⌘ + Enter</span>
                             <v-btn dark color="#18ADED" class="send clearMargin" small depressed
-                                   @click="publishComment">评论
+                                   @click="publishComment">{{btnMsg}}
                             </v-btn>
                             <span class="ml-2 cancel font-3 d-inline-block" @click="cancel"> 取消</span>
                         </v-flex>
@@ -72,68 +79,81 @@
 </template>
 
 <script>
-  import {Picker} from 'emoji-mart-vue'
-  import {firstUpperCase} from '../../utils'
+  import { Picker } from 'emoji-mart-vue'
+  import { firstUpperCase } from '../../utils'
 
   let _ = require('lodash')
   export default {
-    name: 'publishComment',
-    data: function () {
-      return {
-        menu: false,
-        text: '',
-        height: 0,
-        prefix: ''
-      }
+	name: 'publishComment',
+	data: function () {
+	  return {
+		menu: false,
+		text: '',
+		height: 0,
+		prefix: ''
+	  }
+	},
+	props: {
+	  mode: {
+		type: Number,
+		default: 0
+	  },
+	  replyUser: {//被回复用户
+		type: Object,
+		default: null
+	  }
+	},
+	components: {
+	  Picker
+	},
+	computed: {
+	  btnMsg: function () {
+		if ( this.mode === 1 ) {
+		  return '回复'
+		} else {
+		  return '评论'
+		}
+	  }
+	},
+	watch: {
+	  'replyUser':function () {
+		if ( !_.isUndefined(this.replyUser.nickname) ) {
+		  this.prefix = `@ ${firstUpperCase(this.replyUser.nickname)}：`
+		}
+	  }
     },
-    props: {
-      mode: {
-        type: Number,
-        default: 0
-      },
-      replyUser: {
-        type: Object,
-        default: null
-      }
-    },
-    components: {
-      Picker
-    },
-    beforeDestroy () {
+	mounted () {
+	  if ( this.mode !== 0 ) {
+		this.height = 45
+		if ( !_.isUndefined(this.replyUser.nickname) ) {
+		  this.prefix = `@ ${firstUpperCase(this.replyUser.nickname)}：`
+		}
+	  }
+	},
+	methods: {
+	  show () {
+		if ( this.mode === 0 ) {
+		  this.height = 45
+		}
+	  },
+	  cancel () {
+		if ( this.mode !== 0 ) {
+		  this.$emit('cancel')
+		} else {
+		  this.height = 0
+		}
+	  },
+	  publishComment () {
+		this.$emit('publishComment', this.text, this.replyUser, () => {
+		  console.log('执行回调')
+		  this.text = ''
+		})
 
-    },
-    mounted () {
-      if (this.mode !== 0) {
-        this.height = 45
-        if (!_.isUndefined(this.replyUser.nickname)) {
-          this.prefix = `@ ${firstUpperCase(this.replyUser.nickname)}：`
-        }
-      }
-    },
-    methods: {
-      show () {
-        if (this.mode === 0) {
-          this.height = 45
-        }
-      },
-      cancel () {
-        if (this.mode !== 0) {
-          this.$emit('cancel')
-        } else {
-          this.height = 0
-        }
-      },
-      publishComment () {
-        this.$emit('publishComment', this.text, this.replyUser,()=>{
-          console.log('执行回调')
-          this.text=''
-        })
-
-      },
-      addEmoji (emoji) {
-        this.text += emoji.native
-      }
-    }
+	  },
+	  addEmoji (emoji) {
+		this.text += emoji.native
+	  }
+	}
   }
 </script>
 

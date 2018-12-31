@@ -15,7 +15,7 @@
       startToWatchToken () {
         setInterval(() => {
           this.handleTokenExpired()
-        }, 5000)
+        }, 3000)
       },
       handleTokenExpired () {
         if (this.$store.state.tokenExpired) {

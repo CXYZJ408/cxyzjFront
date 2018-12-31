@@ -2,7 +2,7 @@
     <div id="myIndex">
         <v-container grid-list-md class="clearPadding mb-5" v-scroll="onScroll">
             <v-layout row wrap>
-                <toolbar :font_size=28 :icon_size=28 :index=true @down="down" @up="up"></toolbar>
+                <toolbar :font_size=28 :icon_size=28 :index=true @down="down" @up="up" ref="toolbar"></toolbar>
             </v-layout>
             <v-layout align-center justify-center wrap ref="swiper"
                       style="height:65vh;min-height: 500px" mt-3>
@@ -88,9 +88,12 @@
                             <v-flex md12>
                                 <v-tabs-items v-model="currentItem" class="article-list">
                                     <v-tab-item :lazy="true">
-                                        <articleList :articleList="articleList" :page="page" :userLabel="undefined"
+                                        <articleList :articleList="$store.state.article.articleList"
+                                                     :page="$store.state.article.articlePage"
+                                                     :userLabel="undefined"
                                                      @getArticleList="getArticleList" :index="-1"
-                                                     :state="state[0]" v-if="articleList.length!==0"></articleList>
+                                                     :state="state[0]"
+                                                     v-if="$store.state.article.articleList.length!==0"></articleList>
                                         <div v-else class="animation">
                                             <div class="spinner">
                                                 <div class="dot1"></div>
@@ -103,10 +106,12 @@
                                             :key="index" :value="'tab-'+label.label_id"
                                             :lazy="true"
                                     >
-                                        <articleList :articleList="articleList" :page="page" :index="index"
+                                        <articleList :articleList="$store.state.article.articleList"
+                                                     :page="$store.state.article.articlePage"
+                                                     :index="index"
                                                      :userLabel="label" @getArticleList="getArticleList"
                                                      :state="state[index+1]"
-                                                     v-if="articleList.length!==0"></articleList>
+                                                     v-if="$store.state.article.articleList.length!==0"></articleList>
                                         <div v-else class="animation">
                                             <div class="spinner">
                                                 <div class="dot1"></div>
@@ -119,39 +124,44 @@
                         </v-layout>
                     </v-card>
                 </v-flex>
-                <v-flex md3 xl2 wrap class="father " ref="father" style="text-align: center">
-                    <div :class="{fixed:isFixed}" :style="topicStyle" ref="hotTopic">
-                        <v-card class="card py-3">
-                            <v-layout row wrap align-center justify-center px-2>
-                                <v-flex md5>
-                                    <span class="font-5">热门标签</span>
-                                </v-flex>
-                                <v-spacer></v-spacer>
-                                <v-flex md5>
-                                    <nuxt-link class="title3" :to="{path:'/article/labels?tab=all'}">
-                                        查看全部&nbsp;&nbsp;>>
-                                    </nuxt-link>
-                                </v-flex>
-                            </v-layout>
-                            <v-divider class="mt-2"></v-divider>
-                            <v-layout row wrap px-2 py-2>
-                                <myLabel v-for="(label,index) in labels" :label="label" :key="index"></myLabel>
-                            </v-layout>
-                        </v-card>
-                    </div>
-                    <div :class="{fixed2:isFixed}" class="mt-4 px-2" :style="boardStyle">
-                        <board :board="board" v-for="(board ,index) in boards"
-                               :class="{'top35':index>0}"
-                               :key="index"></board>
+                <v-flex md3 xl2 wrap class="father" ref="father" style="text-align: center">
+                    <div :style="topicStyle" class="right">
+                        <div ref="hotTopic">
+                            <v-card class="card py-3">
+                                <v-layout row wrap align-center justify-center px-2>
+                                    <v-flex md5>
+                                        <span class="font-5">热门标签</span>
+                                    </v-flex>
+                                    <v-spacer></v-spacer>
+                                    <v-flex md5>
+                                        <nuxt-link class="title3" :to="{path:'/article/labels?tab=all'}">
+                                            查看全部&nbsp;&nbsp;>>
+                                        </nuxt-link>
+                                    </v-flex>
+                                </v-layout>
+                                <v-divider class="mt-2"></v-divider>
+                                <v-layout row wrap px-2 py-2>
+                                    <myLabel v-for="(label,index) in labels" :label="label" :key="index"></myLabel>
+                                </v-layout>
+                            </v-card>
+                        </div>
+                        <div class="mt-4 px-2" :style="boardStyle">
+                            <board :board="board" v-for="(board ,index) in boards"
+                                   :class="{'top35':index>0}"
+                                   :key="index"></board>
+                        </div>
                     </div>
                 </v-flex>
             </v-layout>
         </v-container>
-        <el-tooltip content="建议反馈" placement="top" effect="dark">
-            <v-icon @click="" color="blue" size="35" class="feedback">
-                iconfont icon-feedback
-            </v-icon>
-        </el-tooltip>
+        <transition name="scale-transition">
+            <v-speed-dial :bottom="true" :right="true" :fixed="true" v-show="showTop"
+                          direction="top" :open-on-hover="true" transition="slide-y-reverse-transition">
+                <v-btn color="blue" dark fab slot="activator" @click="top">
+                    <v-icon size="30">expand_less</v-icon>
+                </v-btn>
+            </v-speed-dial>
+        </transition>
         <no-ssr>
             <Footer color='#BDC3C7'></Footer>
         </no-ssr>
@@ -166,6 +176,7 @@
   import { ArticleApi } from '../api/ArticleApi'
   import { ArticleLabelApi } from '../api/ArticleLabelApi'
   import Status from '../utils/status'
+  import { scrollToSmooth } from '../utils'
 
   let _ = require('lodash')
   let $articleApi
@@ -180,27 +191,34 @@
 	  $articleLabelApi = new ArticleLabelApi(this.$store)
 	  this.init()
 	},
-	mounted () {
-	  this.onScroll()
-	  this.$store.commit('setBackground', '#F3F3F3')
+	beforeDestroy () {
+	  this.$store.commit('article/setArticleList', [])
 	},
 	methods: {
+	  top () {
+		scrollToSmooth(0, () => {
+		  let { toolbar } = this.$refs
+		  let { ToolBarTemplate } = toolbar.$refs
+		  ToolBarTemplate.showMain()
+		  this.showTop = false
+		})
+	  },
 	  down () {//页面向下滚动
-		this.hotTop = 30
+		this.hotTop = 15
 	  },
 	  up () {//页面向上滚动
-		this.hotTop = 70
+		this.hotTop = 80
 	  },
 	  changeTabs (index) {//tab变更
 		console.log(index)
-		this.page.is_end = false
+		this.$store.commit('article/setPageEnd', false)
 		let labelId = undefined
 		this.handleState(true)//关闭所有子页面
 		if ( index !== -1 ) {
 		  labelId = this.userLabels[ index ].label_id
 		}
 		setTimeout(() => {
-		  this.articleList = []//如果是获取第一页，则数据清空
+		  this.$store.commit('article/setArticleList', [])//如果是获取第一页，则数据清空
 		  this.getArticleList(0, labelId, () => {
 			this.handleState(false, index + 1)//启动子页面
 		  })
@@ -241,8 +259,8 @@
 		 */
 		$articleApi.getArticleList(0).then(result => {
 		  if ( result.status === $status.SUCCESS ) {
-			this.articleList = result.data.list
-			this.page = result.data.page
+			this.$store.commit('article/setArticleList', result.data.list)
+			this.$store.commit('article/setArticlePage', result.data.page)
 		  }
 		}).catch((e) => {
 		  console.log(e)
@@ -276,39 +294,33 @@
 			  this.userLabels = _.slice(articleLabelResult.data.label, 0, 4)
 			}
 		  }
+		}).catch((e) => {
+		  console.log(e, '-------')
 		})
 	  },
 	  onScroll () {
 		let offsetTop = window.pageYOffset
+		this.showTop = offsetTop !== 0
 		let element = this.$refs.swiper
 		if ( !_.isUndefined(element) ) {
 		  let top = element.offsetHeight
 		  if ( offsetTop >= top + 35 ) {
 			// 如果当前浏览部分的上端距离大于轮播图下边，则固定board和hotTopic
-			if ( !this.isFixed ) {
-			  this.isFixed = true
-			  let width = this.$refs.father.offsetWidth - 10 // 重新设置宽度
-			  let height = this.$refs.hotTopic.offsetHeight + this.hotTop //重新设置距离顶部的高度
-			  this.boardStyle = 'width:' + width + 'px;top:' + height + 'px'
-			  this.topicStyle = 'width:' + width + 'px;top:' + this.hotTop + 'px'
-			}
+			let width = this.$refs.father.offsetWidth - 10
+			this.topicStyle = 'position:fixed;width:' + width + 'px;top:' + this.hotTop + 'px'
 		  } else {
-			this.isFixed = false
-			this.topicStyle = ''
-			this.boardStyle = ''
+			this.topicStyle = 'position:relative;'
 		  }
 		}
 	  },
 	  getArticleList (pageNum, labelId, callback) {//获取文章列表
 		console.log('开始读取', labelId)
-		if ( !this.page.is_end ) {
+		if ( !this.$store.state.article.articlePage.is_end ) {
 		  setTimeout(() => {
 			$articleApi.getArticleList(pageNum, labelId).then(result => {
 			  if ( result.status === this.$status.SUCCESS ) {
-				for ( let i = 0; i < result.data.list.length; i++ ) {
-				  this.articleList.push(result.data.list[ i ])
-				}
-				this.page = result.data.page
+				this.$store.commit('article/pushArticleList', result.data.list)
+				this.$store.commit('article/setArticlePage', result.data.page)
 			  }
 			  if ( _.isFunction(callback) ) {
 				callback()
@@ -328,14 +340,15 @@
 
 	data: function () {
 	  return {
+		showTop: false,
+		fab: false,
 		hotTop: 0,
-		articleList: [],
-		page: {},
 		state: [ 1, 0, 0, 0, 0 ],//子页面状态器
 		isFixed: false,
 		boardStyle: '',
 		topicStyle: '',
 		currentItem: '',
+		event: '',
 		//轮播图配置
 		swiperOption: {
 		  loop: true,
@@ -428,14 +441,6 @@
 
     #myIndex .fixed2 {
         position: fixed;
-    }
-
-    #myIndex .feedback {
-        position: fixed;
-        top: 93%;
-        left: 95%;
-        background-color: white;
-        border-radius: 50px;
     }
 
     #main .title2 {
@@ -554,6 +559,10 @@
             transform: scale(1.0);
             -webkit-transform: scale(1.0);
         }
+    }
+
+    .right {
+        transition: all ease-in 0.3s;
     }
 
     .animation {

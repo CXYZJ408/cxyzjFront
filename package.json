@@ -23,6 +23,7 @@
     "lodash": "^4.17.11",
     "mavon-editor": "git+https://github.com/CXYZJ408/mavonEditor.git",
     "nuxt": "latest",
+    "qrcode": "^1.3.2",
     "qs": "latest",
     "tocbot": "^4.4.0",
     "vlf": "^1.0.5",

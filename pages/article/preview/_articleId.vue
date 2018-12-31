@@ -19,7 +19,7 @@
             <v-flex md9 xl7>
                 <v-layout row wrap>
                     <v-flex md12 ref="articleContent">
-                        <articleContent :article="article" :user="user" :label="label" :allowReport="false">
+                        <articleContent :article="article" :user="user" :label="label" :preview="true">
                             <span slot="words" class="grey--text subheading">字数：{{words}}&nbsp;&nbsp;&nbsp;&nbsp;阅读大约需要：{{Math.floor(words/300)}}分钟</span>
                             <div class="markdown-body article mt-1" v-viewer slot="articleRender"
                                  v-html="articleRender" id="articleContent"></div>
@@ -91,7 +91,6 @@
 	  this.generateArticle(this)
 	  this.rendered()
 	  this.onScroll()
-	  this.$store.commit('setBackground', 'white')
 	},
 	created () {
 	  $articleApi = new ArticleApi(this.$store)

@@ -1,14 +1,14 @@
 <template>
     <div>
         <v-card class="toolbar" tile flat :style="{'top':top+'px','background-color': backColor}">
-            <div :style="{'height': mainHeight+'px'}">
+            <div :style="{'height': mainHeight+'px'}" v-if="!hiddenMainBar">
                 <slot name="toolBarMain"></slot>
             </div>
             <div :style="{'height': otherHeight+'px'}">
                 <slot name="toolBarOther"></slot>
             </div>
         </v-card>
-        <div :style="{'height':(mainHeight+otherHeight)+'px'}"></div>
+        <div :style="{'height':height+'px'}" class="height-transform"></div>
     </div>
 </template>
 
@@ -21,9 +21,20 @@
 	  otherHeight: { type: Number, default: 0 },
 	  backColor: { type: String, default: 'white' },
 	},
+	computed: {
+	  height: function () {
+		if ( this.hiddenMainBar ) {
+		  return this.otherHeight
+		} else {
+		  return this.mainHeight + this.otherHeight
+		}
+	  }
+	},
 	data: function () {
 	  return {
-		top: 0
+		top: 0,
+		hiddenMainBar: false,
+		last: 0
 	  }
 	},
 	beforeDestroy () {
@@ -33,33 +44,47 @@
 	  this.onScroll()
 	},
 	methods: {
-	  handleScroll (e) {
-		let direction
-		if ( e.wheelDelta ) {//IE/Opera/Chrome  
-		  direction = e.wheelDelta
-		} else if ( e.detail ) {//Firefox  
-		  direction = e.detail
-		}
-		if ( direction < 0 ) {
-		  //向下滚动
-		  this.top = -this.mainHeight + this.otherHeight
-		  this.$emit('down')
-		} else {
-		  //向上滚动
-		  this.top = 0
-		  this.$emit('up')
+	  hiddenMain () {
+		console.log('hidden')
+		this.top = -this.mainHeight
+		this.hiddenMainBar = true
+	  },
+	  showMain () {
+		console.log('show')
+		this.hiddenMainBar = false
+		this.top = 0
+	  },
+	  handleScroll () {
+		let offsetTop = window.pageYOffset
+		if ( offsetTop !== this.last ) {
+		  if ( offsetTop > this.last ) {
+			//向下滚动
+			if ( !this.hiddenMainBar ) {
+			  this.top = -this.mainHeight - 5
+			} else {
+			  this.top = 0
+			}
+			this.$emit('down')
+		  } else {
+			//向上滚动
+			this.top = 0
+			this.$emit('up')
+		  }
+		  this.last = offsetTop
 		}
 	  },
 	  onScroll () {
-		document.addEventListener('DOMMouseScroll', this.handleScroll)
-
-		document.addEventListener('mousewheel', this.handleScroll)
+        document.addEventListener('scroll',this.handleScroll)
 	  },
 	}
   }
 </script>
 
 <style scoped>
+    .height-transform {
+        transition: all ease-in 0.3s;
+    }
+
     .toolbar {
         position: fixed;
         width: 100%;
@@ -70,41 +95,5 @@
         height: auto;
         border-bottom: 1px #f0f0f0 solid;
         transition: all ease-in 0.3s;
-    }
-
-    .menu {
-        margin-left: -3vh;
-    }
-
-    .el-input >>> input {
-        border-radius: 20px;
-        height: 30px;
-        width: 100%;
-    }
-
-    .el-input >>> .el-input__icon {
-        line-height: 0;
-    }
-
-    .el-input {
-        width: 30%;
-        transition: all 1s ease-out;
-    }
-
-    .el-input:focus-within {
-        width: 50%;
-    }
-
-    .alarm:hover {
-        color: #20A0FF
-    }
-
-    a {
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .avatar {
-        overflow: hidden;
     }
 </style>

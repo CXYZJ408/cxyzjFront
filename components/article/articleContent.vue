@@ -49,12 +49,31 @@
                     <articleLabel :label="label" fontColor="white" backColor="#5DADE2"></articleLabel>
                 </v-flex>
                 <v-spacer></v-spacer>
-                <v-flex md2 class="text-md-right" v-if="allowReport"><span
-                        class="subheading grey--text more"> 举报文章</span></v-flex>
+                <v-flex md2 class="text-md-right" v-if="!preview">
+                    <span class="subheading grey--text more mr-2"> 举报文章</span></v-flex>
             </v-layout>
         </v-flex>
-        <v-flex md12>
-            <slot name="articleTools"></slot>
+        <v-flex md12 v-if="!preview">
+            <v-layout mt-1>
+                <v-flex md6>
+                    <v-icon color="grey" size="22">iconfont icon-attention</v-icon>
+                    <span class="body-2 pl-1 grey--text">{{article.views}}</span>
+                    <v-icon class="ml-3" color="grey" size="22">iconfont icon-comment2</v-icon>
+                    <span class="body-2 pl-1 grey--text">{{article.comments}}</span>
+                    <v-icon class="ml-3" color="grey" size="20" :class="{'red-font':article.is_collected}">iconfont
+                        icon-collection
+                    </v-icon>
+                    <span class="body-2 pl-1 grey--text"
+                          :class="{'red-font':article.is_collected}">{{article.collections}}</span>
+                </v-flex>
+                <v-spacer></v-spacer>
+                <v-flex md3 class="text-md-right">
+                    <v-btn flat color='white' small @click="share" class="clearAll">
+                        <v-icon color="#FF9800" size="22">iconfont icon-share</v-icon>
+                        <span class="black--text body-2 pl-2">分享</span>
+                    </v-btn>
+                </v-flex>
+            </v-layout>
         </v-flex>
         <v-flex md12 class="mt-2">
             <hr class="hr-dash">
@@ -74,9 +93,9 @@
 	  this.createTime = this.$utils.transformTime(this.article.update_time)
 	},
 	props: {
-	  readModel:{
-	    type:Boolean
-      },
+	  readModel: {
+		type: Boolean
+	  },
 	  article: {
 		type: Object
 	  },
@@ -89,9 +108,9 @@
 	  catalogs: {
 		type: Array
 	  },
-	  allowReport: {
+	  preview: {
 		type: Boolean,
-		default: true
+		default: false
 	  }
 	},
 	data: function () {
@@ -99,6 +118,11 @@
 		createTime: ''
 	  }
 	},
+	methods: {
+	  share () {
+		this.$emit('share')
+	  }
+	}
 
   }
 </script>
@@ -119,6 +143,10 @@
 
     .user {
         border-left: 4px solid #009DFF;
+    }
+
+    .red-font {
+        color: #E74C3C !important;
     }
 
     hr {

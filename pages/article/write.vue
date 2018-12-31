@@ -24,9 +24,11 @@
                             </v-menu>
                             <v-layout wrap row justify-center class="text-md-center">
                                 <v-flex md12 class="pt-2">
-                                    <v-avatar size="75">
-                                        <img :src="$store.state.user.head_url" alt="">
-                                    </v-avatar>
+                                    <nuxt-link :to="'/user/'+$store.state.user.user_id+'/articles'">
+                                        <v-avatar size="75" color="white">
+                                            <img :src="$store.state.user.head_url" alt="">
+                                        </v-avatar>
+                                    </nuxt-link>
                                 </v-flex>
                                 <v-flex md10 class="pt-3 pb-4 text-md-center">
                                     <p class="title capital limit-one-line d-inline-block clearMargin"
@@ -367,7 +369,6 @@
 	  HappyScroll, articleLabelChoose
 	},
 	beforeDestroy () {
-
 	  window.removeEventListener('beforeunload', this.event)
 	},
 	methods: {
@@ -381,14 +382,13 @@
 		this.getArticleList().then(() => {//向后台获取文章数据
 		  this.handleLocalDB().then(() => {//读取并加载本地数据库信息
 			this.handlePreviewArticle().then(() => {//新建一篇初始化的文章
-
 			  setTimeout(() => {
 				this.loading = false
-                setTimeout(()=>{
+				setTimeout(() => {
 				  this.editable = true//允许编辑
 				  this.handleAutoSave(true)//开启自动保存机制
-                },500)
-			  }, 1500)
+				}, 600)
+			  }, 1100)
 			})
 		  })
 		}).catch(() => {

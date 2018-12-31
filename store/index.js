@@ -4,7 +4,7 @@ import $status from '../utils/status'
 
 let _ = require('lodash')
 //主模块
-let defaultToken = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0OTUyOTIyOTg4Njc3NjkzNDQiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoyMzAyMjU5MTQ3LCJpYXQiOjE1NDUzOTUxNDcsImlzcyI6ImN4eXpqIiwic3ViIjoiVG9rZW4iLCJhdWQiOiJVc2VyIiwianRpIjoiYWY2NzI2OGMtNmI4ZC00YzlkLTg1N2YtYmEzNzMxNzNmZTY4In0.EUTZ5HK6-HQZKA3z5pka7C7M6Co8p8Rfqjux5bm_tifFxXJZf94XXF3DpbKZ0a8S9NS3JSwrqEgSiZA_0reopw'
+let defaultToken = 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0ODcwMDUzODM3OTgyOTI0ODIiLCJyb2xlIjoiUk9MRV9BTk9OWU1JVFkiLCJleHAiOjIzMDI1ODU1MTksImlhdCI6MTU0NTcyMTUxOSwiaXNzIjoiY3h5emoiLCJzdWIiOiJUb2tlbiIsImF1ZCI6IlVzZXIiLCJqdGkiOiIzNTlkODc1MC01ZWY2LTQwZjEtYjAyOS00NWE2ZWU1MDczODQifQ.R61dCs-Y_UtlcAeTa2CMWXQvl7Om_b8mC3rCuG5xwQpPO6WDKkHNkEPevyK1B1JguSYT7VAO4omvwzWI_apDAQ'
 //默认的匿名用户的token是不会过期的(或者说是在2118年过期,如果这个项目还在的话。。。)
 export const state = () => ( {
   isLogin: false,//登录状态

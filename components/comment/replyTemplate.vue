@@ -3,13 +3,17 @@
         <v-flex md12>
             <v-layout row wrap>
                 <v-flex md12>
-                    <span class="capital font-2">{{user.nickname}}</span>
+                    <nuxt-link :to="'/user/'+user.user_id+'/articles'">
+                        <span class="capital font-2">{{user.nickname}}</span>
+                    </nuxt-link>
                     <span class="grey--text  ml-3 font-1">
                     {{createTime}}
                     </span>
                 </v-flex>
                 <v-flex md12 class="py-2">
-                    <p class="clearMargin font-2"><a href="" class=" ml-1 capital">@{{reply.discusser_nickname}}：</a>{{reply.text}}
+                    <p class="clearMargin font-2">
+                        <nuxt-link :to="'/user/'+reply.discusser_id+'/articles'" class=" ml-1 capital">
+                            @{{reply.discusser_nickname}}：</nuxt-link>{{reply.text}}
                     </p>
                 </v-flex>
                 <v-flex md4>
@@ -62,60 +66,68 @@
 </template>
 
 <script>
-  import {transformTime} from '../../utils'
-  import {ArticleCommentApi} from '../../api/ArticleCommentApi'
+  import { transformTime } from '../../utils'
+  import { ArticleCommentApi } from '../../api/ArticleCommentApi'
 
   let $articleCommentApi
   export default {
-    name: 'replyTemplate',
-    props: {
-      reply: {
-        type: Object
-      },
-      user: {
-        type: Object
-      },
-      commentIndex: {
-        type: Number
-      },
-      replyIndex: {
-        type: Number
-      }
-    },
-    mounted () {
-      this.createTime = transformTime(this.reply.create_time)
-      $articleCommentApi = new ArticleCommentApi(this.$store)
-    },
-    beforeDestroy () {
-    },
-    data: function () {
-      return {
-        createTime: '',
-        show: false,
-      }
-    },
-    methods: {
-      replyComment () {
-        this.$emit('reply', this.user)
-      },
-      object () {
+	name: 'replyTemplate',
+	props: {
+	  reply: {
+		type: Object
+	  },
+	  user: {
+		type: Object
+	  },
+	  commentIndex: {
+		type: Number
+	  },
+	  replyIndex: {
+		type: Number
+	  }
+	},
+	mounted () {
+	  this.createTime = transformTime(this.reply.create_time)
+	  $articleCommentApi = new ArticleCommentApi(this.$store)
+	},
+	beforeDestroy () {
+	},
+	data: function () {
+	  return {
+		createTime: '',
+		show: false,
+	  }
+	},
+	methods: {
+	  replyComment () {
+		if ( this.$store.state.isLogin ) {
+		  this.$emit('reply', this.user)
+		} else {
+		  this.$message.warning('请先登录！')
+		}
+	  },
+	  deleteReply () {
+		if ( this.reply.allow_delete ) {
+		  this.$emit('deleteCommentReply', this.commentIndex, this.replyIndex)
+		}
 
-      },
-      deleteReply () {
-        if (this.reply.allow_delete) {
-          this.$emit('deleteCommentReply', this.commentIndex, this.replyIndex)
-        }
-
-      },
-      support () {
-        if (!this.reply.allow_vote) {
-          this.$emit('support', false, this.commentIndex, this.reply.is_support, this.reply.reply_id, this.replyIndex)
-        } else {
-          this.$message.warning('您不能给自己投票！')
-        }
-      },
-
-    }
+	  },
+	  support () {
+		if ( this.$store.state.isLogin ) {
+		  if ( !this.reply.is_author ) {
+			if ( !this.reply.allow_vote ) {
+			  this.$message.warning('抱歉，您不能投票！')
+			} else {
+			  this.$emit('support', false, this.commentIndex, this.reply.is_support, this.reply.reply_id, this.replyIndex)
+			}
+		  } else {
+			this.$message.warning('您不能给自己投票！')
+		  }
+		} else {
+		  this.$message.warning('请先登录！')
+		}
+	  },
+	}
   }
 </script>
 

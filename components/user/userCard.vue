@@ -61,10 +61,13 @@
                     </p>
                 </v-flex>
                 <v-flex md6 class=" pb-2">
-                    <v-btn outline block flat :color="color" round @mouseover="isAttention(true)"
-                           @mouseleave="isAttention(false)" @click="Attention">
-                        <v-icon>{{icon}}</v-icon>
-                        {{attentionMsg}}
+                    <v-btn outline block flat color="blue" v-if="!isFollow" round @click="Attention">
+                        <v-icon>add</v-icon>
+                        关注
+                    </v-btn>
+                    <v-btn outline block flat color="red" v-else round @click="Attention">
+                        <v-icon>done</v-icon>
+                        已关注
                     </v-btn>
                 </v-flex>
             </v-layout>
@@ -81,96 +84,91 @@
 
 <script>
   import $status from '~/utils/status'
-  import {UserApi} from '../../api/UserApi'
+  import { UserApi } from '../../api/UserApi'
 
   let $userApi
   export default {
-    name: 'userCard',
-    props: {
-      index: {
-        type: Number
-      }
-    },
-    watch: {
-      '$store.state.userCard.needFlush': function () {
-        this.getUser()
-      }
-    },
-    data: function () {
-      return {
-        attentionMsg: '',
-        color: '',
-        icon: ''
-      }
-    },
-    methods: {
-      Attention () {
-        if (this.$store.state.userCard.user.is_followed) {
-          //已关注则取消关注
-          $userApi.disFollowUser(this.$store.state.userCard.user.user_id).then((result) => {
-            if (result.status === $status.SUCCESS) {
-              this.$message.success(`您成功取消关注${this.$store.state.userCard.user.nickname}`)
-              this.$store.commit('userCard/setAttention', true)
-            } else if (result.status === $status.USER_NOT_FOLLOWED) {
-              this.$message.warning('您还未关注该用户')
-            }
-            this.isAttention(true)
-          }).catch(error => {
-            error({statusCode: 500, message: '未知错误！'})
-          })
-        } else {
-          //未关注则进行关注
-          $userApi.followUser(this.$store.state.userCard.user.user_id).then((result) => {
-            if (result.status === $status.SUCCESS) {
-              this.$message.success(`您成功关注了${this.$store.state.userCard.user.nickname}`)
-            } else if (result.status === $status.USER_HAS_FOLLOWED) {
-              this.$message.warning('您已经关注过该用户了')
-            }
-            this.isAttention(true)
-          }).catch(error => {
-            error({statusCode: 500, message: '未知错误！'})
-          })
-        }
-      },
-      isAttention (hover) {
-        if (hover) {
-          if (this.$store.state.userCard.user.is_followed) {
-            this.icon = 'clear'
-            this.attentionMsg = '取消关注'
-            this.color = 'grey'
-          } else {
-            this.icon = 'add'
-            this.attentionMsg = '关注'
-            this.color = 'blue'
-          }
-        } else {
-          if (this.$store.state.userCard.user.is_followed) {
-            this.icon = 'done'
-            this.attentionMsg = '已关注'
-            this.color = 'red'
-          } else {
-            this.icon = 'add'
-            this.attentionMsg = '关注'
-            this.color = 'blue'
-          }
-        }
-      },
-      getUser () {
-        if (this.$store.state.userCard.needFlush) {
-          $userApi.getOtherUserDetails(this.$store.state.userCard.userId).then(result => {
-            if (result.status === $status.SUCCESS) {
-              setTimeout(() => {
-                this.$store.commit('userCard/setUserCard', result.data.user)
-                this.isAttention(false)
-              }, 500)
-            }
-          })
-        }
-      }
-    },
-    mounted () {
-      $userApi = new UserApi(this.$store)
-    }
+	name: 'userCard',
+	props: {
+	  index: {
+		type: Number
+	  }
+	},
+	watch: {
+	  '$store.state.userCard.needFlush': function () {
+		if ( this.$store.state.userCard.needFlush ) {
+		  this.getUser()
+		}
+	  }
+	},
+	computed: {
+	  isFollow: function () {
+		if ( !this.$store.state.isLogin ) {
+		  return false
+		}
+		return this.$store.state.userCard.user.is_followed
+	  }
+	},
+	data: function () {
+	  return {
+		attentionMsg: '',
+		color: '',
+		icon: ''
+	  }
+	},
+	methods: {
+	  Attention () {
+		if ( !this.$store.state.isLogin ) {
+		  this.$message.warning('请先登录！')
+		  return
+		}
+		if ( this.$store.state.user.user_id === this.$store.state.userCard.user.user_id ) {
+		  this.$message.warning('你不能关注自己！')
+		  return
+		}
+		if ( this.$store.state.userCard.user.is_followed ) {
+		  //已关注则取消关注
+		  $userApi.disFollowUser(this.$store.state.userCard.user.user_id).then((result) => {
+			if ( result.status === $status.SUCCESS ) {
+			  this.$message.success(`您成功取消关注${this.$store.state.userCard.user.nickname}`)
+			  this.$store.commit('userCard/setAttention', false)
+			  this.$store.commit('userCard/setUserFans', result.data.fans)
+			} else if ( result.status === $status.USER_NOT_FOLLOWED ) {
+			  this.$message.warning('您还未关注该用户')
+			}
+		  }).catch(error => {
+			error({ statusCode: 500, message: '未知错误！' })
+		  })
+		} else {
+		  //未关注则进行关注
+		  $userApi.followUser(this.$store.state.userCard.user.user_id).then((result) => {
+			if ( result.status === $status.SUCCESS ) {
+			  this.$message.success(`您成功关注了${this.$store.state.userCard.user.nickname}`)
+			  this.$store.commit('userCard/setAttention', true)
+			  this.$store.commit('userCard/setUserFans', result.data.fans)
+			} else if ( result.status === $status.USER_HAS_FOLLOWED ) {
+			  this.$message.warning('您已经关注过该用户了')
+			}
+		  }).catch(error => {
+			error({ statusCode: 500, message: '未知错误！' })
+		  })
+		}
+	  },
+	  getUser () {
+		if ( this.$store.state.userCard.needFlush ) {
+		  $userApi.getOtherUserDetails(this.$store.state.userCard.userId).then(result => {
+			if ( result.status === $status.SUCCESS ) {
+			  setTimeout(() => {
+				this.$store.commit('userCard/setUserCard', result.data.user)
+			  }, 500)
+			}
+		  })
+		}
+	  }
+	},
+	mounted () {
+	  $userApi = new UserApi(this.$store)
+	}
   }
 </script>
 

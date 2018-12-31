@@ -1,5 +1,5 @@
 <template>
-    <v-app class="background" :style="background">
+    <v-app class="background" :style="$store.state.background">
         <updateCookie></updateCookie>
         <nuxt/>
     </v-app>
@@ -8,7 +8,7 @@
   export default {
 	watch: {
 	  '$route' (to, from) {
-		if ( (from.name === 'signIn'||from.name === 'signUp' )&& to.name === 'index' ) {
+		if ( ( from.name === 'signIn' || from.name === 'signUp' ) && to.name === 'index' ) {
 		  this.$notify({
 			title: '登录成功！',
 			message: `你好${this.$store.state.user.nickname}，欢迎登录程序员之家！`,
@@ -16,15 +16,6 @@
 		  })
 		}
 	  },
-	  '$store.state.background':
-		function () {
-		  this.background = `background: ${this.$store.state.background };`
-		}
-	},
-	data: () => {
-	  return {
-		background: 'background: #F3F3F3;'
-	  }
 	}
   }
 </script>
@@ -33,6 +24,7 @@
         background-size: cover;
         width: 100%;
         overflow: hidden;
+        background-attachment: fixed
     }
 
 

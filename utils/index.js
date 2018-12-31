@@ -21,9 +21,9 @@ export function dataURLtoFile (dataUrl, filename) {//base64转file
 }
 
 export function setString (str, len) {
-  var strlen = 0
-  var s = ''
-  for ( var i = 0; i < str.length; i++ ) {
+  let strlen = 0
+  let s = ''
+  for ( let i = 0; i < str.length; i++ ) {
 	if ( str.charCodeAt(i) > 128 ) {
 	  strlen += 2
 	} else {
@@ -101,6 +101,7 @@ export function scrollToSmooth (size, callback) {
 	  scrollTo(0, currentTop)
 	} else {
 	  clearInterval(interval)
+	  scrollTo(0, size)//强制
 	  console.log('clear', interval)
 	  if ( _.isFunction(callback) ) {
 		callback()

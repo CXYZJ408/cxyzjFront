@@ -97,7 +97,7 @@
 </template>
 <script>
   import { UserApi } from '../api/UserApi'
-
+  //todo 添加图片验证码
   let $cookie
   let $userApi
   export default {

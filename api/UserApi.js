@@ -172,6 +172,28 @@ export class UserApi extends Api {
 	return super.judgeSend(send)
   }
 
+  getUserArticleList (userId, send = true) {
+	let url = User + `/${userId}/article_list`
+	super.pushRequest = new Request(requestMethods.GET, url, this.getUserArticleList)
+	return super.judgeSend(send)
+  }
+
+  getUserCommentList (userId, pageNum, send = true) {
+	let url = User + `/${userId}/comment_list/user_comment/${pageNum}`
+	super.pushRequest = new Request(requestMethods.GET, url, this.getUserCommentList )
+	return super.judgeSend(send)
+  }
+  getUserReplyList (userId, pageNum, send = true) {
+	let url = User + `/${userId}/comment_list/user_reply/${pageNum}`
+	super.pushRequest = new Request(requestMethods.GET, url, this.getUserReplyList )
+	return super.judgeSend(send)
+  }
+  getOtherToUserReplyList (userId, pageNum, send = true) {
+	let url = User + `/${userId}/comment_list/other_reply/${pageNum}`
+	super.pushRequest = new Request(requestMethods.GET, url, this.getOtherToUserReplyList )
+	return super.judgeSend(send)
+  }
+
   getAttentions (userId, pageNum, send = true) {
 	console.log('getAttentions')
 	let url = User + `/${userId}/attention_list/${pageNum}`

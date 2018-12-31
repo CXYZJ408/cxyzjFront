@@ -1,26 +1,25 @@
 <template>
     <v-container grid-list-md wrap class="clearPadding">
-        <v-layout row wrap style="height:63px " v-show="!readModel">
-            <toolbar :font_size=28 :icon_size=28 :none=true></toolbar>
+        <v-layout row wrap>
+            <toolbar :font_size=28 :icon_size=28 :none=true :otherHeight="5" @up="up" @down="down" ref="toolbar">
+                <v-progress-linear
+                        background-color="white"
+                        color="#24A9FD"
+                        height="5"
+                        :value="progress"
+                        class="progress clearAll"
+                ></v-progress-linear>
+            </toolbar>
         </v-layout>
-        <v-progress-linear
-                background-color="white"
-                color="#24A9FD"
-                height="5"
-                :value="progress"
-                class="progress clearMargin"
-                :style="{'top':progressTop+'px'}"
-        ></v-progress-linear>
-        <v-layout mt-4 justify-center pt-2>
+        <v-layout mt-1 justify-center pt-2 pb-5>
             <v-flex md9 xl7>
                 <v-layout row wrap>
                     <v-flex md12 ref="articleContent">
                         <articleContent :article="article" :user="user" :read-model="readModel" :label="label"
-                                        @keyup.112="read">
+                                        @share="showShare">
                             <span slot="words" class="grey--text subheading">字数：{{words}}&nbsp;&nbsp;&nbsp;&nbsp;阅读大约需要：{{Math.floor(words/300)}}分钟</span>
                             <div class="markdown-body article mt-1" v-viewer slot="articleRender"
                                  v-html="articleRender" id="articleContent"></div>
-                            <articleTools slot="articleTools" :article="article" v-show="!readModel"></articleTools>
                         </articleContent>
                     </v-flex>
                     <v-flex md12 class="pb-5" v-show="!readModel" ref="comment">
@@ -29,13 +28,14 @@
                 </v-layout>
             </v-flex>
             <div :class="{'md3 xl2 flex':!readModel}">
-                <div class="catalog"></div>
+                <div class="catalog" :style="{'top':top+'px'}"></div>
             </div>
         </v-layout>
-        <floatBtn :edit-btn="$store.state.article.article.is_author"
-                  :delete-btn="$store.state.article.article.is_author" :publish-btn="false" :collect-btn="collectBtn"
+        <floatBtn :edit-btn="article.is_author"
+                  :delete-btn="article.is_author" :publish-btn="false" :collect-btn="collectBtn"
                   :read-btn="!readModel" :collected-btn="collectedBtn" @comment="comment" @editArticle="editArticle"
-                  @deleteArticle="beforeDeleteArticle"
+                  @deleteArticle="beforeDeleteArticle" @share="showShare" @top="toTop" @collect="collect"
+                  @cancelCollect="cancelCollect"
                   @read="read"></floatBtn>
         <el-dialog
                 :visible.sync="deleteDialog"
@@ -54,6 +54,37 @@
                 </v-card-actions>
             </v-card>
         </el-dialog>
+        <v-dialog
+                v-model="shareDialog"
+                width="500"
+        >
+            <v-card flat>
+                <div class="card-title font-10">分享</div>
+                <v-card-text>
+                    <span class="font-6 grey--text">分享本文至：</span>
+                    <v-btn icon color="blue" large @click="share('qq')">
+                        <v-icon color="white" size="33">iconfont icon-QQ-share</v-icon>
+                    </v-btn>
+                    <v-btn icon color="red" large @click="share('weibo')">
+                        <v-icon color="white" size="35">iconfont icon-weibo1</v-icon>
+                    </v-btn>
+                    <v-btn icon color="yellow" large @click="share('qqSpace')">
+                        <v-icon color="white" size="35">iconfont icon-QQ-space</v-icon>
+                    </v-btn>
+                    <v-btn icon color="grey" large @click="share('QR')">
+                        <v-icon color="white" size="25">iconfont icon-QR_code</v-icon>
+                    </v-btn>
+                    <div style="text-align: center" v-show="canvas">
+                        <canvas id="canvas"></canvas>
+                    </div>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" dark flat round @click="shareDialog = false" class="font-5 mr-3">取消
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <no-ssr>
             <viewer :images="images">
                 <img v-for="(image,index) in images" :src="image" :key="index">
@@ -64,7 +95,6 @@
 
 <script>
   import articleContent from '~/components/article/articleContent.vue'
-  import articleTools from '~/components/article/articleTools.vue'
   import commentList from '~/components/comment/commentList.vue'
   import { mavonEditor } from 'mavon-editor'
   import { ArticleApi } from '../../api/ArticleApi'
@@ -83,9 +113,9 @@
   export default {
 	name: 'index',
 	components: {
-	  articleContent, commentList, articleTools
+	  articleContent, commentList
 	},
-    created(){
+	created () {
 	  $articleApi = new ArticleApi(this.$store)
 	},
 	mounted () {
@@ -93,36 +123,37 @@
 	  this.rendered()
 	  this.onScroll()
 	  this.keyEventListen()
-	  this.$store.commit('setBackground', 'white')
 	},
 	beforeDestroy () {
+	  this.$store.commit('article/setArticle', {})
 	  window.removeEventListener('scroll', this.event)
 	},
 	computed: {
-	  progressTop () {
-		if ( this.readModel ) {
-		  return 0
-		} else {
-		  return 62
-		}
-	  },
 	  collectedBtn: function () {
-		if ( this.$store.state.article.article.is_author ) {
+		if ( this.article.is_author || !this.$store.state.isLogin ) {
 		  return false
 		} else {
-		  return this.$store.state.article.article.is_collected
+		  return this.article.is_collected
 		}
 	  },
 	  collectBtn: function () {
-		if ( this.$store.state.article.article.is_author ) {
+		if ( this.article.is_author || !this.$store.state.isLogin ) {
 		  return false
 		} else {
-		  return !this.$store.state.article.article.is_collected
+		  return !this.article.is_collected
+		}
+	  }
+	},
+	watch: {
+	  shareDialog: function () {
+		if ( !this.shareDialog ) {
+		  this.canvas = false
 		}
 	  }
 	},
 	data: function () {
 	  return {
+		shareDialog: false,
 		catalogs: [],
 		articleRender: '',
 		words: 0,
@@ -131,7 +162,9 @@
 		currentIndex: 0,
 		event: null,
 		readModel: false,
-		deleteDialog:false
+		deleteDialog: false,
+		top: 100,
+		canvas: false
 	  }
 	},
 	asyncData ({ params, store }) {
@@ -145,12 +178,90 @@
 	  })
 	},
 	methods: {
+	  showShare () {
+		this.shareDialog = true
+	  },
+	  share (which) {
+		let share = {
+		  url: `https://www.baidu.com/`,
+		  title: this.article.title,
+		  picture: 'https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1805276442,1361300111&fm=58&bpow=495&bpoh=378',
+		  summary: this.article.article_sum
+		}
+		let link = undefined
+		switch ( which ) {
+		  case 'qq':
+			link = `https://connect.qq.com/widget/shareqq/index.html?url=${share.url}&title=${share.title}&summary=${share.summary}&pics=${share.picture}`
+			break
+		  case 'qqSpace':
+			link = `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${share.url}&title=${share.title}&pics=${share.picture}&summary=${share.summary}`
+			break
+		  case 'weibo':
+			link = `http://service.weibo.com/share/share.php?url=http://zixuephp.net/article-309.html?title=${share.title}&pic=${share.picture}`
+			break
+		  case 'QR':
+			let QRCode = require('qrcode')
+			QRCode.toCanvas(document.getElementById('canvas'), share.url).then(() => {
+			  this.canvas = true
+			}).catch(err => {
+			  console.error(err)
+			})
+			break
+		}
+		if ( !_.isUndefined(link) ) {
+		  window.open(link)
+		}
+	  },
+	  cancelCollect () {
+		$articleApi.deleteCollectedArticle(this.article.article_id).then(res => {
+		  if ( res.status === Status.SUCCESS ) {
+			this.$message.success('取消收藏成功！')
+			this.$store.commit('article/setArticleCollections', res.data.collections)
+		  } else if ( res.status === Status.ARTICLE_NOT_COLLECTED ) {
+			this.$message.warning('该文章没有收藏！')
+		  }
+		  this.$store.commit('article/setArticleCollected', false)
+		}).catch(() => {
+		  this.$message.error('未知错误，操作失败！')
+		})
+	  },
+	  collect () {
+		$articleApi.collectArticle(this.article.article_id).then(res => {
+		  if ( res.status === Status.SUCCESS ) {
+			this.$message.success('收藏成功！')
+			this.$store.commit('article/setArticleCollections', res.data.collections)
+		  } else if ( res.status === Status.ARTICLE_HAS_COLLECTED ) {
+			this.$message.warning('该文章已收藏！')
+		  }
+		  this.$store.commit('article/setArticleCollected', true)
+		}).catch(() => {
+		  this.$message.error('未知错误，操作失败！')
+		})
+	  },
+	  toTop () {
+		if ( !this.readModel ) {
+		  this.top = 100
+		} else {
+		  this.top = 30
+		}
+		this.getToolBarTemplate().showMain()
+	  },
+	  up () {
+		if ( !this.readModel ) {
+		  this.top = 100
+		} else {
+		  this.top = 30
+		}
+	  },
+	  down () {
+		this.top = 30
+	  },
 	  comment () {
 		//如果在阅读模式下，则先退出
-        let time = 0
+		let time = 0
 		if ( this.readModel ) {
 		  this.exitFullScreen()
-          time=500
+		  time = 500
 		}
 		setTimeout(() => {
 		  let { comment } = this.$refs
@@ -184,10 +295,29 @@
 			this.enterFullScreen()
 		  }
 		}, false)
-		window.onresize = () => {
+		document.addEventListener('mozfullscreenchange', () => {
 		  this.readModel = !this.readModel
 		  console.log(this.readModel)
-		}
+		  if ( this.readModel ) {
+			this.getToolBarTemplate().hiddenMain()
+			this.top = 30
+		  } else {
+			this.getToolBarTemplate().showMain()
+			this.top = 100
+		  }
+		})
+		document.addEventListener('webkitfullscreenchange', () => {
+		  this.readModel = !this.readModel
+		  console.log(this.readModel)
+		  if ( this.readModel ) {
+			this.getToolBarTemplate().hiddenMain()
+			this.top = 30
+		  } else {
+			this.getToolBarTemplate().showMain()
+			this.top = 100
+		  }
+		})
+
 	  },
 	  read () {
 		if ( !this.readModel ) {
@@ -203,6 +333,11 @@
 		if ( !_.isUndefined(rfs) && rfs ) {
 		  rfs.call(el)
 		}
+	  },
+	  getToolBarTemplate () {
+		let { toolbar } = this.$refs
+		let { ToolBarTemplate } = toolbar.$refs
+		return ToolBarTemplate
 	  },
 	  exitFullScreen () {
 		let exitMethod = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.webkitExitFullscreen
@@ -276,6 +411,7 @@
 </style>
 <style scoped>
     .catalog {
+        transition: all ease-in 0.3s;
         position: fixed;
         width: auto;
         margin-left: 50px;
@@ -293,4 +429,8 @@
         padding: 0 !important;
     }
 
+    .card-title {
+        text-align: center;
+        color: #FF9800;
+    }
 </style>

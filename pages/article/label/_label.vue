@@ -121,7 +121,7 @@
   import Status from '../../../utils/status'
   import Constant from '../../../utils/constant'
   import { setString } from '../../../utils'
-
+  //todo 待改造
   let $articleLabelApi
   let _ = require('lodash')
 
@@ -133,9 +133,6 @@
 	created () {
 	  $articleLabelApi = new ArticleLabelApi(this.$store)
 	  this.init()
-	},
-	mounted () {
-	  this.$store.commit('setBackground', '#F3F3F3')
 	},
 	methods: {
 	  choose () {
@@ -218,23 +215,22 @@
 	  init () {
 		let labelId = this.$route.fullPath.split('/')[ 3 ]//读取labelId
 		this.label.label_id = labelId
-		$articleLabelApi.getArticleLabelDetails(labelId, false).
-        getArticleListByLabelIdAndType(this.label.label_id, 0, Constant.HOT_LIST).then(result => {
-			let articleLabelInfo = result[ 0 ]
-			let articleList = result[ 1 ]
-			if ( articleLabelInfo.status === Status.SUCCESS ) {
-			  this.label = articleLabelInfo.data.label
-			  this.introduce = setString(this.label.introduce, 140)
-			} else if ( articleLabelInfo.status === Status.LABEL_NOT_EXIST ) {
-			  this.$message.error('该标签信息不存在！')
-			}
-			if ( articleList.status === Status.SUCCESS ) {
-			  this.pushArticle(articleList.data.list)
-			  this.page = articleList.data.page
-			} else if ( articleList.status === Status.LABEL_NOT_EXIST ) {
-			  this.$message.error('该标签信息不存在！')
-			}
-		  }).catch(() => {
+		$articleLabelApi.getArticleLabelDetails(labelId, false).getArticleListByLabelIdAndType(this.label.label_id, 0, Constant.HOT_LIST).then(result => {
+		  let articleLabelInfo = result[ 0 ]
+		  let articleList = result[ 1 ]
+		  if ( articleLabelInfo.status === Status.SUCCESS ) {
+			this.label = articleLabelInfo.data.label
+			this.introduce = setString(this.label.introduce, 140)
+		  } else if ( articleLabelInfo.status === Status.LABEL_NOT_EXIST ) {
+			this.$message.error('该标签信息不存在！')
+		  }
+		  if ( articleList.status === Status.SUCCESS ) {
+			this.pushArticle(articleList.data.list)
+			this.page = articleList.data.page
+		  } else if ( articleList.status === Status.LABEL_NOT_EXIST ) {
+			this.$message.error('该标签信息不存在！')
+		  }
+		}).catch(() => {
 		  this.$message.error('获取标签数据失败！')
 		})
 

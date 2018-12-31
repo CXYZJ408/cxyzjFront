@@ -48,7 +48,7 @@
                     <el-tooltip class="item" effect="dark" content="收藏" placement="bottom">
                         <v-icon class="ml-3" color="grey" size="20"
                                 :class="{'redfont':article.is_collected}"
-                                @click="operation">iconfont icon-collection
+                                @click="collectOption">iconfont icon-collection
                         </v-icon>
                     </el-tooltip>
                     <span class="body-2 pl-1" :class="{'redfont':article.is_collected}">{{article.collections}}</span>
@@ -60,8 +60,13 @@
 </template>
 
 <script>
+  import { ArticleApi } from '../../api/ArticleApi'
+  import Status from '../../utils/status'
+
+  let $articleApi
   export default {
 	created () {
+	  $articleApi = new ArticleApi(this.$store)
 	  this.createTime = this.$utils.transformTime(this.article.update_time)
 	},
 	props: {
@@ -81,12 +86,53 @@
 	watch: {
 	  'article.update_time': function () {
 		this.createTime = this.$utils.transformTime(this.article.update_time)
-	  }
+	  },
 	},
 	methods: {
-	  operation () {
-		// todo 等api写好后需要修改
-		this.dynamic.is_collected = !this.dynamic.is_collected
+	  collectOption () {
+		if ( this.article.is_collected ) {
+		  $articleApi.deleteCollectedArticle(this.article.article_id).then(res => {
+			let data
+			if ( res.status === Status.SUCCESS ) {
+			  data = {
+				index: this.index,
+				isCollected: false,
+				collections: res.data.collections
+			  }
+			  this.$message.success('取消收藏成功！')
+			} else if ( res.status === Status.ARTICLE_NOT_COLLECTED ) {
+			  this.$message.warning('该文章没有收藏！')
+			  data = {
+				index: this.index,
+				isCollected: false,
+			  }
+			}
+			this.$store.commit('article/setCollect', data)
+		  }).catch(() => {
+			this.$message.error('未知错误，操作失败！')
+		  })
+		} else {
+		  $articleApi.collectArticle(this.article.article_id).then(res => {
+			let data
+			if ( res.status === Status.SUCCESS ) {
+			  this.$message.success('收藏成功！')
+			  data = {
+				index: this.index,
+				isCollected: true,
+				collections: res.data.collections
+			  }
+			} else if ( res.status === Status.ARTICLE_HAS_COLLECTED ) {
+			  this.$message.warning('该文章已收藏！')
+			  data = {
+				index: this.index,
+				isCollected: true,
+			  }
+			}
+			this.$store.commit('article/setCollect', data)
+		  }).catch(() => {
+			this.$message.error('未知错误，操作失败！')
+		  })
+		}
 	  },
 	  mouseOver () {
 		this.show = true
@@ -128,6 +174,8 @@
         font-size: 22px !important;
         font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
         font-weight: 600;
+        transition: all .3s ease-out;
+
     }
 
     .title2:hover {

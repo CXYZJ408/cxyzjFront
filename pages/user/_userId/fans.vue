@@ -1,17 +1,18 @@
 <template>
     <v-card class="main pt-3">
-        <div v-if="size>0">
+        <div v-if="fans.length>0">
             <v-layout row wrap align-center px-2>
                 <v-flex md4 xl3 v-for="(item,index) in fans" :key="index">
-                    <userCard :index="index" :key="index" :user="item"></userCard>
+                    <userCard :index="index" :key="index" :user="item" @attentionUser="attentionUser"
+                              @cancelAttentionUser="cancelAttentionUser" :needAttention="needAttentionBtn"></userCard>
                 </v-flex>
             </v-layout>
             <div class="py-3 text-md-center">
-                <el-pagination
-                        layout="prev, pager, next"
-                        :page-count="page.total"
-                        :current-page="page.page_num+1">
-                </el-pagination>
+                <v-pagination
+                        v-model="page.page_num"
+                        :length="page.total"
+                        circle
+                ></v-pagination>
             </div>
         </div>
         <v-layout v-else justify-center>
@@ -25,29 +26,90 @@
 </template>
 
 <script>
-  import userCard from '~/components/user/userCard.vue'
-  import {UserApi} from '../../../api/UserApi'
+  import userCard from '~/components/user/userCardInUserCenter.vue'
+  import { UserApi } from '../../../api/UserApi'
   import $status from '~/utils/status'
 
   let $userApi
   export default {
-    name: 'fans',
-    components: {
-      userCard
-    },
-    async asyncData ({store}) {
-      $userApi = new UserApi(store)
-      return await $userApi.getFans(store.state.userCenter.user.user_id, 0).then(res => {
-        let fans = []
-        if (res.status === $status.SUCCESS) {
-          fans = res.data.fans
-        }
-        let size = fans.length
-        return {fans: fans, page: res.data.page, size: size}
-      }).catch(error => {
-        error({statusCode: 500, message: '未知错误！'})
-      })
-    }
+	name: 'fans',
+	components: {
+	  userCard
+	},
+	data: function () {
+	  return {
+		fans: [],
+		page: {}
+	  }
+	},
+	computed: {
+	  needAttentionBtn: function () {
+		if ( !this.$store.state.isLogin ) {
+		  return false
+		}
+		return this.$route.params.userId === this.$store.state.user.user_id
+	  }
+	},
+	created () {
+	  $userApi = new UserApi(this.$store)
+	  this.getUserFans(1)
+	},
+	methods: {
+	  getUserFans (pageNum) {
+		pageNum--
+		$userApi.getFans(this.$route.params.userId, pageNum).then(res => {
+		  if ( res.status === $status.SUCCESS ) {
+			this.fans = res.data.fans
+			this.page = res.data.page
+			this.page.page_num++
+			this.$store.commit('userCenter/setFans', this.fans.length)
+		  }
+		}).catch(() => {
+		  this.$message.error('未知错误！')
+		})
+	  },
+	  refreshPage () {
+		let pageNum = this.page.page_num
+		if ( this.page.is_end ) {//如果是最后一页
+		  if ( this.fans.length === 1 ) {//如果要删的是最后一个
+			if ( this.page.total === 1 ) {//如果一共只有一页
+			  pageNum = 1
+			} else {//不止一页
+			  pageNum--
+			}
+		  }
+		}
+		this.getUserFans(pageNum)
+	  },
+	  //取消关注用户
+	  cancelAttentionUser (index) {
+		$userApi.disFollowUser(this.fans[ index ].user_id).then((result) => {
+		  if ( result.status === $status.SUCCESS ) {
+			this.$message.success(`您成功取消关注${this.fans[ index ].nickname}`)
+		  } else if ( result.status === $status.USER_NOT_FOLLOWED ) {
+			this.$message.warning('您还未关注该用户')
+		  }
+		  this.$store.commit('userCenter/setAttentions', result.data.attentions)
+		  this.refreshPage()
+		}).catch(() => {
+		  this.$message.error('未知错误！')
+		})
+	  },
+	  //关注用户
+	  attentionUser (index) {
+		$userApi.followUser(this.fans[ index ].user_id).then((result) => {
+		  if ( result.status === $status.SUCCESS ) {
+			this.$message.success(`您成功关注了${this.fans[ index ].nickname}`)
+		  } else if ( result.status === $status.USER_HAS_FOLLOWED ) {
+			this.$message.warning('您已经关注过该用户了')
+		  }
+		  this.$store.commit('userCenter/setAttentions', result.data.attentions)
+		  this.refreshPage()
+		}).catch(() => {
+		  this.$message.error('未知错误！')
+		})
+	  }
+	}
   }
 </script>
 

@@ -25,6 +25,7 @@ const Status = {
   NO_USER_LABEL: 137,//用户没有自定义标签
   LABEL_NOT_EXIST: 134,//标签不存在
   ARTICLE_NOT_EXIST: 133,//文章不存在
-
+  ARTICLE_HAS_COLLECTED: 131,//文章已被收藏
+  ARTICLE_NOT_COLLECTED: 132,//文章未被收藏
 }
 export default Status

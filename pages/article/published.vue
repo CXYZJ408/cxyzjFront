@@ -6,8 +6,8 @@
                 <nuxt-link to="/"><img height="150" src="/img/login/logo-small.png"></nuxt-link>
                 <div class="boundary"></div>
             </v-card>
-            <v-card flat tile>
-                <v-layout row wrap justify-center>
+            <v-card flat tile >
+                <v-layout row wrap justify-center class="pb-5">
                     <v-flex md12>
                         <span class="display-0">{{$store.state.article.publishedArticle.article.title}}</span>
                     </v-flex>
@@ -78,11 +78,11 @@
     },
     methods: {
       copy () {
-        this.$message.success("链接复制成功！")
         let url = document.getElementById('urlPath')
         url.select()
         document.execCommand('Copy')
-      }
+		this.$message.success("链接复制成功！")
+	  }
     }
   }
 </script>

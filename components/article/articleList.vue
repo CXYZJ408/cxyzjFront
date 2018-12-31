@@ -134,7 +134,7 @@
 	  },
 	  handleShowCard () {
 		if ( this.show || this.$store.state.userCard.hover ) {
-		  let top = ( this.$store.state.userCard.index + 1 ) * 160 - 40
+		  let top = ( this.$store.state.userCard.index + 1 ) * 160 - 35
 		  this.cardStyle = 'top:' + top + 'px;'
 		} else {
 		  this.cardStyle = 'display:none'

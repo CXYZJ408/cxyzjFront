@@ -8,7 +8,9 @@
         <v-flex md11>
             <v-layout row wrap>
                 <v-flex md5>
-                    <span class="capital font-4">{{user.nickname}}</span>
+                    <nuxt-link :to="'/user/'+user.user_id+'/articles'">
+                        <span class="capital font-4">{{user.nickname}}</span>
+                    </nuxt-link>
                 </v-flex>
                 <v-flex offset-md4 md3 class="text-md-right">
                     <span class="font-3">{{comment.level}}楼</span>
@@ -71,56 +73,68 @@
 </template>
 
 <script>
-  import {transformTime} from '../../utils'
-  import {ArticleCommentApi} from '../../api/ArticleCommentApi'
-  import {CommentApi} from '../../api/CommentApi'
+  import { transformTime } from '../../utils'
+  import { ArticleCommentApi } from '../../api/ArticleCommentApi'
+  import { CommentApi } from '../../api/CommentApi'
   import Status from '../../utils/status'
-
+  //todo 用户的跳转
   let $articleCommentApi
   export default {
-    name: 'commentTemplate',
-    props: {
-      comment: {
-        type: Object
-      },
-      user: {
-        type: Object
-      },
-      commentIndex: {
-        type: Number
-      }
-    },
+	name: 'commentTemplate',
+	props: {
+	  comment: {
+		type: Object
+	  },
+	  user: {
+		type: Object
+	  },
+	  commentIndex: {
+		type: Number
+	  }
+	},
 
-    mounted () {
-      this.createTime = transformTime(this.comment.create_time)
-      $articleCommentApi = new ArticleCommentApi(this.$store)
-    },
-    beforeDestroy () {
-    },
-    data: function () {
-      return {
-        createTime: '',
-        show: false,
-      }
-    },
-    methods: {
-      deleteComment () {
-        if (this.comment.allow_delete) {
-          this.$emit('deleteCommentReply',this.commentIndex)
-        }
-      },
-      reply () {
-        this.$emit('reply', this.user)
-      },
-      support () {
-        if (!this.comment.allow_vote) {
-          this.$emit('support', true, this.commentIndex, this.comment.is_support, this.comment.comment_id)
-        } else {
-          this.$message.warning('您不能给自己投票！')
-        }
-      },
+	mounted () {
+	  this.createTime = transformTime(this.comment.create_time)
+	  $articleCommentApi = new ArticleCommentApi(this.$store)
+	},
+	beforeDestroy () {
+	},
+	data: function () {
+	  return {
+		createTime: '',
+		show: false,
+	  }
+	},
+	methods: {
+	  deleteComment () {
+		if ( this.comment.allow_delete ) {
+		  this.$emit('deleteCommentReply', this.commentIndex)
+		}
+	  },
+	  reply () {
+		if ( this.$store.state.isLogin ) {
+		  this.$emit('reply', this.user)
+		} else {
+		  this.$message.warning('请先登录！')
+		}
+	  },
+	  support () {
+		if ( this.$store.state.isLogin ) {
+		  if ( !this.comment.is_author ) {
+			if ( !this.comment.allow_vote ) {
+			  this.$message.warning('抱歉，您不能投票！')
+			} else {
+			  this.$emit('support', true, this.commentIndex, this.comment.is_support, this.comment.comment_id)
+			}
+		  } else {
+			this.$message.warning('您不能给自己投票！')
+		  }
+		} else {
+		  this.$message.warning('请先登录！')
+		}
+	  },
 
-    }
+	}
   }
 </script>
 
