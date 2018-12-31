@@ -5,14 +5,11 @@
         </v-layout>
         <nuxt-child/>
     </v-container>
-
 </template>
 
 <script>
   export default {
-    name: 'index',
-    layout: 'user',
-
+	name: 'index'
   }
 </script>
 

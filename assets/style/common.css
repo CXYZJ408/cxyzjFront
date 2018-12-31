@@ -6,13 +6,15 @@
     overflow: hidden;
     font-size: 25px;
 }
-
-body::-webkit-scrollbar {
-    display: none;
+.v-speed-dial--bottom:not(.v-speed-dial--absolute) {
+    bottom: 30px;
 }
 
-.slide-fade-enter-active {
-    transition: all .4s ease-in-out;
+.v-speed-dial--right {
+    right: 50px;
+}
+body::-webkit-scrollbar {
+    display: none;
 }
 
 .wrap_image {
@@ -28,15 +30,6 @@ body::-webkit-scrollbar {
     height: 100%;
 }
 
-.fade-enter-active, .fade-leave-active {
-    transition: opacity .5s;
-}
-
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
-    opacity: 0;
-}
-
 .v-overlay:before {
     background-color: #D0D3D4;
 }
@@ -49,10 +42,6 @@ body::-webkit-scrollbar {
 .avatar-img-height {
     height: 100% !important;
     width: auto !important;
-}
-
-.slide-fade-leave-active {
-    transition: all .8s cubic-bezier(0, 0, .58, 1)
 }
 
 .clearAll {
@@ -72,24 +61,78 @@ a {
     text-decoration: none;
 }
 
-.slide-fade-enter {
-    transform: translateX(-10px);
-    opacity: 0;
+.font-1 {
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
-.slide-fade-leave-to {
-    transform: translateX(10px);
-    opacity: 0;
+.font-2 {
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-3 {
+    font-size: 18px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-4 {
+    font-size: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-5 {
+    font-size: 22px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-6 {
+    font-size: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-7 {
+    font-size: 26px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-8 {
+    font-size: 28px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-9 {
+    font-size: 30px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.font-10 {
+    font-size: 35px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+:focus {
+    outline: unset;
 }
 
 body {
     padding: 0 !important;
     margin: 0 !important;
+    font-family: -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif !important;
+}
+
+.limit-one-line {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.capital {
+    text-transform: capitalize
 }
 
 .mycard {
-    width: 95%;
-    margin-left: 2.5%;
+    width: 100%;
     height: 700px;
     box-shadow: none;
     border-radius: 15px;
@@ -125,23 +168,30 @@ body {
     -webkit-box-orient: vertical !important;
     -webkit-line-clamp: 3 !important;
 }
+
 .hr {
-    width: 98%;
-    margin-left: 1%;
     border: none;
-    border-top: 1.5px solid #BBBBBB;
+    border-top: 1px solid #AAADB1;
 }
 
 .hr-dotted {
-    border: none;
-    border-top: 1.5px dotted #BBBBBB;
+    border: none !important;
+    border-top: 1px dotted #AAADB1 !important;
 }
 
 .hr-dash {
-    border: none;
-    border-top: 1.5px dashed #BBBBBB;
+    border: none !important;
+    border-top: 1px dashed #AAADB1 !important;
 }
 
 .v-tabs__div {
     text-transform: none;
+}
+
+.v-text-field__prefix {
+    width: auto !important;
+}
+
+.v-textarea textarea {
+    width: auto !important;
 }

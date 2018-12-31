@@ -1,190 +1,214 @@
 <template>
-    <v-card class="comment  mx-3 mb-3" :class="{'elevation-3': hover2}" @mouseover="hover2=true"
-            @mouseleave="hover2=false">
+    <v-card class="comment my-3">
         <v-layout>
             <v-flex md12 ml-4 mt-1>
-                <nuxt-link :to="'/'+comment.commentInfo.mode+'/'+comment.commentInfo.target_id">
-                    <span class="title2"><strong>{{comment.commentInfo.comment_title}}</strong></span>
+                <nuxt-link :to="'/'+commentOrReply.model+'/'+commentOrReply.target_id">
+                    <span class="title2"><strong>{{commentOrReply.comment_title}}</strong></span>
                 </nuxt-link>
             </v-flex>
         </v-layout>
         <v-layout row>
             <v-flex md12>
                 <v-avatar size="55" class="ml-3 " style="vertical-align: top">
-                    <img :src="comment.discusser.head_url" v-if="!comment.commentInfo.is_reply">
-                    <img :src="comment.replier.head_url" v-if="comment.commentInfo.is_reply">
+                    <img :src="replier.head_url" v-if="replier">
+                    <img :src="discusser.head_url" v-else>
                 </v-avatar>
                 <v-layout wrap row class="d-inline-block" ml-2>
-                    <v-flex md12 v-if="!comment.commentInfo.is_reply">
-                        <div @mouseleave="showDiscusser=false" class="d-inline-block">
-                            <transition name="fade">
-                                <div v-show="showDiscusser" class="user-card" @mouseleave="show=false">
-                                    <card :user="comment.discusser" class=" elevation-3"></card>
-                                </div>
-                            </transition>
-                            <nuxt-link class="user" :to="'/user/'+comment.discusser.user_id+'/articles'">
-                                <span class="title"
-                                      @mouseover="showDiscusser=true">{{comment.discusser.nickname}}</span>
-                            </nuxt-link>
-                        </div>
-                    </v-flex>
-
-                    <v-flex md12 v-if="comment.commentInfo.is_reply">
-                        <div @mouseleave="showReplier=false" class="d-inline-block">
-                            <transition name="fade">
-                                <div v-show="showReplier" class="user-card" @mouseleave="showReplier=false">
-                                    <card :user="comment.replier" class=" elevation-3"></card>
-                                </div>
-                            </transition>
-                            <nuxt-link class="user" :to="'/user/'+comment.replier.user_id+'/articles'">
-                                <span class="title " @mouseover="showReplier=true">{{comment.replier.nickname}}</span>
-                            </nuxt-link>
-                        </div>
+                    <v-flex md12 v-if="replier">
+                        <nuxt-link class="user" :to="'/user/'+replier.user_id+'/articles'">
+                            <span class="title">{{replier.nickname}}</span>
+                        </nuxt-link>
                         <v-icon class="ml-2" color="grey">iconfont icon-huifu1</v-icon>
-                        <div @mouseleave="showDiscusser=false" class="d-inline-block ml-2">
-                            <transition name="fade">
-                                <div v-show="showDiscusser" class="userCard2" @mouseleave="showDiscusser=false">
-                                    <card :user="comment.discusser" class=" elevation-3"></card>
-                                </div>
-                            </transition>
-                            <nuxt-link class="user" :to="'/user/'+comment.discusser.user_id+'/articles'">
-                            <span class="title "
-                                  @mouseover="showDiscusser=true">{{comment.discusser.nickname}}</span>
-                            </nuxt-link>
-                        </div>
+                        <nuxt-link class="user" :to="'/user/'+discusser.user_id+'/articles'">
+                            <span class="title">{{discusser.nickname}}</span>
+                        </nuxt-link>
+                    </v-flex>
+                    <v-flex md12 v-else>
+                        <nuxt-link class="user" :to="'/user/'+discusser.user_id+'/articles'">
+                            <span class="title">{{discusser.nickname}}</span>
+                        </nuxt-link>
                     </v-flex>
                     <v-flex md12>
-                        <span class="subheading ">{{comment.commentInfo.create_time}}</span>
+                        <span class="subheading ">{{createTime}}</span>
                     </v-flex>
                 </v-layout>
             </v-flex>
         </v-layout>
-        <v-layout row align-center justify-center>
+        <v-layout row align-center :style="{'height':height}">
             <v-flex md11 ml-4>
-                <p class="body-2">{{text}}</p>
+                <p class="font-2 clearAll">{{text}}</p>
             </v-flex>
-            <v-flex md1>
+            <v-flex md1 v-if="showExpend">
                 <el-tooltip class="item" effect="dark" :content="expandWord" placement="bottom">
-                    <v-btn flat icon color="grey">
+                    <v-btn class="clearMargin" flat icon color="grey">
                         <v-icon @click="expand">{{arrow}}</v-icon>
                     </v-btn>
                 </el-tooltip>
             </v-flex>
         </v-layout>
-        <v-layout wrap row>
+        <v-layout wrap row v-if="showTool">
             <v-flex md3 ml-4>
-                <el-tooltip class="item" effect="dark" content="赞" placement="bottom">
-                    <v-btn flat icon class="btn-operation" @mouseover="hover=true" @click="operation"
-                           @mouseleave="hover=false" color="red" :disabled="!comment.commentInfo.allow_support">
-                        <v-icon color="grey" size="20" :class="{'redfont':hover||comment.commentInfo.is_support}">
-                            iconfont icon-fab
-                        </v-icon>
-                        <span class="body-2 pl-1 grey--text" :class="{'redfont':hover||comment.commentInfo.is_support}"> {{comment.commentInfo.support}}</span>
-                    </v-btn>
-                </el-tooltip>
+                <v-hover>
+                    <el-tooltip slot-scope="{ hover }" class="item" effect="dark" content="赞" placement="bottom">
+                        <v-btn flat icon class="btn-operation" @click="vote" color="red">
+                            <v-icon color="grey" size="20" :class="{'redfont':commentOrReply.is_support||hover}">
+                                iconfont icon-fab
+                            </v-icon>
+                            <span class="body-2 pl-1 grey--text" :class="{'redfont':commentOrReply.is_support||hover}"> {{commentOrReply.support}}</span>
+                        </v-btn>
+                    </el-tooltip>
+                </v-hover>
+
                 <el-tooltip class="item" effect="dark" content="回复" placement="bottom">
-                    <v-btn flat icon class="btn-operation  ml-2">
+                    <v-btn flat icon class="btn-operation  ml-2" @click="showReply">
                         <v-icon color="grey" size="20">iconfont icon-huifu</v-icon>
                     </v-btn>
                 </el-tooltip>
             </v-flex>
             <v-spacer></v-spacer>
-            <v-flex md2>
-                <v-dialog v-model="dialog" persistent max-width="290" v-show="comment.commentInfo.allow_delete">
-                    <el-tooltip slot="activator" class="item" effect="dark" content="删除" placement="bottom">
-                        <v-btn class="btn-operation ml-4" flat round color="red" icon>
-                            <v-icon color="red" size="22">iconfont icon-delete</v-icon>
-                        </v-btn>
-                    </el-tooltip>
-                    <v-card>
-                        <v-card-title class="headline">是否删除?</v-card-title>
-                        <v-card-text>是否确定删除评论，注意一旦删除将无法恢复！
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="green darken-1" flat @click="dialog = false">取消</v-btn>
-                            <v-btn color="red darken-1" flat @click="del">删除</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
+            <v-flex md1 v-if="commentOrReply.allow_delete">
+                <el-tooltip class="item" effect="dark" content="删除" placement="bottom">
+                    <v-btn class="clearMargin" flat round color="red" icon @click="showDelete">
+                        <v-icon color="red" size="22">iconfont icon-delete</v-icon>
+                    </v-btn>
+                </el-tooltip>
             </v-flex>
         </v-layout>
     </v-card>
 </template>
 
 <script>
-  import card from '~/components/user/userCard.vue'
+  import { transformTime } from '../../utils'
 
+  let _ = require('lodash')
   export default {
-    name: 'myComment',
-    components: {
-      card
-    },
-    props: {
-      comment: {
-        type: Object
-      },
-      index: {
-        type: Number
-      }
-    },
-    mounted () {
-      this.text = this.setString(this.comment.commentInfo.text, false)
-    },
-    data: function () {
-      return {
-        hover: false,
-        dialog: false,
-        hover2: false,
-        all: false,
-        arrow: 'keyboard_arrow_down',
-        text: '',
-        showDiscusser: false,
-        showReplier: false,
-        expandWord: '展开'
-      }
-    },
-    methods: {
-      operation () {
-        // todo 等api写好后需要修改
-        this.comment.commentInfo.is_support = !this.comment.commentInfo.is_support
-        if (this.comment.commentInfo.is_support) {
-          this.comment.commentInfo.support++
-        } else {
-          this.comment.commentInfo.support--
-        }
-      },
-      del () {
-        this.$emit('del', this.index)
-      },
-      expand () {
-        this.all = !this.all
-        this.text = this.setString(this.comment.commentInfo.text, this.all)
-        if (this.all) {
-          this.arrow = 'keyboard_arrow_up'
-          this.expandWord = '收起'
-        } else {
-          this.arrow = 'keyboard_arrow_down'
-          this.expandWord = '展开'
-        }
-      },
-      setString (str, all) {
-        let strlen = 0
-        let s = ''
-        for (let i = 0; i < str.length; i++) {
-          if (str.charCodeAt(i) > 128) {
-            strlen += 2
-          } else {
-            strlen++
-          }
-          s += str.charAt(i)
-          if (strlen >= 100 && !all) {
-            return s + '......'
-          }
-        }
-        return s
-      }
-    }
+	name: 'myComment',
+	props: {
+	  comment: {
+		type: Object,
+		default: undefined
+	  },
+	  index: {
+		type: Number,
+		default: 0
+	  },
+	  showTool: {
+		type: Boolean,
+		default: true
+	  },
+	  reply: {
+		type: Object,
+		default: undefined
+	  }
+	},
+	created () {
+	  this.init()
+	},
+	watch: {
+	  'comment': function () {
+		this.init()
+	  },
+	  'reply': function () {
+		this.init()
+	  }
+	},
+	data: function () {
+	  return {
+		dialog: false,
+		all: false,
+		height: '30px',
+		arrow: 'keyboard_arrow_down',
+		text: '',
+		showDiscusser: false,
+		showReplier: false,
+		expandWord: '展开',
+		showExpend: true,
+		commentOrReply: {},
+		discusser: {},
+		replier: {},
+		createTime: ''
+	  }
+	},
+	methods: {
+	  init () {
+		if ( !_.isUndefined(this.comment) ) {
+		  this.replier = false
+		  this.commentOrReply = this.comment.userComment
+		  if ( this.commentOrReply.text.length > 120 ) {
+			this.showExpend = true
+			this.text = this.setString(this.commentOrReply.text, false)
+		  } else {
+			this.text = this.commentOrReply.text
+			this.showExpend = false
+		  }
+		  this.discusser = this.comment.discusser
+		  this.createTime = transformTime(this.commentOrReply.create_time)
+		} else if ( !_.isUndefined(this.reply) ) {
+		  console.log(this.reply)
+		  this.discusser = this.reply.discusser
+		  this.commentOrReply = this.reply.userReply
+		  if ( this.commentOrReply.text.length > 120 ) {
+			this.showExpend = true
+			this.text = this.setString(this.commentOrReply.text, false)
+		  } else {
+			this.showExpend = false
+			this.text = this.commentOrReply.text
+		  }
+		  this.createTime = transformTime(this.commentOrReply.create_time)
+		  this.replier = this.reply.replier
+		}
+	  },
+	  vote () {
+		if ( this.$store.state.isLogin ) {
+		  if ( this.commentOrReply.is_author ) {
+			this.$message.warning('您不能给自己投票！')
+		  } else {
+			if ( this.commentOrReply.is_support ) {
+			  this.$emit('cancelVote', this.index)
+			} else {
+			  this.$emit('vote', this.index)
+			}
+		  }
+		} else {
+		  this.$message.warning('请先登录！')
+		}
+	  },
+	  showDelete () {
+		this.$emit('showDelete', this.index)
+	  },
+	  showReply () {
+		this.$emit('showReply', this.index)
+	  },
+	  expand () {
+		this.all = !this.all
+		this.text = this.setString(this.commentOrReply.text, this.all)
+		if ( this.all ) {
+		  this.arrow = 'keyboard_arrow_up'
+		  this.expandWord = '收起'
+		  this.height = 'auto'
+		} else {
+		  this.arrow = 'keyboard_arrow_down'
+		  this.expandWord = '展开'
+		  this.height = '30px'
+		}
+	  },
+	  setString (str, all) {
+		let strlen = 0
+		let s = ''
+		for ( let i = 0; i < str.length; i++ ) {
+		  if ( str.charCodeAt(i) > 128 ) {
+			strlen += 2
+		  } else {
+			strlen++
+		  }
+		  s += str.charAt(i)
+		  if ( strlen >= 100 && !all ) {
+			return s + '......'
+		  }
+		}
+		return s
+	  }
+	}
   }
 </script>
 
@@ -199,10 +223,6 @@
     }
 
     .btn-operation {
-        margin: 0;
-    }
-
-    p {
         margin: 0;
     }
 

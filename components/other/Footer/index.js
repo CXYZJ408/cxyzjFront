@@ -1,4 +1,4 @@
-import foot from './Footer'
+import foot from './footer'
 
 foot.install = function (Vue) {
   Vue.component('Footer', foot)

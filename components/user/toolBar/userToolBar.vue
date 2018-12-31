@@ -1,6 +1,6 @@
 <template>
-    <v-card class=" toolbar" tile flat>
-        <v-container grid-list-md class="clearPadding  mt-2">
+    <ToolBarTemplate @up="up" @down="down" :otherHeight="otherHeight" ref="ToolBarTemplate">
+        <v-container grid-list-md class="clearPadding  mt-2" slot="toolBarMain">
             <v-layout align-center justify-center>
                 <v-flex xl9 md12>
                     <v-layout justify-center align-center row>
@@ -23,7 +23,7 @@
                             </el-tooltip>
                             <el-dropdown @command="handleCommand" trigger="click">
                                 <v-avatar :size="40" class="avatar ml-2">
-                                    <img :src="$store.state.user.head_url" v-bind:class="widthHeight" alt="">
+                                    <img :src="$store.state.user.head_url" :class="widthHeight" alt="">
                                 </v-avatar>
                                 <el-dropdown-menu slot="dropdown">
                                     <el-dropdown-item command="userCenter">个人中心</el-dropdown-item>
@@ -40,83 +40,92 @@
                 </v-flex>
             </v-layout>
         </v-container>
-    </v-card>
-
+        <slot slot="toolBarOther"></slot>
+    </ToolBarTemplate>
 </template>
 
 <script>
   import icons from '~/components/user/icons.vue'
-
+  //todo 向下滚动收起
   export default {
-    name: 'userToolBar',
-    components: {
-      icons
-    },
-    props: {
-      index: {
-        type: Boolean,
-        default: false
-      },
-      write: {
-        type: Boolean,
-        default: false
-      },
-      discussion: {
-        type: Boolean,
-        default: false
-      },
-      userCenter: {
-        type: Boolean,
-        default: false
-      },
-      education: {
-        type: Boolean,
-        default: false
-      },
-      about: {
-        type: Boolean,
-        default: false
-      },
-      font_size: {
-        type: Number
-      },
-      icon_size: {
-        type: Number
-      },
-      distance: {
-        type: String
-      },
-      none: {
-        type: Boolean,
-        default: false
-      }
-    },
-    data: function () {
-      return {
-        search: '',
-        show: false,
-        widthHeight: 'avatar-img-width'
-      }
-    },
-    methods: {
-      click () {
-        console.log('111')
-        //TODO 需要修改
-      },
-      handleCommand (command) {
-        if (command === 'logout') {
-          let $cookie = require('js-cookie')
-          this.$store.commit('logout')
-          $cookie.remove('token')//移除token
-          $cookie.remove('refreshToken')
-
-          this.$router.push({path: `/`})
-        } else if (command === 'userCenter') {
-          this.$router.push({path: `/user/${this.$store.state.user.user_id}/articles`})
-        }
-
-      }
-    },
+	name: 'userToolBar',
+	components: {
+	  icons
+	},
+	props: {
+	  otherHeight: {
+		type: Number,
+		default: 0
+	  },
+	  index: {
+		type: Boolean,
+		default: false
+	  },
+	  write: {
+		type: Boolean,
+		default: false
+	  },
+	  discussion: {
+		type: Boolean,
+		default: false
+	  },
+	  userCenter: {
+		type: Boolean,
+		default: false
+	  },
+	  education: {
+		type: Boolean,
+		default: false
+	  },
+	  about: {
+		type: Boolean,
+		default: false
+	  },
+	  font_size: {
+		type: Number
+	  },
+	  icon_size: {
+		type: Number
+	  },
+	  distance: {
+		type: String
+	  },
+	  none: {
+		type: Boolean,
+		default: false
+	  }
+	},
+	data: function () {
+	  return {
+		search: '',
+		show: false,
+		widthHeight: 'avatar-img-width'
+	  }
+	},
+	methods: {
+	  click () {
+		console.log('111')
+		//TODO 需要修改
+	  },
+	  up () {
+		this.$emit('up')
+	  },
+	  down () {
+		this.$emit('down')
+	  },
+	  handleCommand (command) {
+		if ( command === 'logout' ) {
+		  let $cookie = require('js-cookie')
+		  this.$store.commit('logout')
+		  $cookie.remove('token')//移除token
+		  $cookie.remove('refreshToken')
+		  this.$router.push({ path: `/` })
+		  location.reload()
+		} else if ( command === 'userCenter' ) {
+		  this.$router.push({ path: `/user/${this.$store.state.user.user_id}/articles` })
+		}
+	  }
+	},
 
   }
 </script>
@@ -136,7 +145,7 @@
     .toolbar {
         position: fixed;
         width: 100%;
-        z-index: 999;
+        z-index: 99;
         background-color: white;
         margin: 0 !important;
         padding: 0 !important;

@@ -6,7 +6,7 @@
                     <v-layout row wrap>
                         <v-flex md12>
                             <v-card-title style="padding: 0">
-                                <nuxt-link :to="'/article/'+article.article_id">
+                                <nuxt-link :to="'/articles/'+article.article_id">
                                     <span class="title2">{{article.title}}</span>
                                 </nuxt-link>
                                 <v-hover close-delay="50" class="ml-3">
@@ -18,7 +18,7 @@
                             </v-card-title>
                         </v-flex>
                         <v-flex md12>
-                            <nuxt-link :to="'/article/'+article.article_id">
+                            <nuxt-link :to="'/articles/'+article.article_id">
                                 <p class="myText limit-2line">{{article.article_sum}}</p>
                             </nuxt-link>
                         </v-flex>
@@ -48,7 +48,7 @@
                     <el-tooltip class="item" effect="dark" content="收藏" placement="bottom">
                         <v-icon class="ml-3" color="grey" size="20"
                                 :class="{'redfont':article.is_collected}"
-                                @click="operation">iconfont icon-collection
+                                @click="collectOption">iconfont icon-collection
                         </v-icon>
                     </el-tooltip>
                     <span class="body-2 pl-1" :class="{'redfont':article.is_collected}">{{article.collections}}</span>
@@ -60,64 +60,112 @@
 </template>
 
 <script>
-  //todo:组件的数据需要重写
+  import { ArticleApi } from '../../api/ArticleApi'
+  import Status from '../../utils/status'
+
+  let $articleApi
   export default {
-
-    mounted () {
-      this.createTime = this.$utils.transformTime(this.article.update_time)
-    },
-    props: {
-      article: {
-        type: Object
-      },
-      label: {
-        type: Object
-      },
-      user: {
-        type: Object
-      },
-      index: {
-        type: Number
-      }
-    },
-    methods: {
-      operation () {
-        // todo 等api写好后需要修改
-        this.dynamic.is_collected = !this.dynamic.is_collected
-      },
-      mouseOver () {
-        this.show = true
-
-        setTimeout(() => {
-          if (this.show) {
-            this.$store.commit('userCard/needToFlush', this.user.user_id)
-            let data = {
-              index: this.index,
-              hover: true
-            }
-            this.$store.commit('userCard/setHover', data)
-          }
-        }, 200)
-      },
-      mouseLeave () {
-        this.show = false
-        setTimeout(() => {
-          if (!this.show) {
-            let data = {
-              index: this.index,
-              hover: false
-            }
-            this.$store.commit('userCard/setHover', data)
-          }
-        }, 100)
-      }
-    },
-    data: function () {
-      return {
-        show: false,
-        createTime: ''
-      }
-    }
+	created () {
+	  $articleApi = new ArticleApi(this.$store)
+	  this.createTime = this.$utils.transformTime(this.article.update_time)
+	},
+	props: {
+	  article: {
+		type: Object
+	  },
+	  label: {
+		type: Object
+	  },
+	  user: {
+		type: Object
+	  },
+	  index: {
+		type: Number
+	  }
+	},
+	watch: {
+	  'article.update_time': function () {
+		this.createTime = this.$utils.transformTime(this.article.update_time)
+	  },
+	},
+	methods: {
+	  collectOption () {
+		if ( this.article.is_collected ) {
+		  $articleApi.deleteCollectedArticle(this.article.article_id).then(res => {
+			let data
+			if ( res.status === Status.SUCCESS ) {
+			  data = {
+				index: this.index,
+				isCollected: false,
+				collections: res.data.collections
+			  }
+			  this.$message.success('取消收藏成功！')
+			} else if ( res.status === Status.ARTICLE_NOT_COLLECTED ) {
+			  this.$message.warning('该文章没有收藏！')
+			  data = {
+				index: this.index,
+				isCollected: false,
+			  }
+			}
+			this.$store.commit('article/setCollect', data)
+		  }).catch(() => {
+			this.$message.error('未知错误，操作失败！')
+		  })
+		} else {
+		  $articleApi.collectArticle(this.article.article_id).then(res => {
+			let data
+			if ( res.status === Status.SUCCESS ) {
+			  this.$message.success('收藏成功！')
+			  data = {
+				index: this.index,
+				isCollected: true,
+				collections: res.data.collections
+			  }
+			} else if ( res.status === Status.ARTICLE_HAS_COLLECTED ) {
+			  this.$message.warning('该文章已收藏！')
+			  data = {
+				index: this.index,
+				isCollected: true,
+			  }
+			}
+			this.$store.commit('article/setCollect', data)
+		  }).catch(() => {
+			this.$message.error('未知错误，操作失败！')
+		  })
+		}
+	  },
+	  mouseOver () {
+		this.show = true
+		setTimeout(() => {
+		  if ( this.show ) {
+			this.$store.commit('userCard/needToFlush', this.user.user_id)
+			let data = {
+			  index: this.index,
+			  hover: true
+			}
+			this.$store.commit('userCard/setHover', data)
+		  }
+		}, 200)
+	  },
+	  mouseLeave () {
+		this.show = false
+		setTimeout(() => {
+		  if ( !this.show ) {
+			let data = {
+			  index: this.index,
+			  hover: false
+			}
+			this.$store.commit('userCard/setHover', data)
+		  }
+		}, 100)
+	  }
+	},
+	data: function () {
+	  return {
+		show: false,
+		createTime: ''
+	  }
+	}
   }
 </script>
 
@@ -126,6 +174,8 @@
         font-size: 22px !important;
         font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
         font-weight: 600;
+        transition: all .3s ease-out;
+
     }
 
     .title2:hover {

@@ -6,7 +6,8 @@ export class Request {
   set header (value) {
     this._header = value
   }
-  constructor (requestMethod, url, func, params = {}, header = {}) {
+
+  constructor (requestMethod, url, func, params = undefined, header = undefined) {
     this._requestMethod = requestMethod
     this._url = url
     this._params = params

@@ -1,217 +1,111 @@
 <template>
-    <v-card class="main pt-3" >
+    <v-card class="main pt-3">
         <v-layout row wrap>
-            <v-flex my-1 md12 v-for="(item,index) in articleList" v-if="item!==undefined" :key="index">
-                <myArticle :index="index"
-                           @del="del" :userCenter=true
-                           :article="item"></myArticle>
+            <v-flex my-1 md12 v-for="(item,index) in nowArticleList" :key="index">
+                <myArticle :index="index" @deleteArticle="deleteArticle" :article="item.article"
+                           :label="item.label"></myArticle>
             </v-flex>
         </v-layout>
         <div class="py-3 text-md-center">
-            <el-pagination
-                    layout="prev, pager, next"
-                    :page-count="page.total"
-                    :current-page="page.page_num">
-            </el-pagination>
+            <v-pagination
+                    v-model="page.pageNum"
+                    :length="page.total"
+                    circle
+            ></v-pagination>
         </div>
     </v-card>
 </template>
 
 <script>
   import myArticle from '~/components/article/myArticle.vue'
+  import { UserApi } from '../../../api/UserApi'
+  import Status from '../../../utils/status'
+  import { scrollToSmooth } from '../../../utils'
+  import { ArticleApi } from '../../../api/ArticleApi'
 
+  let _ = require('lodash')
+  let $userApi
+  let $articleApi
+  const articleNum = 5//一页的文章个数
   export default {
-    name: 'articles',
-    components: {
-      myArticle
-    },
-    data: function () {
-      return {
-        page: {
-          is_end: false,
-          page_num: 1,
-          total: 10
-        },
-        articleList: [
-          {
-            articleInfo: {
-              article_id: 'xxx',
-              title: '中国充电联盟相继发布新能源汽车市场数据',
-              update_time: '9分钟前',
-              article_sum: '中新网5月15日电 本周，。根据中汽协发布2018年4月份汽车产销数据显示，今年4月新能源汽车产销量分别为8.1万辆和8.2万辆，同比增长分别为117.7%和138.4%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%',
-              views: 4,
-              comments: 1,
-              collections: 3,
-              thumbnail: '',
-              text: 'xxx',
-              is_collected: true,
-              allow_delete: false,
-              allow_edit: true,
-              is_author: true,
-              status_id: 100
-            },
-            type: {
-              type_id: 'xxx',
-              type_name: 'IT新闻'
-            },
-            user: {
-              user_id: 'xxxxx',
-              nickname: '野望',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              bg_url: 'xxx',
-              theme_color: 'xxxx',
-              role: 'user',
-              introduce: '一个征集原创真实故事的倾听者，你的故事，我都愿意听。',
-              gender: 0,
-              attentions: 11,
-              fans: 1,
-              articles: 23,
-              discussions: 4,
-              comments: 3,
-              is_followed: false
-            }
-          },
-          {
-            articleInfo: {
-              article_id: 'xxx',
-              title: '中国充电联盟相继发布新能源汽车市场数据',
-              update_time: '9分钟前',
-              article_sum: '中新网5月15日电 本周，。根据中汽协发布2018年4月份汽车产销数据显示，今年4月新能源汽车产销量分别为8.1万辆和8.2万辆，同比增长分别为117.7%和138.4%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%',
-              views: 4,
-              comments: 1,
-              collections: 3,
-              thumbnail: '/test.jpg',
-              text: 'xxx',
-              is_collected: true,
-              allow_delete: true,
-              allow_edit: false,
-              is_author: true,
-              status_id: 101
-            },
-            type: {
-              type_id: 'xxx',
-              type_name: 'IT新闻'
-            },
-            user: {
-              user_id: 'xxxxx',
-              nickname: 'yaser',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              role: 'user',
-              gender: 1,
-              is_followed: false,
-              introduce: 'xx',
-              attentions: 11,
-              fans: 1
-            }
-          },
-          {
-            articleInfo: {
-              article_id: 'xxx',
-              title: '中国充电联盟相继发布新能源汽车市场数据',
-              update_time: '9分钟前',
-              article_sum: '中新网5月15日电 本周，。根据中汽协发布2018年4月份汽车产销数据显示，今年4月新能源汽车产销量分别为8.1万辆和8.2万辆，同比增长分别为117.7%和138.4%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%',
-              views: 4,
-              comments: 1,
-              collections: 3,
-              thumbnail: '',
-              text: 'xxx',
-              is_collected: true,
-              allow_delete: true,
-              allow_edit: true,
-              is_author: true,
-              status_id: 101
-            },
-            type: {
-              type_id: 'xxx',
-              type_name: 'IT新闻'
-            },
-            user: {
-              user_id: 'xxxxx',
-              nickname: 'yaser',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              role: 'user',
-              gender: 1,
-              is_followed: false,
-              introduce: 'xx',
-              attentions: 11,
-              fans: 1
-            }
-          },
-          {
-            articleInfo: {
-              article_id: 'xxx',
-              title: '中国充电联盟相继发布新能源汽车市场数据',
-              update_time: '9分钟前',
-              article_sum: '中新网5月15日电 本周，。根据中汽协发布2018年4月份汽车产销数据显示，今年4月新能源汽车产销量分别为8.1万辆和8.2万辆，同比增长分别为117.7%和138.4%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%',
-              views: 4,
-              comments: 1,
-              collections: 3,
-              thumbnail: '/test.jpg',
-              text: 'xxx',
-              is_collected: true,
-              allow_delete: true,
-              allow_edit: true,
-              is_author: true,
-              status_id: 101
-            },
-            type: {
-              type_id: 'xxx',
-              type_name: 'IT新闻'
-            },
-            user: {
-              user_id: 'xxxxx',
-              nickname: 'yaser',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              role: 'user',
-              gender: 1,
-              is_followed: false,
-              introduce: 'xx',
-              attentions: 11,
-              fans: 1
-            }
-          },
-          {
-            articleInfo: {
-              article_id: 'xxx',
-              title: '中国充电联盟相继发布新能源汽车市场数据',
-              update_time: '9分钟前',
-              article_sum: '中新网5月15日电 本周，。根据中汽协发布2018年4月份汽车产销数据显示，今年4月新能源汽车产销量分别为8.1万辆和8.2万辆，同比增长分别为117.7%和138.4%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%；1-4月累计销售新能源汽车22.5万辆，同比增长149.2%',
-              views: 4,
-              comments: 1,
-              collections: 3,
-              thumbnail: '/test.jpg',
-              text: 'xxx',
-              is_collected: true,
-              allow_delete: true,
-              allow_edit: true,
-              is_author: true,
-              status_id: 101
-            },
-            type: {
-              type_id: 'xxx',
-              type_name: 'IT新闻'
-            },
-            user: {
-              user_id: 'xxxxx',
-              nickname: 'yaser',
-              head_url: '/img/Avatar/15aed405-d513-4cce-90bc-63b01b9c8d65.jpg',
-              role: 'user',
-              gender: 1,
-              is_followed: false,
-              introduce: 'xx',
-              attentions: 11,
-              fans: 1
-            }
-          }
-        ]
-      }
-    },
-    methods: {
-      del (index) {
-        this.$set(this.articleList, index, undefined)
-        // todo 需要更改为向后台发送删除指令，同时获取新的列表数据
-      }
-    }
+	name: 'articles',
+	components: {
+	  myArticle
+	},
+	created () {
+	  $userApi = new UserApi(this.$store)
+	  $articleApi = new ArticleApi(this.$store)
+	},
+	mounted () {
+	  console.log('send1')
+	  this.getUserArticleList(1)
+	},
+	watch: {
+	  'page.pageNum': function () {
+		this.getUserArticleList(this.page.pageNum)
+		scrollToSmooth(0)
+	  },
+	  '$route.params.userId': function () {
+		this.hasGet = false
+		if ( this.page.pageNum === 1 ) {
+		  this.getUserArticleList(1)
+		} else {
+		  this.page.pageNum = 1
+		}
+		console.log('send2')
+	  }
+	},
+	data: function () {
+	  return {
+		page: {
+		  pageNum: 0,
+		  total: 1
+		},//页码信息
+		articleList: [],//所有的文章列表信息
+		nowArticleList: [],//当前展示的文章列表信息
+		hasGet: false//是否已经向后端获取了数据
+	  }
+	},
+	methods: {
+	  getUserArticleList (pageNum) {
+		this.getArticleListAll().then(() => {
+		  if ( pageNum > this.page.total ) pageNum = this.page.total
+		  let start = articleNum * ( pageNum - 1 )//起始
+		  let end = articleNum * pageNum //结束
+		  this.nowArticleList = _.slice(this.articleList, start, end)
+		})
+	  },
+	  getArticleListAll () {//向后端获取数据
+		if ( !this.hasGet ) {
+		  return new Promise((resolve) => {
+			$userApi.getUserArticleList(this.$route.params.userId).then(res => {
+			  if ( res.status === Status.SUCCESS ) {
+				this.articleList = res.data.list
+				this.page.total = Math.ceil(this.articleList.length / articleNum)//设置总页数信息，获取总页数，向上取整
+				this.hasGet = true
+				resolve()
+			  }
+			})
+		  })
+		} else {
+		  return Promise.resolve()
+		}
+	  },
+	  deleteArticle (index) {
+		console.log(index)
+		$articleApi.deleteArticle(this.nowArticleList[ index ].article.article_id, this.$store.state.userCenter.user.user_id).then(res => {
+		  if ( res.status === Status.SUCCESS ) {
+			this.$message.success('文章删除成功！')
+		  } else if ( res.status === Status.ARTICLE_NOT_EXIST ) {
+			this.$message.warning('要删除的文章不存在！')
+		  }
+		  this.hasGet = false
+		  this.getUserArticleList(this.page.pageNum)
+		}).catch(() => {
+		  this.$message.error('未知错误，删除失败！')
+		})
+	  }
+	}
   }
 </script>
 
