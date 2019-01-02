@@ -291,14 +291,17 @@
 <script>
   import { UserApi } from '../../api/UserApi'
   import Constant from '../../utils/constant'
+  import { UtilsApi } from '../../api/UtilsApi'
   //todo 待添加功能：个人介绍使用markdown格式
   let $md5
   let $strength
   let $userApi
+  let $utilsApi
   export default {
 	name: 'userSetting',
 	mounted () {
 	  $userApi = new UserApi(this.$store)
+	  $utilsApi = new UtilsApi(this.$store)
 	  $strength = require('zxcvbn')
 	  $md5 = require('js-md5')
 	},
@@ -327,13 +330,18 @@
 	  },
 	  upload (options) {
 		console.log('upload')
-		$userApi.uploadImage(Constant.IMAGE_BACKGROUND, options.file).then((res) => {
-		  if ( res.status === this.$status.SUCCESS ) {
-			return Promise.resolve(res)
-		  } else {
-			return Promise.reject()
-		  }
-		})
+		return new Promise((resolve, reject) => {
+		  $utilsApi.uploadImage(Constant.IMAGE_BACKGROUND, options.file).then((res) => {
+			console.log(res.status)
+			if ( res.status === this.$status.SUCCESS ) {
+			  resolve(res)
+			} else {
+			  reject()
+			}
+		  }).catch(err=>{
+			console.log(err)
+		  })
+        })
 	  },
 	  handleAvatarSuccess (res) {
 		$userApi.updateHead(res.data.url).then((result) => {
@@ -353,6 +361,7 @@
 	  },
 	  handleBackgroundSuccess (res, file) {
 		this.progress = false//隐藏进度条
+		console.log('handleBackgroundSuccess',res)
 		$userApi.updateBgUrl(res.data.url).then((result) => {
 		  if ( result.status === this.$status.SUCCESS ) {
 			this.$notify({
@@ -362,7 +371,7 @@
 			})
 			this.user.bg_url = res.data.url//设置图片
 			this.$store.commit('userCenter/updateBgUrl', res.data.url)
-			this.$store.commit('setBgUrl', res.data.url)
+			this.$store.commit('setBackground', `background-image:url(${res.data.url})`)
 		  } else {
 			this.$message.error('未知错误！')
 		  }

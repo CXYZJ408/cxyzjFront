@@ -111,14 +111,21 @@
                                                      :index="index"
                                                      :userLabel="label" @getArticleList="getArticleList"
                                                      :state="state[index+1]"
-                                                     v-if="$store.state.article.articleList.length!==0"></articleList>
-                                        <div v-else class="animation">
+                                                     v-if="$store.state.article.articleList.length>0"
+                                        ></articleList>
+                                        <div v-else-if="loading" class="animation">
                                             <div class="spinner">
                                                 <div class="dot1"></div>
                                                 <div class="dot2"></div>
                                             </div>
                                         </div>
+                                        <div v-else>
+                                            <v-card class="mycard mt-2">
+                                                <p class="word"><i>该标签下还没有文章哦！</i></p>
+                                            </v-card>
+                                        </div>
                                     </v-tab-item>
+
                                 </v-tabs-items>
                             </v-flex>
                         </v-layout>
@@ -218,8 +225,10 @@
 		  labelId = this.userLabels[ index ].label_id
 		}
 		setTimeout(() => {
+		  this.loading = true
 		  this.$store.commit('article/setArticleList', [])//如果是获取第一页，则数据清空
 		  this.getArticleList(0, labelId, () => {
+			this.loading = false
 			this.handleState(false, index + 1)//启动子页面
 		  })
 		}, 250)
@@ -374,6 +383,7 @@
 		userLabels: [],
 		more: [],
 		labels: [],
+		loading: false,
 		boards: [
 		  {
 			icon: 'icon-discussion',
@@ -384,7 +394,7 @@
 			  background: 'rgba(24, 173, 237, .4)'
 			},
 			text: '发讨论',
-			href: '/discussions'
+			href: '/coming'
 		  },
 		  {
 			icon: 'icon-write',
@@ -406,7 +416,7 @@
 			  background: 'rgba(37, 155, 36, .4)'
 			},
 			text: '学知识',
-			href: '/educate'
+			href: '/coming'
 		  },
 		  {
 			icon: 'icon-about',
@@ -417,7 +427,7 @@
 			  background: 'rgba(255, 128, 0, .4)'
 			},
 			text: '关于',
-			href: '/about'
+			href: '/coming'
 		  }
 		]
 	  }

@@ -18,7 +18,7 @@
         <v-layout v-else justify-center>
             <v-flex md12>
                 <v-card class="mycard">
-                    <p class="word"><i>你还没有关注任何人哦！</i></p>
+                    <p class="word"><i>{{isAuthor}}还没有关注任何人哦！</i></p>
                 </v-card>
             </v-flex>
         </v-layout>
@@ -47,6 +47,16 @@
 	  this.getUserAttention(1)
 	},
 	computed: {
+	  isAuthor: function () {
+		if ( !this.$store.state.isLogin ) {
+		  return '他'
+		}
+		if ( this.$route.params.userId === this.$store.state.user.user_id ) {
+		  return '你'
+		} else {
+		  return '他'
+		}
+	  },
 	  needAttentionBtn: function () {
 		if ( !this.$store.state.isLogin ) {
 		  return false

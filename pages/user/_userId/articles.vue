@@ -1,17 +1,24 @@
 <template>
     <v-card class="main pt-3">
-        <v-layout row wrap>
-            <v-flex my-1 md12 v-for="(item,index) in nowArticleList" :key="index">
-                <myArticle :index="index" @deleteArticle="deleteArticle" :article="item.article"
-                           :label="item.label"></myArticle>
-            </v-flex>
-        </v-layout>
-        <div class="py-3 text-md-center">
-            <v-pagination
-                    v-model="page.pageNum"
-                    :length="page.total"
-                    circle
-            ></v-pagination>
+        <template v-if="nowArticleList.length>0">
+            <v-layout row wrap>
+                <v-flex my-1 md12 v-for="(item,index) in nowArticleList" :key="index">
+                    <myArticle :index="index" @deleteArticle="deleteArticle" :article="item.article"
+                               :label="item.label" @collect="collect" @cancelCollected="cancelCollected"></myArticle>
+                </v-flex>
+            </v-layout>
+            <div class="py-3 text-md-center">
+                <v-pagination
+                        v-model="page.pageNum"
+                        :length="page.total"
+                        circle
+                ></v-pagination>
+            </div>
+        </template>
+        <div v-else>
+            <v-card class="mycard mt-2">
+                <p class="word"><i>{{isAuthor}}还没有写文章哦！</i></p>
+            </v-card>
         </div>
     </v-card>
 </template>
@@ -55,10 +62,22 @@
 		console.log('send2')
 	  }
 	},
+	computed: {
+	  isAuthor: function () {
+		if ( !this.$store.state.isLogin ) {
+		  return '他'
+		}
+		if ( this.$route.params.userId === this.$store.state.user.user_id ) {
+		  return '你'
+		} else {
+		  return '他'
+		}
+	  }
+	},
 	data: function () {
 	  return {
 		page: {
-		  pageNum: 0,
+		  pageNum: 1,
 		  total: 1
 		},//页码信息
 		articleList: [],//所有的文章列表信息
@@ -67,9 +86,35 @@
 	  }
 	},
 	methods: {
+	  collect (index) {
+		$articleApi.collectArticle(this.nowArticleList[ index ].article.article_id).then(res => {
+		  if ( res.status === Status.SUCCESS ) {
+			this.hasGet = false
+			this.getUserArticleList(this.page.pageNum)
+			this.$message.success(`成功收藏：${this.nowArticleList[ index ].article.title}!`)
+		  }
+		}).catch(() => {
+		  this.$message.error('未知错误，收藏文章失败！')
+		})
+	  },
+	  cancelCollected (index) {
+		console.log('cancelCollected')
+		$articleApi.deleteCollectedArticle(this.nowArticleList[ index ].article.article_id).then(res => {
+		  if ( res.status === Status.SUCCESS ) {
+			this.hasGet = false
+			this.getUserArticleList(this.page.pageNum)
+			this.$message.success(`成功取消收藏：${this.nowArticleList[ index ].article.title}!`)
+		  }
+		}).catch(() => {
+		  this.$message.error('未知错误，取消收藏失败！')
+		})
+	  },
 	  getUserArticleList (pageNum) {
 		this.getArticleListAll().then(() => {
-		  if ( pageNum > this.page.total ) pageNum = this.page.total
+		  if ( pageNum > this.page.total ) {
+			pageNum = this.page.total
+			this.page.pageNum = pageNum
+		  }
 		  let start = articleNum * ( pageNum - 1 )//起始
 		  let end = articleNum * pageNum //结束
 		  this.nowArticleList = _.slice(this.articleList, start, end)

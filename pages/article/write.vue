@@ -777,12 +777,17 @@
 	  handleUpload (option) {
 		let file = option.file
 		let fileType = file.name.substring(file.name.lastIndexOf('.') + 1)
-		if ( fileType === 'md' || fileType === 'txt' ) {
+		if ( fileType === 'md' || fileType === 'txt' ) {//上传文章
 		  this.handleMarkdownTxt(file)
 		  return Promise.resolve(true)
-		} else {
-		  this.$refs.markdown.$refs.toolbar_left.$imgFileAdd(file)
-		  return Promise.resolve(true)
+		} else {//上传图片
+		  if ( this.edit < 0 ) {
+		    this.$message.warning('请先选择一篇文章以添加图片！')
+			return false
+          }else{
+			this.$refs.markdown.$refs.toolbar_left.$imgFileAdd(file)
+			return Promise.resolve(true)
+          }
 		}
 	  },
 	  handleMarkdownTxt (file) {

@@ -355,7 +355,7 @@
         } else if (!this.$refs.form2.validate()) {
           this.step = '3'
         } else if (this.$refs.form3.validate()) {
-          if (this.strength < 1) {
+          if (this.strength < 75) {
             this.$message.warning('密码太简单啦，加强一下吧！')
           } else {
             this.user.password = $md5(this.password1.split('').reverse().join(''))//将密码逆序同时进行md5处理

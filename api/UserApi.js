@@ -177,7 +177,11 @@ export class UserApi extends Api {
 	super.pushRequest = new Request(requestMethods.GET, url, this.getUserArticleList)
 	return super.judgeSend(send)
   }
-
+  getUserCollectedArticleList (userId,pageNum, send = true) {
+	let url = User + `/${userId}/article_collections/${pageNum}`
+	super.pushRequest = new Request(requestMethods.GET, url, this.getUserCollectedArticleList)
+	return super.judgeSend(send)
+  }
   getUserCommentList (userId, pageNum, send = true) {
 	let url = User + `/${userId}/comment_list/user_comment/${pageNum}`
 	super.pushRequest = new Request(requestMethods.GET, url, this.getUserCommentList )

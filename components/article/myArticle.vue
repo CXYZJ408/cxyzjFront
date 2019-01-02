@@ -51,15 +51,20 @@
         </v-layout>
         <v-layout wrap align-center row>
             <v-flex md8 class="grey--text">
-                <span class="subheading ml-3" style="text-transform: capitalize">{{$store.state.userCenter.user.nickname}}</span>
+                <nuxt-link class="user" :to="'/user/'+userId+'/articles'">
+                    <span class="subheading ml-3" style="text-transform: capitalize">{{nickname}}</span>
+                </nuxt-link>
                 <strong class="px-1">·</strong>
                 <span class="subheading grey--text">{{createTime}}</span>
                 <v-icon class="ml-3" color="grey" size="22">iconfont icon-attention</v-icon>
                 <span class="body-2 pl-1">{{article.views}}</span>
                 <v-icon class="ml-3" color="grey" size="22">iconfont icon-comment2</v-icon>
                 <span class="body-2 pl-1">{{article.comments}}</span>
-                <v-icon class="ml-3" color="grey" size="20">iconfont icon-collection</v-icon>
-                <span class="body-2 pl-1">{{article.collections}}</span>
+                <v-icon class="ml-3" size="20" :style="{'color':article.is_collected?'#E74C3C':'#9E9E9E'}"
+                        @click="collectOption">iconfont
+                    icon-collection
+                </v-icon>
+                <span class="body-2 pl-1" :style="{'color':article.is_collected?'#E74C3C':'#9E9E9E'}">{{article.collections}}</span>
             </v-flex>
             <v-spacer></v-spacer>
             <v-flex md2 v-if="article.is_author" class="text-md-right pr-4">
@@ -92,7 +97,7 @@
 </template>
 
 <script>
-  //todo 修改user卡片加载的方式
+  let _ = require('lodash')
   export default {
 	name: 'myArticle',
 	props: {
@@ -104,16 +109,21 @@
 	  },
 	  index: {
 		type: Number
+	  },
+	  user: {
+		type: Object,
+		default: undefined
 	  }
 	},
-    watch:{
-	  'article':function () {
-        this.init()
+	watch: {
+	  'article': function () {
+		this.init()
 	  }
-    },
+	},
 	created () {
 	  this.init()
 	},
+
 	data: function () {
 	  return {
 		articleSum: '',
@@ -124,6 +134,20 @@
 	  }
 	},
 	computed: {
+	  nickname: function () {
+		if ( _.isUndefined(this.user) ) {
+		  return this.$store.state.userCenter.user.nickname
+		} else {
+		  return this.user.nickname
+		}
+	  },
+	  userId: function () {
+		if ( _.isUndefined(this.user) ) {
+		  return this.$store.state.userCenter.user.user_id
+		} else {
+		  return this.user.user_id
+		}
+	  },
 	  status: function () {
 		let temp = ''
 		switch ( this.article.status_id ) {
@@ -147,14 +171,31 @@
 	  }
 	},
 	methods: {
+	  collectOption () {
+		if ( this.article.is_author ) {
+		  this.$message.warning('您不能收藏自己的文章!')
+		  return false
+		}
+		if ( this.article.is_collected ) {
+		  console.log('collect1')
+		  this.$emit('cancelCollected', this.index)
+		} else {
+		  console.log('collect2')
+
+		  this.$emit('collect', this.index)
+		}
+	  }
+	  ,
 	  init () {
 		this.createTime = this.$utils.transformTime(this.article.update_time)
 		this.articleSum = this.$utils.setString(this.article.article_sum, 270)
-	  },
+	  }
+	  ,
 	  deleteArticle () {
 		this.$emit('deleteArticle', this.index)
 		this.deleteDialog = false
-	  },
+	  }
+	  ,
 	  edit () {
 		this.$router.push({ path: '/article/write', query: { articleId: this.article.article_id } })
 	  }
@@ -208,5 +249,13 @@
         background-color: #8E44AD !important;
         color: white !important;
         transition: all .3s ease-out;
+    }
+
+    .red-font {
+        color: #E74C3C !important;
+    }
+
+    .user:hover {
+        color: #18ADED
     }
 </style>
