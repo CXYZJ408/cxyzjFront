@@ -1,12 +1,12 @@
 <template>
-    <v-layout row wrap>
+    <v-layout row wrap style="overflow: hidden;height: 100vh">
         <input type="text" v-model="path" id="urlPath">
         <v-flex md12 class="text-md-center">
             <v-card color="#F3F3F3" class="up" flat tile :height="250">
                 <nuxt-link to="/"><img height="150" src="/img/login/logo-small.png"></nuxt-link>
                 <div class="boundary"></div>
             </v-card>
-            <v-card flat tile >
+            <v-card flat tile style="height: 100vh">
                 <v-layout row wrap justify-center class="pb-5">
                     <v-flex md12>
                         <span class="display-0">{{$store.state.article.publishedArticle.article.title}}</span>

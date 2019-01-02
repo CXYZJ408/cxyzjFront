@@ -15,6 +15,9 @@ export default async function ({ store, route, redirect, error, params, req }) {
 	  case 'article-preview-articleId':
 		store.commit('setBackground', 'background:white')
 		break
+	  case 'coming':
+		store.commit('setBackground', `background-image:url(~/img/Other/bg1.jpg)`)
+		break
 	  default:
 		store.commit('setBackground', 'background:#F3F3F3')
 	}

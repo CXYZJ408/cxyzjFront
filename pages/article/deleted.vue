@@ -1,11 +1,11 @@
 <template>
-    <v-layout row wrap>
+    <v-layout row wrap style="overflow: hidden;height: 100vh">
         <v-flex md12 class="text-md-center">
             <v-card color="#F3F3F3" class="up" flat tile :height="250">
                 <nuxt-link to="/"><img height="150" src="/img/login/logo-small.png"></nuxt-link>
                 <div class="boundary"></div>
             </v-card>
-            <v-card flat tile>
+            <v-card flat tile style="height: 100vh">
                 <v-layout row wrap justify-center>
                     <v-flex md12 class="mt-4">
                         <nuxt-link to='/'>

@@ -6,13 +6,13 @@
                 class="mx-3 "
         >
             <v-tab ripple>
-                <span class="font-6" :class="tab===0?'my-blue':'my-text'">{{isAuthor}}的评论</span>
+                <span class="font-6" :class="tab===0?'my-color':'my-text'">{{isAuthor}}的评论</span>
             </v-tab>
             <v-tab ripple>
-                <span class="font-6 " :class="tab===1?'my-blue':'my-text'">{{isAuthor}}的回复</span>
+                <span class="font-6 " :class="tab===1?'my-color':'my-text'">{{isAuthor}}的回复</span>
             </v-tab>
             <v-tab ripple>
-                <span class="font-6" :class="tab===2?'my-blue':'my-text'">回复{{isAuthor}}的</span>
+                <span class="font-6" :class="tab===2?'my-color':'my-text'">回复{{isAuthor}}的</span>
             </v-tab>
             <v-tab-item>
                 <template v-if="userCommentList.length>0">
@@ -22,7 +22,7 @@
                 </template>
                 <div v-else>
                     <v-card class="mycard mt-2">
-                        <p class="word"><i>你还没有评论任何人哦！</i></p>
+                        <p class="word"><i>{{isAuthor}}还没有评论任何人哦！</i></p>
                     </v-card>
                 </div>
             </v-tab-item>
@@ -46,7 +46,7 @@
                 </template>
                 <div v-else>
                     <v-card class="mycard mt-2">
-                        <p class="word"><i>还没有任何人回复你哦！</i></p>
+                        <p class="word"><i>还没有任何人回复{{isAuthor}}哦！</i></p>
                     </v-card>
                 </div>
             </v-tab-item>
@@ -189,7 +189,6 @@
 	  },
 	  handleDelete () {
 		this.deleteCommentReply().then(() => {//刷新当前页的评论
-		  console.log('refresh------------')
 		  this.showDeleteDialog = false
 		  this.refreshPage(this.getRefreshPage())
 		})
@@ -365,7 +364,7 @@
         min-height: 800px;
     }
 
-    .my-blue {
+    .my-color {
         color: #259B24;
     }
 

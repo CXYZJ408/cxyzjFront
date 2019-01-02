@@ -75,10 +75,10 @@
         default_color: ['#BBBBBB', '#BBBBBB', '#BBBBBB', '#BBBBBB', '#BBBBBB', '#BBBBBB'],
         iconList: [
           {class: 'iconfont icon-compass', name: '首页', iconColor: '#2C3E50', href: '/'},
-          {class: 'iconfont icon-discussion', name: '讨论', iconColor: '#18ADED', href: '/discussions'},
-          {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24', href: '/educations'},
+          {class: 'iconfont icon-discussion', name: '讨论', iconColor: '#18ADED', href: '/coming'},
+          {class: 'iconfont icon-educate', name: '学堂', iconColor: '#259B24', href: '/coming'},
           {class: 'iconfont icon-write', name: '写作', iconColor: '#8E44AD', href: '/article/write'},
-          {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800', href: '/about'},
+          {class: 'iconfont icon-about', name: '关于', iconColor: '#FF9800', href: '/coming'},
           {class: 'iconfont icon-yonghu', name: '个人中心', iconColor: '#18ADED', href: '/user'}],
         icons: [],
         empty: {class: '', name: '', iconColor: '', href: ''}

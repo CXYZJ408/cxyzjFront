@@ -25,7 +25,7 @@
                     </v-layout>
                 </v-flex>
                 <v-flex md2 v-if="article.thumbnail.length!==0">
-                    <nuxt-link class="d-inline-block wrap_image" :to="'/article/'+article.article_id">
+                    <nuxt-link class="d-inline-block wrap_image" :to="'/articles/'+article.article_id">
                         <img :src="article.thumbnail" class="image" alt="">
                     </nuxt-link>
                 </v-flex>
@@ -90,6 +90,10 @@
 	},
 	methods: {
 	  collectOption () {
+		if ( this.article.is_author ) {
+		  this.$message.warning('你不能收藏自己的文章！')
+		  return false
+		}
 		if ( this.article.is_collected ) {
 		  $articleApi.deleteCollectedArticle(this.article.article_id).then(res => {
 			let data

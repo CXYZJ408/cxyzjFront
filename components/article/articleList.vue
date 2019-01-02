@@ -29,6 +29,13 @@
                     </div>
                 </transition>
             </div>
+            <v-card class="no-more mt-3" v-if="page.is_end">
+                <v-layout>
+                    <v-flex class="text-md-center">
+                        <p><i>没有更多啦!</i></p>
+                    </v-flex>
+                </v-layout>
+            </v-card>
         </no-ssr>
     </div>
 </template>
@@ -113,7 +120,7 @@
 	  },
 	  load () {
 		if ( this.isLabelArticleList ) {
-		  this.$emit('getArticleList', this.page.page_num + 1,this.articleType, () => {
+		  this.$emit('getArticleList', this.page.page_num + 1, this.articleType, () => {
 			this.loading = false
 			console.log('加载结束')
 		  })
@@ -168,5 +175,18 @@
 
     .article-list {
         min-height: 700px;
+    }
+
+    .no-more {
+        width: 100%;
+        box-shadow: none;
+        border-radius: 15px;
+    }
+
+    .no-more p {
+        font-weight: 600;
+        font-size: 40px;
+        font-family: 楷体, serif;
+        color: #BBBBBB;
     }
 </style>

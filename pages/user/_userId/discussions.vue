@@ -1,14 +1,9 @@
 <template>
     <v-card class="main pt-3 " >
-        <myDiscussion v-for="(item,index) in discussionList" v-if="item!==undefined" :key="index" :index="index"
-                      @del="del"
-                      :discussion="item"></myDiscussion>
-        <div class="mt-5 text-md-center ">
-            <el-pagination
-                    layout="prev, pager, next"
-                    :page-count="page.total"
-                    :current-page="page.page_num">
-            </el-pagination>
+        <div>
+            <v-card class="mycard mt-2">
+                <p class="word"><i>{{isAuthor}}还没有发布讨论哦！</i></p>
+            </v-card>
         </div>
     </v-card>
 </template>
@@ -21,6 +16,18 @@
     components: {
       myDiscussion
     },
+	computed: {
+	  isAuthor: function () {
+		if ( !this.$store.state.isLogin ) {
+		  return '他'
+		}
+		if ( this.$route.params.userId === this.$store.state.user.user_id ) {
+		  return '你'
+		} else {
+		  return '他'
+		}
+	  }
+	},
     data: function () {
       return {
         page: {

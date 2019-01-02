@@ -38,14 +38,14 @@
                             <v-flex md12>
                                 <p class="my-font px-4">&nbsp;&nbsp;&nbsp;&nbsp;{{introduce}}</p>
                                 <div class="text-md-right">
-                                    <v-dialog v-model="dialog" width="600px">
+                                    <v-dialog v-model="dialog" width="650px">
                                         <div class=" mr-4 blue--text more" slot="activator" @click="dialog=true">更多...
                                         </div>
                                         <v-card>
                                             <v-card-title>
-                                                <span class="display-2 green--text">{{label.label_name}}</span>
+                                                <span class="display-2 green--text pt-3">{{label.label_name}}</span>
                                             </v-card-title>
-                                            <v-card-text class="font-3 grey--text text--darken-2"
+                                            <v-card-text class="font-3 grey--text text--darken-2 px-4"
                                                          style="line-height: 35px;">
                                                 &nbsp;&nbsp;{{label.introduce}}
                                             </v-card-text>
@@ -87,7 +87,7 @@
                             <hr class="hr mt-1">
                         </v-flex>
                         <v-flex md12>
-                            <v-tabs-items v-model="tabs">
+                            <v-tabs-items v-model="tabs" v-if="articleList.length>0">
                                 <v-tab-item
                                         v-for="index in 2"
                                         :key="index-1"
@@ -107,6 +107,18 @@
                                     </div>
                                 </v-tab-item>
                             </v-tabs-items>
+                            <div v-else-if="loading">
+                                <v-layout align-center justify-center style="margin-top: 150px">
+                                    <v-flex md3 class="pl-3 text-md-center">
+                                        <ball-beat-loader color="#3498DB" size="40px"></ball-beat-loader>
+                                    </v-flex>
+                                </v-layout>
+                            </div>
+                            <div v-else>
+                                <v-card class="mycard mt-2">
+                                    <p class="word"><i>该标签下还没有文章哦！</i></p>
+                                </v-card>
+                            </div>
                         </v-flex>
                     </v-layout>
                 </v-card>
@@ -138,19 +150,19 @@
 	  choose () {
 		if ( this.$store.state.isLogin ) {
 		  if ( !this.label.is_select ) {
-			$articleLabelApi.addUserLabel(this.labels.label_id).then(result => {
+			$articleLabelApi.addUserLabel(this.label.label_id).then(result => {
 			  if ( result.status === Status.SUCCESS ) {
-				this.labels.collections = result.data.collections
-				this.labels.is_select = true
-				this.$message.success(`成功关注了${this.labels.label_name}`)
+				this.label.collections = result.data.collections
+				this.label.is_select = true
+				this.$message.success(`成功关注了${this.label.label_name}`)
 			  }
 			})
 		  } else {
-			$articleLabelApi.deleteUserLabel(this.labels.label_id).then(result => {
+			$articleLabelApi.deleteUserLabel(this.label.label_id).then(result => {
 			  if ( result.status === Status.SUCCESS ) {
-				this.labels.collections = result.data.collections
-				this.labels.is_select = false
-				this.$message.success(`成功取消关注了${this.labels.label_name}`)
+				this.label.collections = result.data.collections
+				this.label.is_select = false
+				this.$message.success(`成功取消关注了${this.label.label_name}`)
 			  }
 			})
 		  }
@@ -167,9 +179,11 @@
 		this.page.is_end = false
 		this.handleState(true)//关闭所有子页面
 		setTimeout(() => {
+		  this.loading = true
 		  this.articleList = []//如果是获取第一页，则数据清空
 		  this.getArticleListByLabel(0, this.type, () => {
 			this.handleState(false, index)//启动子页面
+			this.loading = false
 		  })
 		}, 250)
 	  },
@@ -241,6 +255,7 @@
 		dialog: false,
 		tabs: '',
 		introduce: '',
+		loading: false,
 		type: Constant.HOT_LIST,
 		state: [ 1, 0 ],
 		articleList: [],
@@ -284,6 +299,7 @@
 
     #main {
         border-radius: 15px;
+        min-height: 700px;
     }
 
     .label {

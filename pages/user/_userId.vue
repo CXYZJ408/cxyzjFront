@@ -17,7 +17,7 @@
 </template>
 <script>
   import myHead from '~/components/user/myHead.vue'
-  import leftMenu from '~/components/user/leftMenu.vue'
+  import leftMenu from '~/components/user/userCenterLeft.vue'
   import { UserApi } from '../../api/UserApi'
   import $status from '~/utils/status'
   import Status from '../../utils/status'
@@ -34,7 +34,6 @@
 	},
     watch:{
 	  '$route.params.userId':function () {
-        console.log('watch route------------',this.$route.params.userId)
 		this.getUserCenter()
 	  }
     },

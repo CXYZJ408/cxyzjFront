@@ -1,25 +1,34 @@
 <template>
-    <!--自定义报错界面-->
-    <!--todo 放置一个扫雷的小游戏-->
-    <div class="container err">
-        <updateCookie></updateCookie>
-        <h1 v-if="error.statusCode === 404">找不到你想要的。。。</h1>
-        <h1 v-else-if="error.statusCode >= 500">服务器内部错误！</h1>
-        <h1 v-else>前方没路啦！</h1>
-        <nuxt-link to="/">首 页</nuxt-link>
-    </div>
+    <v-app class="background">
+        <v-layout row justify-center wrap>
+            <v-flex md3 class="text-md-center " style="margin-top: 150px">
+                <v-img transition="scale-transition" src="/img/Other/404.jpg" aspect-ratio="1.718"></v-img>
+                <div class="font-10 text-md-right mt-4" style="color: grey">阿勒，出错了。。。。</div>
+                <div class="mt-5 text-md-right">
+                    <v-btn flat color="green" @click="back"><span class="font-3">返回上一页</span></v-btn>
+                    <v-btn color="blue" outline nuxt to="/"><span class="font-3">返回首页</span></v-btn>
+                </div>
+            </v-flex>
+        </v-layout>
+    </v-app>
 </template>
 
 <script>
-  // todo 需要重新设计
   export default {
-    props: ['error'],
-    name: 'error'
+	props: [ 'error' ],
+	name: 'error',
+	methods: {
+	  back () {
+		this.$router.go(-1)
+	  },
+	}
   }
 </script>
 
 <style scoped>
-    .err {
-
+    .background {
+        background-color: #F3F3F3 !important;
+        width: 100%;
     }
+
 </style>
