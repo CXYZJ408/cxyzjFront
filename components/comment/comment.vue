@@ -118,20 +118,19 @@
 	},
 	methods: {
 	  deleteCommentReply (commentIndex, replyIndex = null) {
-		if ( _.isNull(replyIndex) ) {
+		if ( _.isNull(replyIndex) ) {//如果删除的是回复信息
 		  $articleCommentApi.deleteCommentReply(
 			this.$store.state.comment.commentList[ commentIndex ].comment.comment_id,
-			replyIndex, this.$store.state.article.article.article_id).then(res => {
-			console.log(res)
-			if ( res.status === Status.SUCCESS ) {
+			replyIndex, this.$store.state.article.article.article_id).then(res => {//调用API接口
+			if ( res.status === Status.SUCCESS ) {//删除成功
 			  let data = {
 				deleteComment: true,
 				commentIndex: commentIndex,
 			  }
-			  this.$store.commit('comment/deleteCommentReply', data)
+			  this.$store.commit('comment/deleteCommentReply', data)//更新状态数星星
 			  this.$store.commit('article/setArticleComments', res.data.comments)
 			  this.$message.success('删除成功！')
-			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {
+			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {//删除失败
 			  this.$message.warning('该评论已经不存在！')
 			}
 		  })
@@ -139,16 +138,15 @@
 		  $articleCommentApi.deleteCommentReply(
 			this.$store.state.comment.commentList[ commentIndex ].comment.comment_id,
 			this.$store.state.comment.commentList[ commentIndex ].children[ replyIndex ].reply.reply_id,
-			this.$store.state.article.article.article_id).then(res => {
-			console.log(res)
-			if ( res.status === Status.SUCCESS ) {
+			this.$store.state.article.article.article_id).then(res => {//调用API接口删除评论信息
+			if ( res.status === Status.SUCCESS ) {//删除评论成功
 			  let data = {
 				deleteComment: false,
 				commentIndex: commentIndex,
 				replyIndex: replyIndex
 			  }
 			  this.$store.commit('comment/deleteCommentReply', data)
-			  this.$store.commit('article/setArticleComments', res.data.comments)
+			  this.$store.commit('article/setArticleComments', res.data.comments)//更新状态树中的信息
 			  this.$message.success('删除成功！')
 			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {
 			  this.$message.warning('该回复已经不存在！')
@@ -159,22 +157,20 @@
 	  support (isComment, commentIndex, isSupport, commentReplyId, replyIndex) {
 		console.log(isSupport)
 		if ( isSupport ) {
-		  console.log('取消')
 		  //已经投过票，则取消投票
 		  $commentApi.cancelSupportCommentReply(isComment, commentReplyId,
 			this.$store.state.article.article.article_id).then(res => {
 			console.log(res)
 			if ( res.status === Status.SUCCESS ) {
 			  this.$message.success('取消投票成功！')
-			  //更新投票信息
-			  let data = {
+			  let data = { //更新投票信息
 				isComment: isComment,
 				isSupport: !isSupport,
 				commentIndex: commentIndex,
 				support: res.data.support,
 				replyIndex: replyIndex
 			  }
-			  this.$store.commit('comment/setCommentSupport', data)
+			  this.$store.commit('comment/setCommentSupport', data)//更新状态树信息
 			} else if ( res.status === Status.COMMENT_HAS_DELETE ) {
 			  this.$message.warning('该评论已被删除！')
 			} else if ( res.status === Status.USER_NOT_SUPPORT_OR_OBJECT ) {
@@ -182,7 +178,6 @@
 			}
 		  })
 		} else {
-		  console.log('投票')
 		  //未投票，进行投票操作
 		  $commentApi.supportCommentReply(isComment, commentReplyId,
 			this.$store.state.article.article.article_id).then(res => {
@@ -206,13 +201,14 @@
 		  })
 		}
 	  },
-	  publishReply (text, replyUser, callback) {
+	  publishReply (text, replyUser, callback) {//发布回复
 		if ( text.length <= 5 ) {
 		  this.$message.warning('评论不要少于5个字。。。。')
 		} else {
 		  $articleCommentApi.publishReply(this.comment.comment_id, text, replyUser.user_id,
 			this.$store.state.article.article.article_id).then(res => {
-			if ( res.status === Status.SUCCESS ) {
+			//将被评论的评论id，评论信息，被评论的用户id以及被评论的文章id发送给后端
+			if ( res.status === Status.SUCCESS ) {//发布成功
 			  this.$store.commit('article/addArticleComments')
 			  let data = {
 				index: this.commentIndex,
@@ -221,7 +217,7 @@
 			  this.$message.success('回复发表成功！')
 			  this.hasLoad++
 			  this.showReply = false
-			  this.$store.commit('comment/publishReply', data)
+			  this.$store.commit('comment/publishReply', data)//将数据填充进状态树中
 			  callback()
 			} else {
 			  this.$message.error('回复发表失败！')

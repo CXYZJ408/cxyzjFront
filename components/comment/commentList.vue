@@ -93,10 +93,8 @@
 	},
 	methods: {
 	  getCommentList (pageNum) {
-		console.log('getCommentList --------', pageNum)
-		if ( _.isEmpty(this.$store.state.comment.hotCommentList) ) {
-		  //如果hotCommentList没有获取过
-		  $articleCommentApi.getHotCommentList(this.$store.state.article.article.article_id, false)
+		if ( _.isEmpty(this.$store.state.comment.hotCommentList) ) {//判断是否获取过了热门评论
+		  $articleCommentApi.getHotCommentList(this.$store.state.article.article.article_id, false)//没有则同时获取热门评论与所指定评论列表
 			.getCommentList(this.$store.state.article.article.article_id, pageNum).then((res) => {
 			let resHotCommentList = res[ 0 ]
 			let resCommentList = res[ 1 ]
@@ -142,15 +140,14 @@
 		window.addEventListener('scroll', this.debounce(this.handle, 150))
 	  },
 	  publishComment (text, $, callback) {//$表示忽略该参数
-		//评论发布检查
 		if ( text.length <= 5 ) {
-		  this.$message.warning('评论不要少于5个字。。。。')
+		  this.$message.warning('评论不要少于5个字。。。。')//评论发布检查
 		} else {
 		  $articleCommentApi.publishComment(text, this.$store.state.article.article.article_id)
-			.then((result) => {
+			.then((result) => {//发布评论信息
 			  if ( result.status === Status.SUCCESS ) {
 				this.$message.success('评论发表成功！')
-				this.$store.commit('article/addArticleComments')
+				this.$store.commit('article/addArticleComments')//发布成功后将数据写入状态树中
 				this.$store.commit('comment/publishComment', result.data.list)
 				callback()
 			  } else {

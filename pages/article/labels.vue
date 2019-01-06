@@ -68,21 +68,21 @@
 	  my_label: myLabel
 	},
 	methods: {
-	  select (index, isSelect) {
-		if ( !this.$store.state.isLogin ) {
+	  select (index, isSelect) {//选择文章标签
+		if ( !this.$store.state.isLogin ) {//判断是否已经登录，未登录提示登录
 		  this.$message.warning('请先登录！')
 		  return false
 		}
-		if ( isSelect ) {
-		  $articleLabelApi.addUserLabel(this.labels[ index ].label_id).then(result => {
+		if ( isSelect ) {//如果是选择操作
+		  $articleLabelApi.addUserLabel(this.labels[ index ].label_id).then(result => {//将所选标签添加到用户标签中
 			if ( result.status === Status.SUCCESS ) {
-			  this.labels[ index ].collections = result.data.collections
+			  this.labels[ index ].collections = result.data.collections//设置标签信息
 			  this.labels[ index ].is_select = true
 			  this.$message.success(`成功关注了${this.labels[ index ].label_name}`)
 			}
 		  })
-		} else {
-		  $articleLabelApi.deleteUserLabel(this.labels[ index ].label_id).then(result => {
+		} else {//如果是取消选择操作
+		  $articleLabelApi.deleteUserLabel(this.labels[ index ].label_id).then(result => {//将所选标签从用户标签中移除
 			if ( result.status === Status.SUCCESS ) {
 			  this.labels[ index ].collections = result.data.collections
 			  this.labels[ index ].is_select = false

@@ -89,7 +89,7 @@
                 </v-layout>
                 <v-layout pt-2 pb-3 justify-center>
                     <v-flex md8>
-                        <v-btn block flat outline round large class="display-1 " @click="restPassword"
+                        <v-btn block flat outline round large class="display-1 " @click="resetPassword"
                                color="light-blue ">重置密码
                         </v-btn>
                     </v-flex>
@@ -206,30 +206,30 @@
         }
         this.$refs.form.reset()
       },
-      restPassword () {
-        if (this.$refs.form.validate()) {
+      resetPassword () {//重置密码
+        if (this.$refs.form.validate()) {//检查是否通过验证
           let $md5 = require('js-md5')
-          let password = $md5(this.password1.split('').reverse().join(''))
-          if (this.which === 'phone') {
-            $userApi.forgetPasswordUsePhone(password, this.code, this.phone).then(res => {
-              this.handleRestResult(res)
+          let password = $md5(this.password1.split('').reverse().join(''))//将新的密码进行加密处理
+          if (this.which === 'phone') {//手机验证方式
+            $userApi.forgetPasswordUsePhone(password, this.code, this.phone).then(res => {//调用API
+              this.handleResetResult(res)
             })
-          } else {
-            $userApi.forgetPasswordUseEmail(password, this.code, this.email).then(res => {
-              this.handleRestResult(res)
+          } else {//邮箱验证方式
+            $userApi.forgetPasswordUseEmail(password, this.code, this.email).then(res => {//调用API
+              this.handleResetResult(res)
             })
           }
         }
       },
-      handleRestResult (res) {
-        if (res.status === this.$status.SUCCESS) {
+      handleResetResult (res) {//处理返回的结果
+        if (res.status === this.$status.SUCCESS) {//操作成功
           this.$notify({
             title: '密码重置成功！',
             message: '密码已成功重置，请重新登录！',
             type: 'success'
           })
           this.$router.push({path: '/signIn'})
-        } else {
+        } else {//操作失败
           this.$notify({
             title: '密码重置失败！',
             type: 'error'

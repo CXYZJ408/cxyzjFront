@@ -197,14 +197,14 @@
 		  this.state[ index ] = 1
 		}
 	  },
-	  getArticleListByLabel (pageNum, type, callback) {
-		console.log('type:', type)
-		if ( !this.page.is_end ) {
+	  getArticleListByLabel (pageNum, type, callback) {//获取指定标签的文章列表信息
+		if ( !this.page.is_end ) {//页面是否未结束
 		  setTimeout(() => {
-			$articleLabelApi.getArticleListByLabelIdAndType(this.label.label_id, pageNum, type).then(result => {
+			$articleLabelApi.getArticleListByLabelIdAndType(this.label.label_id, pageNum, type).
+            then(result => {//调用API接口获取数据
 			  if ( result.status === Status.SUCCESS ) {
-				this.pushArticle(result.data.list)
-				this.page = result.data.page
+				this.pushArticle(result.data.list)//将获取到的数据添加到列表中
+				this.page = result.data.page//更新页面数据
 				if ( _.isFunction(callback) ) {
 				  callback()
 				}
@@ -226,19 +226,20 @@
 		  this.articleList.push(item)
 		})
 	  },
-	  init () {
+	  init () {//页面初始化
 		let labelId = this.$route.fullPath.split('/')[ 3 ]//读取labelId
 		this.label.label_id = labelId
-		$articleLabelApi.getArticleLabelDetails(labelId, false).getArticleListByLabelIdAndType(this.label.label_id, 0, Constant.HOT_LIST).then(result => {
-		  let articleLabelInfo = result[ 0 ]
-		  let articleList = result[ 1 ]
-		  if ( articleLabelInfo.status === Status.SUCCESS ) {
+		$articleLabelApi.getArticleLabelDetails(labelId, false).//调用API获取label信息
+        getArticleListByLabelIdAndType(this.label.label_id, 0, Constant.HOT_LIST).then(result => {//根据labelId获取指定文章列表
+		  let articleLabelInfo = result[ 0 ]//label数据
+		  let articleList = result[ 1 ]//文章数据
+		  if ( articleLabelInfo.status === Status.SUCCESS ) {//成功获取标签数据
 			this.label = articleLabelInfo.data.label
 			this.introduce = setString(this.label.introduce, 140)
 		  } else if ( articleLabelInfo.status === Status.LABEL_NOT_EXIST ) {
 			this.$message.error('该标签信息不存在！')
 		  }
-		  if ( articleList.status === Status.SUCCESS ) {
+		  if ( articleList.status === Status.SUCCESS ) {//成功获取文章数据
 			this.pushArticle(articleList.data.list)
 			this.page = articleList.data.page
 		  } else if ( articleList.status === Status.LABEL_NOT_EXIST ) {
@@ -247,7 +248,6 @@
 		}).catch(() => {
 		  this.$message.error('获取标签数据失败！')
 		})
-
 	  }
 	},
 	data: () => {

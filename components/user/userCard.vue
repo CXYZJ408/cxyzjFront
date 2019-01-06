@@ -118,20 +118,19 @@
 	},
 	methods: {
 	  Attention () {
-		if ( !this.$store.state.isLogin ) {
+		if ( !this.$store.state.isLogin ) {//判断当前用户是否已登录
 		  this.$message.warning('请先登录！')
 		  return
 		}
-		if ( this.$store.state.user.user_id === this.$store.state.userCard.user.user_id ) {
+		if ( this.$store.state.user.user_id === this.$store.state.userCard.user.user_id ) {//判断关注对象是否为自己本身
 		  this.$message.warning('你不能关注自己！')
 		  return
 		}
-		if ( this.$store.state.userCard.user.is_followed ) {
-		  //已关注则取消关注
-		  $userApi.disFollowUser(this.$store.state.userCard.user.user_id).then((result) => {
+		if ( this.$store.state.userCard.user.is_followed ) {//判断是否已关注被操作对象
+		  $userApi.disFollowUser(this.$store.state.userCard.user.user_id).then((result) => {//如果已关注，则取消
 			if ( result.status === $status.SUCCESS ) {
 			  this.$message.success(`您成功取消关注${this.$store.state.userCard.user.nickname}`)
-			  this.$store.commit('userCard/setAttention', false)
+			  this.$store.commit('userCard/setAttention', false)//将相关信息写入状态树
 			  this.$store.commit('userCard/setUserFans', result.data.fans)
 			} else if ( result.status === $status.USER_NOT_FOLLOWED ) {
 			  this.$message.warning('您还未关注该用户')
@@ -140,11 +139,10 @@
 			error({ statusCode: 500, message: '未知错误！' })
 		  })
 		} else {
-		  //未关注则进行关注
-		  $userApi.followUser(this.$store.state.userCard.user.user_id).then((result) => {
+		  $userApi.followUser(this.$store.state.userCard.user.user_id).then((result) => {//如果未关注，则进行关注操作
 			if ( result.status === $status.SUCCESS ) {
 			  this.$message.success(`您成功关注了${this.$store.state.userCard.user.nickname}`)
-			  this.$store.commit('userCard/setAttention', true)
+			  this.$store.commit('userCard/setAttention', true)//将相关信息写入状态树
 			  this.$store.commit('userCard/setUserFans', result.data.fans)
 			} else if ( result.status === $status.USER_HAS_FOLLOWED ) {
 			  this.$message.warning('您已经关注过该用户了')
@@ -155,12 +153,10 @@
 		}
 	  },
 	  getUser () {
-		if ( this.$store.state.userCard.needFlush ) {
-		  $userApi.getOtherUserDetails(this.$store.state.userCard.userId).then(result => {
+		if ( this.$store.state.userCard.needFlush ) {//如果用户信息需要被刷新
+		  $userApi.getOtherUserDetails(this.$store.state.userCard.userId).then(result => {//调用API接口
 			if ( result.status === $status.SUCCESS ) {
-			  setTimeout(() => {
-				this.$store.commit('userCard/setUserCard', result.data.user)
-			  }, 500)
+				this.$store.commit('userCard/setUserCard', result.data.user)//将读取到的信息存入状态树中
 			}
 		  })
 		}

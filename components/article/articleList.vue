@@ -104,8 +104,8 @@
 	  },
 	  handle () {//滚动结束后执行的计算操作
 		if ( !this.loading && this.state === 1 ) {
-		  let current = window.pageYOffset + window.screen.availHeight + 200
-		  let element = this.$refs.list
+		  let current = window.pageYOffset + window.screen.availHeight + 200//计算当前页面位置
+		  let element = this.$refs.list//获取列表对象
 		  if ( !_.isUndefined(element) ) {
 			const offsetTop = element.getBoundingClientRect().top + window.scrollY
 			if ( current > offsetTop + element.offsetHeight ) {//预加载
