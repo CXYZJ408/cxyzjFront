@@ -5,17 +5,17 @@
                 <RecycleScroller
                         :key="true"
                         :items="articleList"
-                        :item-height="160"
                         :buffer="200"
                         :page-mode="true"
                         :poolSize="100"
                         key-field="article_id"
+                        :item-size="160"
                         style="z-index:10"
                 >
-                    <template slot-scope="{item,index}">
-                        <articleInList :article=item.article :user=item.user :label=item.label
-                                       :index=index></articleInList>
-                    </template>
+                     <template slot-scope="{item,index}">
+                         <articleInList :article=item.article :user=item.user :label=item.label
+                                        :index=index></articleInList>
+                     </template>
                 </RecycleScroller>
                 <v-layout align-center justify-center v-if="loading">
                     <v-flex md2 class="pl-3">

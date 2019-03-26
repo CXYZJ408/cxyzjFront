@@ -73,7 +73,7 @@
                             <RecycleScroller
                                     :key="true"
                                     :items="articleList"
-                                    :item-height="50"
+                                    :item-size="50"
                                     :page-mode="true"
                                     key-field="article_id"
                             >

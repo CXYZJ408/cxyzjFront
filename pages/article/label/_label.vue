@@ -253,7 +253,7 @@
 	data: () => {
 	  return {
 		dialog: false,
-		tabs: '',
+		tabs: 0,
 		introduce: '',
 		loading: false,
 		type: Constant.HOT_LIST,

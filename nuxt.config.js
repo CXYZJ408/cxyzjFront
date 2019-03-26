@@ -1,4 +1,7 @@
 module.exports = {
+  server: {
+	port: 3000, // default: 3000
+  },
   /*
   ** Headers of the page
   */
@@ -17,19 +20,19 @@ module.exports = {
 	]
   },
   plugins: [
-	{ src: '~/plugins/vuetify.js' },
-	{ src: '~/plugins/element.js' },
-	{ src: '~/plugins/component.js' },
-	{ src: '~/plugins/markdown.js', ssr: false },
-	{ src: '~/plugins/utils.js', ssr: false },
-	{ src: '~/plugins/vueCroppa.js', ssr: false },
-	{ src: '~/plugins/viewer.js', ssr: false },
+	{ src: '~/plugins/vuetify.js' },//UI框架
+	{ src: '~/plugins/element.js' },//UI框架
+	{ src: '~/plugins/component.js' },//自定义组件
+	{ src: '~/plugins/markdown.js', ssr: false },//markdown解析器
+	{ src: '~/plugins/utils.js', ssr: false },//自定义工具箱
+	{ src: '~/plugins/vueCroppa.js', ssr: false },//图片处理插件
+	{ src: '~/plugins/viewer.js', ssr: false },//图片浏览插件
 	{ src: '~/assets/js/iconfont.js', ssr: false },//article 标签svg渲染文件
-	{ src: '~/plugins/vueScroll.js' },
-	{ src: '~/plugins/swiper.js', ssr: false },
-	{ src: '~/plugins/vue-virtual-scroller.js', ssr: false },
-	{ src: '~/plugins/loading.js' },
-	{ src: '~/plugins/localForage.js', ssr: false }
+	{ src: '~/plugins/vueScroll.js' },//滚动条美化插件
+	{ src: '~/plugins/swiper.js', ssr: false },//轮播图插件
+	{ src: '~/plugins/vue-virtual-scroller.js', ssr: false },//虚拟滚动条插件，提高页面性能
+	{ src: '~/plugins/loading.js' },//页面加载动画插件
+	{ src: '~/plugins/localForage.js', ssr: false }//indexDB数据库连接组件
   ],
 
   css: [

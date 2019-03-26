@@ -87,7 +87,7 @@
                             </v-flex>
                             <v-flex md12>
                                 <v-tabs-items v-model="currentItem" class="article-list">
-                                    <v-tab-item :lazy="true">
+                                    <v-tab-item >
                                         <articleList :articleList="$store.state.article.articleList"
                                                      :page="$store.state.article.articlePage"
                                                      :userLabel="undefined"
@@ -356,7 +356,7 @@
 		isFixed: false,
 		boardStyle: '',
 		topicStyle: '',
-		currentItem: '',
+		currentItem: 0,
 		event: '',
 		//轮播图配置
 		swiperOption: {
