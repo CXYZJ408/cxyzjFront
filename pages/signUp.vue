@@ -354,7 +354,7 @@
           this.step = '2'
         } else if (!this.$refs.form2.validate()) {
           this.step = '3'
-        } else if (this.$refs.form3.validate()) {
+        } else if (this.$refs.form3.validate()&&this.valid) {
           if (this.strength < 75) {//如果密码强度太低，则进行提示用户加强
             this.$message.warning('密码太简单啦，加强一下吧！')
           } else {//通过验证后

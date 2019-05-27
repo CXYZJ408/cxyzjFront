@@ -38,9 +38,9 @@
                             <v-flex md12>
                                 <p class="my-font px-4">&nbsp;&nbsp;&nbsp;&nbsp;{{introduce}}</p>
                                 <div class="text-md-right">
+                                    <div class=" mr-4 blue--text more" slot="activator" @click="dialog=true">更多...
+                                    </div>
                                     <v-dialog v-model="dialog" width="650px">
-                                        <div class=" mr-4 blue--text more" slot="activator" @click="dialog=true">更多...
-                                        </div>
                                         <v-card>
                                             <v-card-title>
                                                 <span class="display-2 green--text pt-3">{{label.label_name}}</span>

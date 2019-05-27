@@ -16,7 +16,7 @@ module.exports = {
 	  { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
 	  { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' },
 	  { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css' },
-	  { rel: 'stylesheet', href: 'http://at.alicdn.com/t/font_795495_jqpfdf2g5xc.css' },//阿里icon设置
+	  { rel: 'stylesheet', href: 'https://at.alicdn.com/t/font_795495_je2q78ru5dc.css' },//阿里icon设置
 	]
   },
   plugins: [
