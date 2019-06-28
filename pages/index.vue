@@ -28,7 +28,7 @@
                 <v-flex md9 xl7>
                     <v-card id="main">
                         <v-layout row wrap justify-center align-center>
-                            <v-flex md2 class="headline green--text mt-3 pl-5">
+                            <v-flex md2 class=" green--text mt-3 pl-5" style="font-size: 22px">
                                 <strong class="mt-1 ">热门文章</strong>
                             </v-flex>
                             <v-flex md9 class="mt-3">
@@ -87,7 +87,7 @@
                             </v-flex>
                             <v-flex md12>
                                 <v-tabs-items v-model="currentItem" class="article-list">
-                                    <v-tab-item :lazy="true">
+                                    <v-tab-item >
                                         <articleList :articleList="$store.state.article.articleList"
                                                      :page="$store.state.article.articlePage"
                                                      :userLabel="undefined"
@@ -356,7 +356,7 @@
 		isFixed: false,
 		boardStyle: '',
 		topicStyle: '',
-		currentItem: '',
+		currentItem: 0,
 		event: '',
 		//轮播图配置
 		swiperOption: {

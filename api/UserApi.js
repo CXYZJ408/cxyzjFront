@@ -289,7 +289,7 @@ export class UserApi extends Api {
   }
 
   verifySendCode (verifyType, send = true) {
-	console.log('verifySendCode')
+	console.log('verifySendCode',verifyType)
 	let url = User + '/verify_user/send_code'
 	let params = {
 	  verify_type: verifyType

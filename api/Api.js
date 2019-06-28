@@ -68,10 +68,8 @@ export class Api {
 	let request = _.cloneDeep(this.requestQueue)
 	this.requestQueue = []//清空请求队列
 	if ( request.length === 1 ) {
-	  console.log('发送一个')
 	  result = await proxyOne(request, this.returnType)
 	} else if ( request.length > 1 ) {
-	  console.log('发送多个')
 	  result = await proxy(request, this.returnType)
 	}
 	return result
@@ -79,10 +77,8 @@ export class Api {
 
   judgeSend (send) {
 	if ( this.apply && send ) {
-	  console.log('发送')
 	  return new Promise(resolve => resolve(this.send()))
 	} else {
-	  console.log('不发送')
 	  return this
 	}
   }
@@ -94,7 +90,6 @@ async function proxy (request, returnType) {//批量请求发送
 	let expire = false
 	for ( let i = 0; i < results.length; i++ ) {
 	  if ( results[ i ].data.status === $status.TOKEN_EXPIRED ) {
-		console.log('token过期')
 		expire = true
 		break //token过期了，需要重新登录
 	  }
@@ -107,7 +102,6 @@ async function proxy (request, returnType) {//批量请求发送
 	  //token没有过去
 	  if ( !_.isEmpty(results) ) {
 		//成功请求到了数据
-		console.log('开始返回数据')
 		return pushData(results, request, returnType)
 	  } else {
 		//请求数据失败
@@ -121,7 +115,6 @@ async function proxy (request, returnType) {//批量请求发送
 
 async function proxyOne (request, returnType) {//单个请求
   return await proxy(request, returnType).then(result => {
-	console.log('proxyOne', result)
 	if ( returnType === RETURN_TYPE.Array ) {//提取数据
 	  return result[ 0 ]
 	} else {
@@ -147,31 +140,25 @@ function pushData (results, request, returnType) {//打包数据
 }
 
 function pack (request) {//打包
-  console.log('请求打包', request)
   let invokes = []
   for ( let i = 0; i < request.length; i++ ) {//封装函数与参数
 	invokes.push(new Promise((resolve) => {
 	  let call = Methods(request[ i ].requestMethod)
 	  if ( !_.isUndefined(request[ i ].header) ) {
 		//存在header
-		console.log('存在header', request[ i ].header)
 		if ( !_.isUndefined(request[ i ].params) ) {
 		  //存在params
-		  console.log('存在params', request[ i ].params)
 		  resolve(call(request[ i ].url, request[ i ].params, request[ i ].header))
 		} else {
 		  //不存在params
-		  console.log('不存在params')
 		  resolve(call(request[ i ].url, null, request[ i ].header))
 		}
 	  } else if ( !_.isUndefined(request[ i ].params) ) {
 		//不存在header，存在params
-		console.log('不存在header，存在params')
 
 		resolve(call(request[ i ].url, request[ i ].params))
 	  } else {
 		//header于params均不存在
-		console.log('header于params均不存在')
 		resolve(call(request[ i ].url))
 	  }
 	}))

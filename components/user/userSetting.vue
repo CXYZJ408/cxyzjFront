@@ -312,8 +312,8 @@
 	},
 	methods: {
 	  verify () {
-		$userApi.verifyUser(this.code).then((result) => {
-		  if ( result.status === this.$status.SUCCESS ) {
+		$userApi.verifyUser(this.code).then((result) => {//调用身份验证接口
+		  if ( result.status === this.$status.SUCCESS ) {//成功操作
 			this.$notify({
 			  title: '验证成功',
 			  message: '您成功完成了用户安全验证，请在五分钟内重置手机邮箱或密码！',
@@ -321,7 +321,7 @@
 			})
 			this.verifyDialog = false
 			this.isVerify = true
-		  } else if ( result.status === this.$status.CODE_ERROR ) {
+		  } else if ( result.status === this.$status.CODE_ERROR ) {//失败
 			this.$message.error('验证码错误！')
 		  } else {
 			this.$message.error('未知错误！')
@@ -499,7 +499,7 @@
 	  },
 	  modify () {
 		if ( this.which === 'email' ) {
-		  if ( this.$refs.email.validate() ) {//验证
+		  if ( this.$refs.email.validate() ) {//验证是否合法
 			$userApi.updateEmail(this.newEmail, this.user.user_id).then((result) => {
 			  if ( result.status === this.$status.SUCCESS ) {
 				this.user.email = result.data.email
@@ -643,9 +643,9 @@
 			if ( this.user.nickname.length < 3 ) {
 			  this.$message.warning('昵称太短啦！')
 			} else {
-			  $userApi.updateNickname(this.user.nickname).then((result) => {
-				if ( result.status === this.$status.SUCCESS ) {
-				  this.$store.commit('userCenter/updateNickname', this.user.nickname)
+			  $userApi.updateNickname(this.user.nickname).then((result) => {//调用更改昵称API接口
+				if ( result.status === this.$status.SUCCESS ) {//修改成功
+				  this.$store.commit('userCenter/updateNickname', this.user.nickname)//更新状态树信息
 				  this.$store.commit('setNickname', this.user.nickname)
 				  this.$notify({
 					title: '修改成功！',
@@ -654,13 +654,13 @@
 				  })
 				  this.show(0, false)
 				  this.editNickname = false
-				} else if ( result.status === this.$status.NICKNAME_EXIST ) {
+				} else if ( result.status === this.$status.NICKNAME_EXIST ) {//有重复的昵称
 				  this.$notify({
 					title: '修改失败！',
 					message: '该昵称已经存在了，换个吧！',
 					type: 'warning'
 				  })
-				} else {
+				} else {//修改失败
 				  this.$notify({
 					title: '修改失败！',
 					message: '未知错误，昵称修改失败！',

@@ -137,7 +137,6 @@
 		}
 	  },
 	  deleteArticle (index) {
-		console.log(index)
 		$articleApi.deleteArticle(this.nowArticleList[ index ].article.article_id, this.$store.state.userCenter.user.user_id).then(res => {
 		  if ( res.status === Status.SUCCESS ) {
 			this.$message.success('文章删除成功！')

@@ -354,10 +354,10 @@
           this.step = '2'
         } else if (!this.$refs.form2.validate()) {
           this.step = '3'
-        } else if (this.$refs.form3.validate()) {
-          if (this.strength < 75) {
+        } else if (this.$refs.form3.validate()&&this.valid) {
+          if (this.strength < 75) {//如果密码强度太低，则进行提示用户加强
             this.$message.warning('密码太简单啦，加强一下吧！')
-          } else {
+          } else {//通过验证后
             this.user.password = $md5(this.password1.split('').reverse().join(''))//将密码逆序同时进行md5处理
             $userApi.registerUser(this.user.nickname, this.user.email, this.user.password,
               this.user.gender, this.user.phone, this.user.head_url).then((res) => {
@@ -373,9 +373,9 @@
                 this.$message.warning('邮箱已经被注册啦，换个吧！')
               } else if (res.status === this.$status.SUCCESS) {
                 //注册成功
-                this.$store.commit('login', res.data)
-                $cookie.set('token', res.data.token,{expires: 7})
-                this.$router.push({path: `/`})
+                this.$store.commit('login', res.data)//将用户注册的信息存入状态树中
+                $cookie.set('token', res.data.token,{expires: 7})//将用户的token信息存入到本地，并设置保存7天
+                this.$router.push({path: `/`})//页面跳转至主页
               }
             })
           }

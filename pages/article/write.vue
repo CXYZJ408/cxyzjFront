@@ -73,7 +73,7 @@
                             <RecycleScroller
                                     :key="true"
                                     :items="articleList"
-                                    :item-height="50"
+                                    :item-size="50"
                                     :page-mode="true"
                                     key-field="article_id"
                             >
@@ -337,8 +337,6 @@
 		labels: [],
 		storageDB: '',
 		updateArticleIdSet: undefined,
-		updateArticleId: [],
-		newsArticleId: [],
 		changing: false,
 		showList: true,
 		showNonList: false
@@ -532,36 +530,26 @@
 		let articleMap = new Map()//预处理操作
 		let index = 0
 		_.forEach(this.articleList, (article) => {//将文章列表做一个映射处理
-		  let articleValue = {
-			index: index,
-			update_time: article.update_time,
-			value: article
-		  }
+		  let articleValue = { index: index, update_time: article.update_time, value: article }
 		  articleMap.set(article.article_id, articleValue)
 		  index++
 		})
 		return Promise.resolve(this.storageDB.then(store => {
 		  store.iterate((articleValue, articleKey) => {//遍历本地数据
-			if ( !_.isUndefined(articleValue.isNews) ) {
-			  //本地新建的，但没有上传的文章
-			  if ( !this.isInitArticle(articleValue) ) {
-				//如果不是初始化的文章
+			if ( !_.isUndefined(articleValue.isNews) ) {			  //本地新建的，但没有上传的文章
+			  if ( !this.isInitArticle(articleValue) ) {//如果不是初始化的文章
 				this.articleList.push(articleValue)//将数据添加到列表中
 				this.addArticleId(articleKey)
-			  } else {
-				//是初始化的文章则删除掉
+			  } else {//是初始化的文章则删除掉
 				store.removeItem(articleKey)
 			  }
-			} else {
-			  //服务器已经有的，但本地有新版本没上传
+			} else {//服务器已经有的，但本地有新版本没上传
 			  let articleTemp = articleMap.get(articleKey)//从文章列表元素中读取服务器文章的数据信息
 			  let compareResult = this.compareArticleVersion(articleTemp, articleValue)//比较版本信息
-			  if ( compareResult === 2 ) {
-				//本地数据更新
+			  if ( compareResult === 2 ) {//本地数据更新
 				this.articleList.splice(articleTemp.index, 1, articleValue)
 				this.addArticleId(articleKey)
-			  } else {
-				//服务器数据更新，忽略相等情况，删除本地版本
+			  } else {//服务器数据更新，忽略相等情况，删除本地版本
 				store.removeItem(articleKey)
 			  }
 			}
@@ -595,20 +583,19 @@
 		}
 	  },
 	  handlePublish () {
-		this.handleAutoSave(false)
-		let labelId = this.article.label.label_id
+		this.handleAutoSave(false)//关闭自动保存机制
+		let labelId = this.article.label.label_id//读取标签信息
 		if ( labelId === -1 ) {
 		  this.$message.warning('请选择文章标签！')
 		} else if ( this.edit < 0 ) {
 		  this.$message.error('请选择要发布的文章！')
 		} else {
 		  this.deleteArticleId(this.article.article_id)//删除要发布的文章id
-		  if ( !_.isUndefined(this.article.isNews) ) {
-			//是一篇新的文章
-			this.article.article_id = Constant.NEWS
+		  if ( !_.isUndefined(this.article.isNews) ) {//是一篇新的文章
+			this.article.article_id = Constant.NEWS//设置id为0
 		  }
-		  if ( this.article.status_id === Constant.DRAFT ) {
-			this.publish().then((res) => {
+		  if ( this.article.status_id === Constant.DRAFT ) {//是草稿
+			this.publish().then((res) => {//进行发布
 			  this.afterPublish(res)
 			}).catch((error) => {
 			  console.log(error)
@@ -623,8 +610,8 @@
 		let articleSummary = this.getArticleSummary()
 		let thumbnail = this.getThumbnail()
 		return new Promise((resolve, reject) => {
-		  $articleApi.publishArticle(this.article.title, this.article.text, this.article.label.label_id, articleSummary, thumbnail,
-			this.article.article_id, this.$store.state.user.user_id).then(res => {
+		  $articleApi.publishArticle(this.article.title, this.article.text, this.article.label.label_id,
+			articleSummary, thumbnail, this.article.article_id, this.$store.state.user.user_id).then(res => {
 			if ( res.status === Status.SUCCESS ) {
 			  //上传成功
 			  resolve(res.data)
@@ -634,7 +621,7 @@
 		  })
 		})
 	  },
-	  afterPublish (data) {
+	  afterPublish (data) {//处理文章发布后
 		this.beforeLeave().then(() => {
 		  this.article.article_id = data.article_id
 		  let publishedArticle = {
@@ -645,26 +632,25 @@
 		  this.$router.push({ path: '/article/published' })
 		})
 	  },
-	  uploadDrafts () {
-		console.log('uploadDrafts')
+	  uploadDrafts () {//上传草稿数据
 		if ( this.updateArticleIdSet.size === 0 ) {//没有要更新的值
 		  return Promise.resolve()
 		}
 		let articleList = []
 		if ( this.updateArticleIdSet.size === 0 ) return Promise.resolve(true)
-		for ( let articleId of this.updateArticleIdSet.values() ) {
+		for ( let articleId of this.updateArticleIdSet.values() ) {//遍历数据
 		  articleList.push(this.getLocalArticleData(articleId))//根据id到本地数据库获取每一个文章的信息
 		}
 		return Promise.all(articleList).then(articles => {
-		  let drafts = []
+		  let drafts = []//待上传草稿列表
 		  _.forEach(articles, article => {
 			if ( !this.isInitArticle(article) ) {//不是初始化文章
 			  if ( !_.isUndefined(article.isNews) ) {//本地新建的文章
 				article.article_id = Constant.NEWS
 			  }
-			  drafts.push(new Draft(article.article_id, this.$store.state.user.user_id, article.title, article.update_time, article.label.label_id, article.text))
-			}
-		  })
+			  drafts.push(new Draft(article.article_id, this.$store.state.user.user_id,
+				article.title, article.update_time, article.label.label_id, article.text))//添加草稿数据
+			}})
 		  return new Promise(resolve => {
 			if ( drafts.length > 0 ) {
 			  $articleApi.draftsUpdateBatch(drafts, this.$store.state.user.user_id).then(res => {//批量请求更新
@@ -672,19 +658,17 @@
 				  this.clearLocalDataBase().then(() => {
 					resolve(true)
 				  })//删除数据库中不是初始化的文章
-				}
-			  })
-			} else {
+				}})} else {
 			  resolve(true)
 			}
 		  })
 		})
 	  },
-	  beforeLeave () {
+	  beforeLeave () {//离开前的操作
 		return new Promise(resolve => {
-		  this.uploadDrafts().then((res) => {
+		  this.uploadDrafts().then((res) => {//上传所有编辑过的文章操作信息
 			this.storageDB.then(store => {
-			  store.clear().then(() => {
+			  store.clear().then(() => {//清空本地数据库
 				resolve(res)
 			  })
 			})
@@ -775,28 +759,28 @@
 		}
 	  },
 	  handleUpload (option) {
-		let file = option.file
-		let fileType = file.name.substring(file.name.lastIndexOf('.') + 1)
-		if ( fileType === 'md' || fileType === 'txt' ) {//上传文章
-		  this.handleMarkdownTxt(file)
+		let file = option.file//获取上传的文件
+		let fileType = file.name.substring(file.name.lastIndexOf('.') + 1)//读取文件类型
+		if ( fileType === 'md' || fileType === 'txt' ) {//如果类型为md或txt，则上传文章
+		  this.handleMarkdownTxt(file)//处理文章上传
 		  return Promise.resolve(true)
 		} else {//上传图片
-		  if ( this.edit < 0 ) {
-		    this.$message.warning('请先选择一篇文章以添加图片！')
+		  if ( this.edit < 0 ) {//如果当前未选择文章进行编辑
+			this.$message.warning('请先选择一篇文章以添加图片！')
 			return false
-          }else{
+		  } else {//调用图片上传方法
 			this.$refs.markdown.$refs.toolbar_left.$imgFileAdd(file)
 			return Promise.resolve(true)
-          }
+		  }
 		}
 	  },
-	  handleMarkdownTxt (file) {
+	  handleMarkdownTxt (file) {//处理文章上传
 		let fileRead = new FileReader()
-		fileRead.readAsText(file)
-		fileRead.onload = () => {
-		  this.handleCreate().then(() => {
-			this.article.title = file.name.substring(0, file.name.lastIndexOf('.'))
-			this.article.text = fileRead.result
+		fileRead.readAsText(file)//将数据作为text类型读取
+		fileRead.onload = () => {//加载数据
+		  this.handleCreate().then(() => {//创建一篇新的文章来存放新上传的文章数据
+			this.article.title = file.name.substring(0, file.name.lastIndexOf('.'))//读取上传的文件名作为文章名
+			this.article.text = fileRead.result//将上传的文件数据进行填充
 		  })
 		}
 	  },
@@ -817,37 +801,36 @@
 		  this.changing = true
 		}
 	  },
-	  handleAutoSave (run) {
-		if ( run ) {//运行
+	  handleAutoSave (run) {//处理文章自动保存机制
+		if ( run ) {//判断是否运行自动保存机制
 		  this.autoSave = setInterval(() => {
-			if ( this.changing ) {
-			  this.changing = false
-			} else {
-			  this.save()
+			if ( this.changing ) {//判断是否正在修改
+			  this.changing = false//如果正在修改则不保存，待下次在保存修改
+			} else {//不处于修改的状态中
+			  this.save()//执行保存操作
 			}
-		  }, 600)
+		  }, 600)//每600ms执行一次
 		} else {
-		  clearInterval(this.autoSave)
+		  clearInterval(this.autoSave)//清除自动保存机制
 		}
 	  },
-	  save () {
-		if ( this.edit < 0 ) {this.hasSave = true}
-		if ( !this.hasSave ) {
+	  save () {//保存文章
+		if ( this.edit < 0 ) {this.hasSave = true}//判断当前文章编号是否合法
+		if ( !this.hasSave ) {//没有保存过
 		  let articleId = this.article.article_id//文章id
 		  //更新文章信息
 		  this.articleList[ this.edit ].title = this.article.title//更新文章标题
 		  this.article.status_id = Constant.DRAFT//更改文章status状态
-		  this.articleList[ this.edit ].status_id = Constant.DRAFT
+		  this.articleList[ this.edit ].status_id = Constant.DRAFT//修改列表信息状态
 		  this.article.update_time = new Date().getTime()//更新时间
 		  this.addArticleId(articleId)//将id加入set中
-		  this.hasSave = true
+		  this.hasSave = true//设置已保存
 		  return Promise.resolve(this.storageDB.then(store => {
-			store.setItem(this.article.article_id, this.article)
+			store.setItem(this.article.article_id, this.article)//将数据存入本地数据库中
 		  }))
 		}
 		return Promise.resolve(true)
 	  },
-	  // todo 待修改
 	  /**
 	   * 删除文章操作
 	   *

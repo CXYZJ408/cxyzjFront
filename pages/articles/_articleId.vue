@@ -295,6 +295,7 @@
 			this.enterFullScreen()
 		  }
 		}, false)
+
 		document.addEventListener('mozfullscreenchange', () => {
 		  this.readModel = !this.readModel
 		  console.log(this.readModel)

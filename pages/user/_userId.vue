@@ -46,7 +46,7 @@
 			  this.$store.commit('userCenter/setUser', res.data.user)
 			  this.$store.commit('setBackground', `background-image:url(${ res.data.user.bg_url})`)
 			} else if ( res.status === Status.NONE_USER ) {
-			  //todo 跳转404
+			  //todo 跳转4041
 			}
 		  }).catch((e) => {
 			//todo 跳转500
