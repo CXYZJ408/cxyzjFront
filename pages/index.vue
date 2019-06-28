@@ -28,7 +28,7 @@
                 <v-flex md9 xl7>
                     <v-card id="main">
                         <v-layout row wrap justify-center align-center>
-                            <v-flex md2 class="headline green--text mt-3 pl-5">
+                            <v-flex md2 class=" green--text mt-3 pl-5" style="font-size: 22px">
                                 <strong class="mt-1 ">热门文章</strong>
                             </v-flex>
                             <v-flex md9 class="mt-3">
